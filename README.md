@@ -12,6 +12,8 @@ At work we use **GitHub Copilot CLI**. We use **Claude Code** as the reference, 
 | **2. The ecosystem** | What an LLM wiki is, and a tour of [agentic-ai-wiki](https://github.com/ndjordjevic/agentic-ai-wiki), our map of tools around coding agents. | [part2-llm-wiki.md](part2-llm-wiki.md) |
 | **3. Staying up to date** | The YouTube channels and newsletter worth following. | [part3-staying-up-to-date.md](part3-staying-up-to-date.md) |
 
+**Extra reading (not part of the training):** [The AI-native SDLC Playbook](ai-native-sdlc-playbook.md), a short summary of Anthropic's course on changing the whole development process for AI, with one example feature followed through every stage.
+
 ## Files
 
 ```
@@ -26,6 +28,7 @@ part1-tab6-reference.md
 part2-llm-wiki.md               Part 2A: LLM wikis and pin-llm-wiki
 part2-agentic-ai-wiki.md        Part 2B: a tour of agentic-ai-wiki
 part3-staying-up-to-date.md     Part 3: channels and newsletters
+ai-native-sdlc-playbook.md      extra: summary of the AI-native SDLC course
 ```
 
 ## Docs
