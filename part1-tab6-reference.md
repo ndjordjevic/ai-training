@@ -32,6 +32,8 @@ For Copilot, most of this lives on one big page: the [Copilot CLI command refere
 - **Health check:** `claude doctor`. Update: `claude update`.
 - **`claude --help` doesn't list every flag.** This page does.
 
+**Copilot note:** `copilot -i "task"` starts a chat and runs the first prompt. `copilot help <topic>` prints short guides in the terminal (topics include `permissions`, `config`, `providers` and `sandbox`). `copilot completion zsh` adds tab completion for bash, zsh or fish.
+
 ---
 
 #### 145. Commands (Study)
@@ -57,6 +59,8 @@ For Copilot, most of this lives on one big page: the [Copilot CLI command refere
 - **Between tasks:** `/clear`, `/resume`, `/branch` to try another direction.
 - **When something is wrong:** `/rewind`, `/doctor`, `/debug`.
 - **Most have a Copilot twin:** `/init`, `/plan`, `/model`, `/context`, `/compact`, `/btw`, `/diff`, `/review`, `/clear`, `/resume`, `/rewind`.
+
+**Copilot note:** Copilot-only commands worth knowing: `/env` (everything that loaded), `/fleet` (parallel subagents), `/rubber-duck` (a second opinion from another model), `/delegate` (hand the task to the cloud agent, which opens a PR), `/chronicle` (search past sessions) and `/tasks` (running subagents and shells).
 
 ---
 
@@ -123,6 +127,8 @@ For Copilot, most of this lives on one big page: the [Copilot CLI command refere
 - **LSP gives real code navigation** and reports type errors after each edit.
 - **Ask "What tools do you have?"** in a session to see the list.
 
+**Copilot note:** Copilot's tool names are lowercase: `bash`, `view`, `edit`, `create`, `task` (subagents), `grep`, `glob`, `web_fetch`. You use them with `--available-tools` and `--excluded-tools`. Permission rules use a different form: `shell(...)`, `write(...)`, `url(...)`.
+
 ---
 
 #### 148. Interactive mode (Study)
@@ -163,6 +169,8 @@ For Copilot, most of this lives on one big page: the [Copilot CLI command refere
 - **`/btw`** asks a side question without adding it to the conversation.
 - **Copilot uses the same keys:** `@`, `!`, Esc, Shift+Tab, Ctrl+O, and `/btw` (or `/ask`).
 
+**Copilot note:** Copilot has a few extra keys: `#123` adds a GitHub issue or PR to the prompt, `?` on an empty prompt opens quick help, and `Ctrl+Q` queues a message while the agent works. To send a running task to the background, press `Ctrl+X` then `b` (Claude uses `Ctrl+B`).
+
 ---
 
 #### 149. Checkpointing (Study)
@@ -187,6 +195,8 @@ For Copilot, most of this lives on one big page: the [Copilot CLI command refere
 - **Not tracked:** files changed by shell commands (`rm`, `mv`, `cp`), and most subagent edits.
 - **Checkpoints are not git.** Still commit your good work.
 - **Copilot has the same thing:** Esc Esc, `/undo` or `/rewind`.
+
+**Copilot note:** Copilot's rewind has limits too. Files over 10 MB, and turns that changed more than 500 files, are not captured. A file you edited yourself after Copilot is skipped, so your edits are kept. Rewind doesn't work in remote sessions.
 
 ---
 
@@ -218,6 +228,8 @@ For Copilot, most of this lives on one big page: the [Copilot CLI command refere
 - **A hook runs with your full user rights.** Read any hook before you add it.
 - **Debug with `claude --debug`** and check the log.
 - **Copilot reads Claude's hook format too,** including hooks in `.claude/settings.json`.
+
+**Copilot note:** in Copilot, a prompt hook on `sessionStart` types a prompt or slash command for you when a new session starts. Admins can add policy hooks that load first and that you can't turn off. To pause your own hooks without deleting them, set `disableAllHooks`.
 
 ---
 

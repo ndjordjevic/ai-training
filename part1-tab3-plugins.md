@@ -31,6 +31,8 @@ A plugin is a package that bundles skills, subagents, hooks and MCP servers so a
 - **A marketplace is a catalog** (a git repo). Install with `plugin@marketplace`.
 - **Scopes:** you (all projects), the whole repo (project), or you in this repo (local).
 
+**Copilot note:** Copilot can also install a plugin straight from a GitHub repo, with no marketplace: `copilot plugin install owner/repo`. If a plugin has a skill or agent with the same name as one in your repo or your personal setup, yours wins and the plugin's is ignored.
+
 ---
 
 ### Group: Use plugins
@@ -61,6 +63,8 @@ A plugin is a package that bundles skills, subagents, hooks and MCP servers so a
 - **Third-party marketplaces don't auto-update** by default.
 - **Copilot CLI has almost the same commands** (`/plugin`, `copilot plugin install`).
 
+**Copilot note:** in Copilot, the shell commands are `copilot plugin list`, `update --all`, `disable`, `enable` and `uninstall`. Our org can pin plugins through managed settings; those show a **Managed** badge in `/plugin`, and you can't turn them off.
+
 ---
 
 #### 65. Anthropic's marketplaces (Glance)
@@ -83,6 +87,8 @@ A plugin is a package that bundles skills, subagents, hooks and MCP servers so a
 - **Anthropic's official marketplace** is added automatically. It has plugins from Anthropic and partners.
 - **Community and demo marketplaces** can be added by hand.
 - **Everything else is third-party.** Read it before you install.
+
+**Copilot note:** Copilot comes with two marketplaces: `copilot-plugins` and `awesome-copilot`. Plugins from these two update by themselves at the start of each session. You can add Anthropic's marketplace too: `copilot plugin marketplace add anthropics/claude-code`.
 
 ---
 
@@ -136,6 +142,8 @@ A plugin is a package that bundles skills, subagents, hooks and MCP servers so a
 - **Before installing:** check the source, and read its hooks, `.mcp.json` and `bin/` files.
 - **Fake "official" marketplaces are refused;** everything not from Anthropic is third-party.
 - **The same risk applies to Copilot plugins.**
+
+**Copilot note:** Copilot has no plugin security page, so use the same checks. One extra risk: plugins from the two built-in marketplaces update by themselves at session start, so a plugin can change without you doing anything. Turn this off with the `autoUpdate` setting set to `false`.
 
 ---
 
@@ -192,6 +200,8 @@ A plugin is a package that bundles skills, subagents, hooks and MCP servers so a
 - **Put instructions in a skill.** A `CLAUDE.md` inside a plugin is not loaded.
 - **`userConfig`** asks users for values like API keys at install time.
 - **After changes:** `claude plugin validate .` and `/reload-plugins`.
+
+**Copilot note:** in a Copilot plugin, language servers go in `lsp-config/servers.json` (or `lspServers` in `plugin.json`). Skills load only from the `skills/` folder.
 
 ---
 
@@ -563,6 +573,8 @@ A plugin is a package that bundles skills, subagents, hooks and MCP servers so a
 - **`claude plugin …`** does the same from the shell or scripts (install, list, update, validate).
 - **`/reload-plugins`** applies changes without restarting.
 - **`--plugin-dir`** loads a plugin for one session.
+
+**Copilot note:** Copilot has no `validate` command. To test a plugin, install it from its folder (`copilot plugin install ./my-plugin`) or load it with `--plugin-dir`. `/plugin` marks plugins that have a newer version and offers an Update action.
 
 ---
 

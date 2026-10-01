@@ -95,6 +95,8 @@
 - **Check your version** with `claude --version` (or `copilot --version`) and keep it updated.
 - **To spot new features,** read only the "Added" lines of the last few versions.
 
+**Copilot note:** you don't need the browser. In a session, `/changelog summarize last 3` gives a short summary of the last three versions, and `/update` installs the latest one.
+
 ---
 
 
@@ -147,6 +149,8 @@ This is the most important group in Part 1. It explains how every coding agent w
 - **Context window:** everything goes in it. When full, it compacts and early details can get lost. `/context` shows usage.
 - **Two safety nets:** checkpoints (`Esc Esc` undoes file edits, not deploys or databases) and permission modes (`Shift+Tab`).
 - **Work style:** iterate instead of restarting, and delegate the goal, not every step.
+
+**Copilot note:** in Copilot, press `Esc` twice while the agent is idle to open the rewind picker. You choose to rewind only the chat, or the chat and the files. It works outside git repos too. `Ctrl+C` is the hard stop: it cancels at once.
 
 ---
 
@@ -248,6 +252,8 @@ This is the most important group in Part 1. It explains how every coding agent w
 - **Habits:** `/clear` between tasks, `/compact focus on X` before a big task, send research to a subagent.
 - **`/context`** shows what fills it. It works in Copilot CLI too.
 
+**Copilot note:** Copilot starts compacting by itself at about 80% full, in the background, so you rarely wait. Each summary is saved as a checkpoint; `/session checkpoints` lists them. Tool output over 20 KiB goes to a file, and the agent gets only a preview.
+
 ---
 
 
@@ -280,6 +286,8 @@ This is the most important group in Part 1. It explains how every coding agent w
 - **These break the cache,** so the next turn is slower and costs more: switching models, adding or removing MCP servers or plugins, compacting.
 - **Editing `CLAUDE.md` mid-session doesn't apply** until `/clear`, `/compact` or a restart.
 - **Rule for any tool:** pick the model at the start of a task and don't switch in the middle.
+
+**Copilot note:** Copilot uses prompt caching too, but you can't see or control it, and its docs don't list what breaks it. The same habits are a safe bet: one model per task, and no adding MCP servers in the middle.
 
 ---
 
@@ -444,6 +452,8 @@ How to work with an agent day to day. The habits here matter more than any singl
 - **The six patterns behind them:** describe the outcome; ask it to check its work; point at an example; give a measurable target; paste the real error or log; say how you want the answer.
 - **These patterns work in any agent.**
 
+**Copilot note:** Awesome Copilot is more than prompts. It has hundreds of community agents, instructions, skills and plugins. Its marketplace is already set up in Copilot CLI: `copilot plugin install <name>@awesome-copilot`. Third parties write them, so read one before you install it.
+
 ---
 
 
@@ -529,6 +539,8 @@ The same agent runs in many places: terminal, IDE, desktop app, web, phone and C
 - **Local vs cloud:** local uses your machine and files; cloud keeps running when your laptop is closed.
 - **Integrations:** Chrome, GitHub Actions, GitLab, Code Review, Slack, and anything else through MCP.
 
+**Copilot note:** Copilot has the same spread: the CLI, the GitHub Copilot app (a desktop app built on the CLI that runs parallel sessions, each on its own branch), Copilot in VS Code and JetBrains, and the cloud agent on GitHub. In Business and Enterprise, the app has its own admin policy, on by default.
+
 ---
 
 
@@ -560,6 +572,8 @@ The same agent runs in many places: terminal, IDE, desktop app, web, phone and C
 - **Safe:** no open ports, and your files stay local.
 - **Needs a claude.ai login** and the terminal must stay open.
 - **Copilot CLI has the same feature** (github.com or GitHub Mobile).
+
+**Copilot note:** turn it on with `/remote on`, or start with `copilot --remote`. `/keep-alive` stops your machine from sleeping while you're away. Your sessions sync to GitHub by default, but only as read-only views; you can steer one only with remote control on.
 
 ---
 
@@ -656,6 +670,11 @@ The same agent runs in many places: terminal, IDE, desktop app, web, phone and C
 - **Create one** at claude.ai/code/routines or with `/schedule daily PR review at 9am`.
 - **Write a self-contained prompt.** Nobody is there to answer questions.
 - **A green run only means it didn't crash.** Open it to check the result.
+
+**Copilot note:** Copilot has two versions:
+
+- **Automations** run the cloud agent on a schedule (hourly, daily or weekly) or when an issue or PR opens. They work only in private or internal repos, and the cloud agent must be on for the repo.
+- **In the CLI,** `/every 1h <prompt>` repeats a prompt and `/after 30m <prompt>` runs it once later. They run only while the session is open, and they are experimental (`/experimental on`).
 
 ---
 
@@ -1008,6 +1027,8 @@ The same agent runs in many places: terminal, IDE, desktop app, web, phone and C
 - **They share history:** `claude --resume` in the terminal continues a panel conversation.
 - **Both tools connect a CLI to VS Code with `/ide`.**
 
+**Copilot note:** Copilot CLI connects by itself when you start it in a folder that is open in VS Code. Then you can select code and just say "debug this", and edits open as diffs in VS Code with accept and reject buttons. The Copilot version of the Claude extension is Copilot Chat, built into VS Code.
+
 ---
 
 
@@ -1164,6 +1185,8 @@ The same agent runs in many places: terminal, IDE, desktop app, web, phone and C
 - **Setup:** `/install-github-app`.
 - **Keep keys in GitHub Secrets,** give minimal permissions, and limit cost with `--max-turns`.
 - **Copilot CLI also runs in Actions** with `-p`.
+
+**Copilot note:** GitHub recommends [GitHub Agentic Workflows](https://docs.github.com/en/copilot/how-tos/copilot-cli/automate-copilot-cli/automate-with-actions#recommended-approach-github-agentic-workflows) over calling `copilot -p` in a workflow step, because they add guardrails. In org repos, use the built-in `GITHUB_TOKEN`, not a personal token: there's no long-lived secret, and the org pays. An org owner must turn on that billing policy.
 
 ---
 

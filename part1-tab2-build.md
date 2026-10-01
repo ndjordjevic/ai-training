@@ -32,6 +32,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - **Worktrees keep parallel edits apart.**
 - **Every extra agent costs tokens.**
 
+**Copilot note:** Copilot's main tool for parallel work is `/fleet`. The main agent splits a plan into parts and runs subagents on them at the same time. Subagents use a low-cost model by default, and more agents mean more AI credits. After plan mode, choose "Accept plan and build on autopilot + /fleet".
+
 ---
 
 
@@ -131,6 +133,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - **Costs much more than one session.**
 - **Copilot's closest match is** `/fleet`**.**
 
+**Copilot note:** `/fleet` is not a real team. The main agent splits the work and coordinates it; the docs don't describe subagents messaging each other or sharing a task list. You can point a part of the work at one of your custom agents with `@agent-name`.
+
 ---
 
 
@@ -193,6 +197,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - **Good for:** audits of many files, big migrations, "keep fixing until tests pass".
 - **Costs a lot of tokens.** Test on a small slice first.
 
+**Copilot note:** Copilot has `copilot workflow run <name>`, which runs a saved dynamic workflow with no chat, takes JSON arguments, and can print JSON. The docs only describe the command, not how to write a workflow. For everyday parallel work, use `/fleet`.
+
 ---
 
 
@@ -225,6 +231,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - **It's a fresh checkout:** install dependencies, and list files like `.env` in `.worktreeinclude`.
 - **A clean worktree is removed on exit;** one with changes asks first.
 - **Copilot CLI has the same:** `copilot --worktree <name>`.
+
+**Copilot note:** Copilot can also switch mid-session. `/worktree <branch>` moves the session to a new worktree, `/move` takes your uncommitted changes with you, and `/fork worktree` copies the chat into a new worktree. Worktrees go in `<repo>.worktrees/` by default.
 
 ---
 
@@ -275,6 +283,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - **Only add servers you trust,** and remove unused ones; they cost context.
 - **Copilot CLI:** `/mcp add`; the GitHub server is built in.
 
+**Copilot note:** Copilot keeps your personal servers in `~/.copilot/mcp-config.json`, and it also reads the repo's `.mcp.json`. So one team file serves both tools. If our org has an MCP allowlist, only allowed servers will run.
+
 ---
 
 
@@ -311,6 +321,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - **Use** `${ENV_VAR}` **in** `.mcp.json` so secrets stay out of git.
 - **Tool search (on by default)** loads tool details only when needed, so many servers cost little context.
 - **Large tool outputs can fill your context;** you get a warning above 10,000 tokens.
+
+**Copilot note:** Copilot's tool search turns on only when you have about 30 tools or more, and only on recent Claude and GPT models. To keep one server's tools always loaded, set `deferTools: "never"` on it. Tool output over 20 KiB is saved to a file, and the agent gets a preview.
 
 ---
 
@@ -361,6 +373,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - **Key settings:** a clear `description`; `disable-model-invocation: true` for anything with side effects (like deploy).
 - **Rule of thumb:** facts go in `CLAUDE.md`, procedures go in skills.
 - **Same** `SKILL.md` **works in Copilot CLI** (open standard).
+
+**Copilot note:** Copilot reads skills from `.github/skills/`, `.claude/skills/` or `.agents/skills/` in the repo, and `~/.copilot/skills/` for you. `/skills list` shows them; `/skills reload` picks up a new one without a restart. `allowed-tools` in the frontmatter skips approval for those tools; never pre-approve `shell` for a skill you don't fully trust.
 
 ---
 
@@ -447,6 +461,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - **Where:** `.claude/settings.json` (team) or `~/.claude/settings.json` (you). The easiest way is to ask the agent to write one.
 - **Copilot CLI:** `.github/hooks/`, and it also reads Claude's hooks.
 
+**Copilot note:** Copilot names events in camelCase (`preToolUse`, `agentStop`), but it also accepts Claude's names like `PreToolUse` with Claude's matchers, and it reads hooks in `.claude/settings.json`. So a Claude Code hook usually works as is. Personal hooks go in `~/.copilot/hooks/`.
+
 ---
 
 
@@ -507,6 +523,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - **Stops when the session ends;** recurring tasks expire after 7 days.
 - **Copilot CLI:** `/every` and `/after`.
 
+**Copilot note:** in Copilot these are experimental (`/experimental on`). `/loop` is another name for `/every`. `/every` with no interval lets the agent pick the pace and stop by itself, so watch it. You can also schedule a skill: `/every 1d /my-skill`.
+
 ---
 
 
@@ -535,6 +553,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - **Works in scripts too** (`claude -p "/goal …"`).
 - **Copilot CLI has** `/goal` **too** (autopilot).
 
+**Copilot note:** in Copilot, `/goal <objective>` starts autopilot. Unlike Claude Code, there is no separate checker: the agent stops when it thinks it's done, or after 5 automatic steps by default (`--max-autopilot-continues`). Cap the cost with `/goal <objective> --max-ai-credits 5`.
+
 ---
 
 
@@ -562,6 +582,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - `--output-format json` for scripts (includes the cost).
 - `--bare` skips your local setup, so results are the same on every machine.
 - **Copilot CLI:** `copilot -p`, `-s`, `--allow-tool`.
+
+**Copilot note:** for scripts, add `-s` (clean output, no session info), `--no-ask-user` (it decides instead of stopping to ask) and `--output-format json`. Grant only what the task needs, for example `--allow-tool='shell(git:*)'`. Use `--allow-all` only in a sandbox.
 
 ---
 
@@ -639,6 +661,8 @@ This is where the agent goes from "chat that edits code" to a tool you can shape
 - **Short root** `CLAUDE.md` **+ one per package.** Skip areas you never touch with `claudeMdExcludes`.
 - **Read less:** block generated or vendored code, and add a language server plugin.
 - **For changes across packages:** do it all in one session and plan first.
+
+**Copilot note:** Copilot reads `AGENTS.md` and `CLAUDE.md` in every folder from the repo root down to where you work, so one file per package works the same. For rules that match files across folders, use `.github/instructions/*.instructions.md` with an `applyTo` glob. `/instructions` turns off files you don't need.
 
 ---
 
@@ -729,6 +753,8 @@ Use these when something breaks. No need to read them ahead of time, except "Deb
 - **Tools:** `/context`, `/memory`, `/status`, `/mcp`, `/hooks`, `/doctor`, and `--safe-mode` (everything off).
 - **Common mistakes:** a lowercase hook matcher (`bash` instead of `Bash`), a skill file not in its own folder, `.mcp.json` inside `.claude/`.
 - **Copilot CLI:** `/context`, `/instructions`, `/mcp`, `/skills`.
+
+**Copilot note:** in Copilot, `/env` shows everything that loaded in one list: instructions, MCP servers, skills, agents, hooks and plugins. `/diagnose` reads the session log and looks for errors.
 
 ---
 

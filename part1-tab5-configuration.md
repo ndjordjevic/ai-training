@@ -71,6 +71,8 @@ This tab is about tuning the agent: where settings live, what it may do without 
 - **Some keys are managed-only.** Setting them in your own file does nothing.
 - **Come back here** when you need one key.
 
+**Copilot note:** in Copilot, `/settings` changes a setting inside a session (`/settings KEY VALUE` sets one value). Its **Problems** tab lists typos and invalid keys in your `settings.json`. `copilot help config` prints a quick reference in the terminal.
+
 ---
 
 #### 121. Example settings files (Glance)
@@ -90,6 +92,8 @@ This tab is about tuning the agent: where settings live, what it may do without 
 - **Team file:** shared permission rules, hooks and plugins, committed to the repo.
 - **Company file:** locked rules nobody can override.
 - **Copy one and delete what you don't need.**
+
+**Copilot note:** Copilot has no page of example files. Settings worth a look for your personal file: `beep` (a sound when Copilot needs you), `includeCoAuthoredBy` (the co-author line on commits), `footer.showBranch` and `theme`. The team file is `.github/copilot/settings.json`.
 
 ---
 
@@ -129,6 +133,8 @@ This tab is about tuning the agent: where settings live, what it may do without 
 - **Access starts at the launch folder.** Add more with `--add-dir` or `/add-dir`.
 - **Copilot rule format:** `shell(git:*)`, `write(src/*.ts)`, `url(github.com)`, used with `--allow-tool` and `--deny-tool`. Deny always wins there too.
 
+**Copilot note:** when you choose "don't ask again", Copilot saves it per folder in `~/.copilot/permissions-config.json`. `--allow-tool` flags last only for that session. `/reset-allowed-tools` takes back what you granted. `--available-tools` hides tools completely, so the model can't even try them.
+
 ---
 
 #### 123. Choose a permission mode (Study)
@@ -160,6 +166,8 @@ This tab is about tuning the agent: where settings live, what it may do without 
 - **Bypass only inside a container or VM.** Some paths (like `.git`) still ask in most modes.
 - **Copilot:** Shift+Tab cycles standard, plan and autopilot. `--allow-all` is its bypass.
 
+**Copilot note:** in autopilot, Copilot still can't do anything that needs permission unless you also grant it, with `--allow-all` (or `/allow-all` mid-session). Copilot has no auto mode with a safety checker. The closest to "don't ask" for scripts is `--no-ask-user`, which stops it asking questions.
+
 ---
 
 #### 124. Configure the sandboxed Bash tool (Study)
@@ -188,6 +196,8 @@ This tab is about tuning the agent: where settings live, what it may do without 
 - **It covers shell commands only,** not the file tools or MCP servers.
 - **It is not a full wall.** For untrusted code, use a container or VM.
 - **Copilot has `/sandbox` too.** It is deny-by-default and also covers MCP servers and file tools.
+
+**Copilot note:** run `/sandbox policy` to see exactly what the sandbox allows in your folder. Sandboxed commands can read the whole repo, so add deny rules for secret files. Remote MCP servers are not covered. On Windows it needs an Insiders build.
 
 ---
 
@@ -218,6 +228,8 @@ This tab is about tuning the agent: where settings live, what it may do without 
 - **Unattended or bypass mode:** a dev container, container or VM.
 - **Untrusted code:** a VM.
 - **Copilot offers two:** local sandboxing and cloud sandboxes.
+
+**Copilot note:** Copilot's cloud sandbox runs the whole session in a fresh Linux machine on GitHub: `copilot --experimental --cloud`. It is billed by usage, and it is off by default for orgs, so an admin must turn it on.
 
 ---
 
@@ -472,6 +484,8 @@ Cloud sessions run on Anthropic's machines, or on your company's own machines (s
 - **Switch with `/model`.** `/status` shows what you are on.
 - **Copilot:** `/model` picks the model and reasoning effort. `auto` lets Copilot choose (and costs less).
 
+**Copilot note:** in Copilot, `/model` changes only the current session by default. `/model --repo` saves a default model for the repo, and `/model --global` for all your future sessions. Some models have a long-context version: press Tab on the model in the picker.
+
 ---
 
 #### 135. Speed up responses with fast mode (Glance)
@@ -498,6 +512,8 @@ Cloud sessions run on Anthropic's machines, or on your company's own machines (s
 - **Use it for live debugging and quick back-and-forth.** Don't use it for long or background tasks.
 - **Turning it on mid-session reprices the whole context,** so decide early.
 - **Copilot lists an Opus "fast mode" model (preview)** in its model picker.
+
+**Copilot note:** in Copilot, fast mode is a separate model in the `/model` picker (an Opus "fast mode" model, in preview), not a toggle. Picking it is a model switch, so choose it at the start of a task.
 
 ---
 
@@ -529,6 +545,8 @@ Cloud sessions run on Anthropic's machines, or on your company's own machines (s
 - **Each call costs extra tokens,** at the advisor model's price.
 - **Experimental, and only on the Anthropic API.**
 - **Copilot's rubber duck is the same idea,** but it uses a different model family (for example GPT to review Claude). Ask for it with `/rubber-duck`.
+
+**Copilot note:** the rubber duck only reviews; it can't edit files or run commands. It sorts findings into blocking, non-blocking and suggestions, and skips style comments. Copilot asks it after planning, during big changes and after writing tests. You can also ask it yourself with `/rubber-duck`.
 
 ---
 
@@ -600,6 +618,8 @@ Cloud sessions run on Anthropic's machines, or on your company's own machines (s
 - **Paste huge logs into a file** and point the agent at it.
 - **Theme with `/theme`.** Vim mode is in `/config`.
 - **Copilot:** Shift+Enter for a newline, `/theme`, and `/vim`.
+
+**Copilot note:** if Shift+Enter doesn't add a new line, run `/terminal-setup`. `Ctrl+G` opens your prompt in your `$EDITOR`, which is handy for long prompts. Set `beep` to `true` to hear a sound when Copilot needs you.
 
 ---
 
@@ -688,6 +708,8 @@ Cloud sessions run on Anthropic's machines, or on your company's own machines (s
 - **You can mix voice and typing** in one prompt.
 - **Copilot has `/voice`** too.
 
+**Copilot note:** a big difference: Copilot turns speech into text **on your machine**, and your audio never leaves it. The first `/voice` downloads a voice runtime and a model. It doesn't work on Intel Macs.
+
 ---
 
 #### 142. Customize your status line (Glance)
@@ -715,6 +737,8 @@ Cloud sessions run on Anthropic's machines, or on your company's own machines (s
 - **Show context use.** It tells you when to `/clear` or `/compact`.
 - **Keep the script fast.** Cache slow commands like `git status`.
 - **Copilot's `/statusline`** turns built-in items on or off. A custom script also works, through the `statusLine` setting.
+
+**Copilot note:** Copilot's built-in items include the context window, your quota, AI credits used and code changes. Turn on the context window and AI credits used: they tell you when to `/compact` and what a task costs.
 
 ---
 

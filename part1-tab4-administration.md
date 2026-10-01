@@ -34,6 +34,8 @@ Three pages matter for everyone: **Manage costs** (112), **Security** (114) and 
 - **Run `/status` to see which company policy is active** on your machine.
 - **Copilot works the same way:** admins turn Copilot CLI on or off and pick the models you can use.
 
+**Copilot note:** only some org controls reach Copilot CLI: turning it on or off, the model list, content exclusion, MCP policies and org-wide custom agents. IDE-only policies don't apply. If you can't start the CLI, check that the org that gives you your Copilot license has it turned on. `/delegate` also needs the cloud agent policy.
+
 ---
 
 #### 85. Advanced setup (Glance)
@@ -61,6 +63,8 @@ Three pages matter for everyone: **Manage costs** (112), **Security** (114) and 
 - **Homebrew and WinGet installs don't auto-update.** Update them yourself.
 - **Copilot:** install with Homebrew, npm or WinGet. Update with `/update`.
 
+**Copilot note:** every Copilot installer has a prerelease version (for example `npm install -g @github/copilot@prerelease`), which is like Claude's `latest` channel. The npm install needs Node.js 22 or later. On macOS and Linux there's also a script: `curl -fsSL https://gh.io/copilot-install | bash`.
+
 ---
 
 #### 86. Authentication (Glance)
@@ -82,6 +86,8 @@ Three pages matter for everyone: **Manage costs** (112), **Security** (114) and 
 - **If `ANTHROPIC_API_KEY` is set, it wins over your login** and you pay API prices. A common surprise.
 - **Credentials live in the macOS Keychain,** or in a file only you can read on Linux.
 - **Copilot:** you log in with your GitHub account. `/user switch` changes accounts.
+
+**Copilot note:** Copilot has the same trap. `COPILOT_GITHUB_TOKEN`, `GH_TOKEN` or `GITHUB_TOKEN` in your shell silently wins over your login, so a token set for another tool can log you in as the wrong account. Classic tokens (`ghp_`) don't work at all; use a fine-grained token with the Copilot Requests permission.
 
 ---
 
@@ -108,6 +114,8 @@ Three pages matter for everyone: **Manage costs** (112), **Security** (114) and 
 - **Managed settings sit above everything,** including command-line flags.
 - **Debug a policy:** `/status` shows which source won; `claude doctor` shows what was dropped.
 - **Copilot now has managed settings too,** with the same three delivery paths, and Copilot CLI reads them.
+
+**Copilot note:** server-managed settings live in `copilot/managed-settings.json` in the enterprise's `.github-private` repo, and reach users within about an hour (a restart applies them at once). If the CLI can't reach the server and has no cached copy, those settings are off for that session. Rules that must always hold go through MDM or a file.
 
 ---
 
@@ -162,6 +170,8 @@ Three pages matter for everyone: **Manage costs** (112), **Security** (114) and 
 - **Levels:** no MCP, a fixed company set, or your own servers filtered by an allowlist or denylist.
 - **The denylist always wins,** wherever the server came from.
 - **Copilot:** the enterprise MCP allowlist is fail-closed. If the policy can't be checked, extra servers are blocked.
+
+**Copilot note:** in Copilot, the admin sets an MCP registry and an allowlist. The approved servers show up as a source you can browse when you add a server, and only allowed servers can run.
 
 ---
 
@@ -219,6 +229,8 @@ Three pages matter for everyone: **Manage costs** (112), **Security** (114) and 
 - **Make install one click.** Easy setup drives adoption.
 - **Start new users on Q&A and small fixes,** then bigger tasks.
 - **Copilot:** you can plug your own model keys into Copilot CLI (OpenAI, Azure OpenAI, Anthropic).
+
+**Copilot note:** to use your own model, set `COPILOT_PROVIDER_BASE_URL`, `COPILOT_PROVIDER_TYPE` (`openai`, `azure` or `anthropic`) and `COPILOT_PROVIDER_API_KEY` before you start `copilot`. It works with local models like Ollama too. The model must support tool calling. Company policies don't control these local keys, so check our rules before you send work code to another provider.
 
 ---
 
@@ -375,6 +387,8 @@ Three pages matter for everyone: **Manage costs** (112), **Security** (114) and 
 - **The firewall must allow** `api.anthropic.com` and a few other domains (listed on the page).
 - **Copilot uses the same variables:** `HTTPS_PROXY` and `NODE_EXTRA_CA_CERTS`.
 
+**Copilot note:** Copilot reads the OS trust store plus `NODE_EXTRA_CA_CERTS`, so it works behind Zscaler-style proxies. It supports Kerberos proxy login, but not proxy URLs that start with `https://`. The firewall list is in the [Copilot allowlist reference](https://docs.github.com/en/copilot/reference/copilot-allowlist-reference).
+
 ---
 
 #### 98. Run Claude Code behind a corporate launcher (Skip)
@@ -424,6 +438,8 @@ Three pages matter for everyone: **Manage costs** (112), **Security** (114) and 
 - **A container is the safe place for `--dangerously-skip-permissions`,** as a non-root user.
 - **Also limit network traffic** (the reference container has a firewall script).
 - **Copilot:** its docs say the same: use a container or VM with `--allow-all`.
+
+**Copilot note:** Copilot has two lighter options than a container, both in public preview: `/sandbox enable` limits file, network and system access on your machine, and a cloud sandbox runs the whole session on GitHub's machines.
 
 ---
 
@@ -858,6 +874,8 @@ A gateway is a proxy between the agent and the model provider. The company holds
 - **Turn off extra traffic** with `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`.
 - **Copilot CLI syncs your sessions to your GitHub account by default.** You can turn that off.
 
+**Copilot note:** Copilot saves each session in `~/.copilot/session-state/`. For Business and Enterprise users, syncing to GitHub happens only if the org's "Store local sessions in the Cloud" policy allows it. Synced sessions are visible only to you; admins can't read them. Cloud agent sessions are different: anyone with access to the repo can see them.
+
 ---
 
 #### 116. Zero data retention (Skip)
@@ -915,6 +933,8 @@ A gateway is a proxy between the agent and the model provider. The company holds
 - **The tips cover:** models, CLAUDE.md, plan mode, MCP, hooks, skills. Most apply to Copilot CLI too.
 - **The FAQ table** gives one-line answers to the usual questions.
 
+**Copilot note:** GitHub's page has a sample timeline: start 45 days before launch (success metrics, train champions), send announcements 14 days out, run a workshop 7 days out, and open a channel and wiki on launch day. Useful for planning this training.
+
 ---
 
 #### 118. Champion kit (Glance)
@@ -940,6 +960,8 @@ A gateway is a proxy between the agent and the model provider. The company holds
 - **Common pushback and answers:** "it hallucinates" is usually missing context; "I don't trust it" is solved by plan mode plus normal review.
 - **Top habits:** give the right files, review the plan first, run `/init`, save repeated workflows as skills.
 - **Success is when others answer the questions** in the channel, not you.
+
+**Copilot note:** GitHub suggests a two-week team sprint. Give the team two or three approved workflows instead of "use AI more", aim for use on 3 or more days a week, and measure outcomes like time to open a PR. Never measure the amount of generated code.
 
 ---
 
