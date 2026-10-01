@@ -182,7 +182,7 @@ This is the most important group in Part 1. It explains how every coding agent w
 
 - **The options:** `CLAUDE.md` (always-on rules), skills (loaded when needed), subagents (separate context), MCP (outside tools), hooks (automatic actions), plugins (packages of all of these).
 - **Add features when you hit a need.** Same mistake twice → `CLAUDE.md`. Same prompt again and again → skill. Must happen every time → hook.
-- **`CLAUDE.md` vs skill:** needed every session → `CLAUDE.md`; needed sometimes → skill.
+- `CLAUDE.md` **vs skill:** needed every session → `CLAUDE.md`; needed sometimes → skill.
 - **Hook vs skill:** a hook always runs; a skill is followed by the agent, so the result can vary.
 - **Everything costs context.** Too much setup makes the agent worse, not better.
 
@@ -250,7 +250,7 @@ This is the most important group in Part 1. It explains how every coding agent w
 - **Some of it is used before you type:** `CLAUDE.md`, memory, MCP tool names, skill descriptions.
 - **When it fills up, the chat is summarized.** `CLAUDE.md` is reloaded, but early details can be lost.
 - **Habits:** `/clear` between tasks, `/compact focus on X` before a big task, send research to a subagent.
-- **`/context`** shows what fills it. It works in Copilot CLI too.
+- `/context` shows what fills it. It works in Copilot CLI too.
 
 **Copilot note:** Copilot starts compacting by itself at about 80% full, in the background, so you rarely wait. Each summary is saved as a checkpoint; `/session checkpoints` lists them. Tool output over 20 KiB goes to a file, and the agent gets only a preview.
 
@@ -271,8 +271,8 @@ This is the most important group in Part 1. It explains how every coding agent w
 | How the cache is organized        | ⭐ Read                 | —               |
 | Actions that invalidate the cache | ⭐ Read (just the list) | —               |
 | Actions that keep the cache       | Skim                   | —               |
-| Resuming a session                | Skip                   | —               |
-| Cache lifetime                    | Skip                   | —               |
+| Resuming a session                | Skim                   | —               |
+| Cache lifetime                    | Skim                   | —               |
 | Cache scope                       | Skip                   | —               |
 | Check cache performance           | Skip                   | —               |
 | Subagents and the cache           | Skip                   | —               |
@@ -284,7 +284,7 @@ This is the most important group in Part 1. It explains how every coding agent w
 
 - **The model remembers nothing.** Each turn resends the whole chat; the cache makes that fast and cheap.
 - **These break the cache,** so the next turn is slower and costs more: switching models, adding or removing MCP servers or plugins, compacting.
-- **Editing `CLAUDE.md` mid-session doesn't apply** until `/clear`, `/compact` or a restart.
+- **Editing** `CLAUDE.md` **mid-session doesn't apply** until `/clear`, `/compact` or a restart.
 - **Rule for any tool:** pick the model at the start of a task and don't switch in the middle.
 
 **Copilot note:** Copilot uses prompt caching too, but you can't see or control it, and its docs don't list what breaks it. The same habits are a safe bet: one model per task, and no adding MCP servers in the middle.
@@ -339,11 +339,11 @@ How to work with an agent day to day. The habits here matter more than any singl
 **Pay attention to:**
 
 - **Two kinds of memory:** `CLAUDE.md`, which you write, and auto memory, which the agent writes. Both load every session.
-- **Add to `CLAUDE.md` when** the agent repeats a mistake or you repeat a correction.
+- **Add to** `CLAUDE.md` **when** the agent repeats a mistake or you repeat a correction.
 - **Keep it short and concrete** (under ~200 lines): commands, conventions, gotchas. `/init` writes a first draft.
 - **Instructions are advice, not rules.** Use a hook for anything that must never happen.
-- **Use `AGENTS.md` for a team on several tools.** Claude Code and Copilot CLI both read it.
-- **`/memory` and `/context`** show which files actually loaded.
+- **Use** `AGENTS.md` **for a team on several tools.** Claude Code and Copilot CLI both read it.
+- `/memory` **and** `/context` show which files actually loaded.
 
 **Copilot note:** Copilot's version of auto memory is Copilot Memory, in public preview. It stores memories on GitHub, not on your machine, and your org may need to turn it on.
 
@@ -374,8 +374,8 @@ How to work with an agent day to day. The habits here matter more than any singl
 
 - **Sessions are saved as you go.** `--continue` resumes the last one; `--resume` lets you pick.
 - **Name sessions** (`/rename`) when you run several, then resume by name.
-- **`/branch`** copies the chat so you can try another approach safely.
-- **`/clear`** starts fresh, **`/compact`** summarizes, **`/context`** shows usage.
+- `/branch` copies the chat so you can try another approach safely.
+- `/clear` starts fresh, `/compact` summarizes, `/context` shows usage.
 - **Copilot CLI has the same,** plus `/chronicle` to search past sessions.
 
 **Copilot note:** Copilot has two extras here:
@@ -421,7 +421,7 @@ How to work with an agent day to day. The habits here matter more than any singl
 - **New code:** start broad ("give me an overview"), then narrow ("trace the login flow").
 - **Bugs:** give the error and how to reproduce it. **Tests:** say what behavior to test, then have it run them.
 - **PRs:** "summarize my changes" → "create a pr". Always review before submitting.
-- **`@file`** puts a file straight into the prompt; you can also paste screenshots.
+- `@file` puts a file straight into the prompt; you can also paste screenshots.
 - **Habits:** plan mode for bigger changes, worktrees for parallel work, subagents for research, `-p` for scripts.
 
 **Copilot note:** Copilot has extra PR commands: fix review feedback, fix CI failures, resolve merge conflicts. See [Managing pull requests](https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli/manage-pull-requests).
@@ -703,7 +703,7 @@ The same agent runs in many places: terminal, IDE, desktop app, web, phone and C
 - **A deep, paid code review in the cloud:** many agents, and each finding is checked before it's reported.
 - **Run:** `/code-review ultra` (your branch) or `/code-review ultra 1234` (a PR). It takes about 5–10 minutes.
 - **Cost:** 3 free runs on Pro and Max, then about $5–25 per review.
-- **Use `/code-review` for quick feedback,** and ultra before merging big or risky changes.
+- **Use** `/code-review` **for quick feedback,** and ultra before merging big or risky changes.
 
 ---
 
@@ -795,7 +795,7 @@ The same agent runs in many places: terminal, IDE, desktop app, web, phone and C
 
 - **Shares setup with the CLI** (`CLAUDE.md`, settings, skills, MCP). You can use both on one project.
 - **Extras:** a built-in browser preview that checks its own changes, a diff view, parallel sessions, and PR status with auto-fix.
-- **`/desktop`** moves a CLI session into the app.
+- `/desktop` moves a CLI session into the app.
 - **Use the app for visual review and parallel work; use the CLI for scripts.**
 
 ---
@@ -875,7 +875,7 @@ The same agent runs in many places: terminal, IDE, desktop app, web, phone and C
 
 - **Runs a prompt on a schedule on your machine,** with access to local files.
 - **Only while the app is open and the computer is awake.** After sleep there is one catch-up run.
-- **Cloud routines** run with your laptop off; **`/loop`** only runs inside an open session.
+- **Cloud routines** run with your laptop off; `/loop` only runs inside an open session.
 - **Tip:** click "Run now" once and allow the tools it needs, so later runs don't get stuck.
 
 ---
@@ -1025,7 +1025,7 @@ The same agent runs in many places: terminal, IDE, desktop app, web, phone and C
 - **Two ways:** the extension (a chat panel with side-by-side diffs) or the CLI in VS Code's terminal.
 - **Some things are CLI-only** (all commands, the `!` shortcut).
 - **They share history:** `claude --resume` in the terminal continues a panel conversation.
-- **Both tools connect a CLI to VS Code with `/ide`.**
+- **Both tools connect a CLI to VS Code with** `/ide`**.**
 
 **Copilot note:** Copilot CLI connects by itself when you start it in a folder that is open in VS Code. Then you can select code and just say "debug this", and edits open as diffs in VS Code with accept and reject buttons. The Copilot version of the Claude extension is Copilot Chat, built into VS Code.
 
@@ -1271,7 +1271,7 @@ The same agent runs in many places: terminal, IDE, desktop app, web, phone and C
 - **Claude Code in GitLab pipelines:** mention `@claude` in an issue or MR and get an MR back. Beta.
 - **Setup:** an API key as a masked CI variable, plus one job in `.gitlab-ci.yml`.
 - **Limit cost** with `--max-turns` and job timeouts.
-- **The same `-p` pattern works in any CI.**
+- **The same** `-p` **pattern works in any CI.**
 
 ---
 
@@ -1300,7 +1300,7 @@ The same agent runs in many places: terminal, IDE, desktop app, web, phone and C
 
 **Pay attention to:**
 
-- **Mention `@Claude` in Slack** with a coding task. It starts a cloud session and posts progress in the thread.
+- **Mention** `@Claude` **in Slack** with a coding task. It starts a cloud session and posts progress in the thread.
 - **Older version:** Team and Enterprise are moving to Claude Tag.
 - **Be specific:** file names, the error, and what "done" means.
 - **Copilot equivalent:** the GitHub app for Slack.
