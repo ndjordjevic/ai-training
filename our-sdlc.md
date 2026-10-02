@@ -4,8 +4,21 @@ Work in progress, built while reading Anthropic's [AI-native SDLC Playbook](http
 
 **Words used here**
 - **The agent** means Copilot CLI, which is what we have. Claude Code works the same way, and some features below are named in both.
-- **intent, spec, plan** are three Markdown files per ticket: what is wanted (`intent/`), what we decided to build (`specs/`), and how we build it in our code (`plans/`).
+- **intent, spec, plan** are three Markdown files per ticket. See the table below.
 - The course calls its first stage "Plan", and that stage produces the **intent**. Our `plan.md` is something else: the implementation plan made at the start of the build.
+
+**Intent, spec and plan**
+
+| File | Answers | Written from | Example (BILL-123) |
+|---|---|---|---|
+| **Intent** | **Why**, and what is wanted | The ticket: the user's or business's view | Customers copy invoices by hand. They want a "Download CSV" button. |
+| **Spec** | **What** we will build, decided | The intent plus our rules (security, UX) | `GET /invoices/export`, these columns, at most 10,000 rows, no tax IDs, no Excel file. |
+| **Plan** | **How and where** in our code | The spec plus reading the code | Stream from the invoice repository. Task A in `api/` and `core/`, task B in `web/`, then C. |
+
+They are connected in three ways:
+- **Same name, three folders:** `intent/BILL-123-invoice-csv.md`, `specs/BILL-123-invoice-csv.md`, `plans/BILL-123-invoice-csv.md`. The Jira key ties them to the ticket.
+- **Each file links to the one before it:** the spec starts with "Intent: …", and the plan with "Spec: …".
+- **Changes flow down:** the refresh updates the intent first, then the spec, then the plan.
 
 ## Our starting point
 
@@ -19,11 +32,11 @@ All our work comes from Jira tickets, and the product team will keep writing the
 2. **Refresh, then spec:** what we will build, following our company rules.
 3. **Refresh, then plan:** the agent reads the code and writes how to build it, split into tasks.
 4. **Refresh, then build:** one main session builds the tasks with subagents. The agent checks its own work.
-5. **PR:** one PR with the intent, spec, plan and code. AI review first, then a code owner approves.
-6. **Release:** CI deploys, and a human approves production.
+5. **PR:** one PR with the intent, spec, plan and code. An optional AI review first, then coworkers review it as today.
+6. **Release (session 6):** merge the approved PR, deploy to production with a human's approval, and check the AWS logs and metrics.
 7. **Back to the start:** problems found in production become new Jira tickets.
 
-Steps 1 to 6 happen on every ticket (Part 1). The tools behind them are set up once (Part 2).
+Steps 1 to 6 happen on every ticket (Part 1), with the same numbers as the sections below. Two rules apply to every step: refresh against Jira first, and use one session per step. The tools behind them are set up once (Part 2).
 
 ---
 
@@ -44,7 +57,7 @@ Steps 1 to 6 happen on every ticket (Part 1). The tools behind them are set up o
 
 **The intent has these parts:** Source (Jira key, the ticket's last-updated time, the Confluence page version, when we last synced), Problem, Outcome, Affected systems, Constraints, Decisions from comments (who said what, and when), From attachments, Open questions, and a Changelog.
 
-## 2. The refresh: keeping everything in sync with Jira
+## Rule for every step: the refresh (keeping in sync with Jira)
 
 The ticket keeps changing after the intent is written: new comments, edits, a changed Confluence page. So **before each step (spec, plan, build, PR)** the agent refreshes the intent **and every file after it** that exists.
 
@@ -62,61 +75,93 @@ Prompt to reuse:
 - **Comments can override the description.** That is why the intent keeps "Decisions from comments", with names and dates.
 - **A file that is behind its parent says so** at the top, for example "Stale: intent changed on 3 Oct", until it is refreshed.
 
-## 3. Sessions: one per step
+## Rule for every step: one session per step
 
-Use a new session for each step: intent, spec, plan, build. The committed files carry the state, not the chat. A fresh session has no leftover assumptions, can't use anything that isn't written down, and doesn't suffer from a long, compacted conversation. You can also stop and resume, or hand over to someone else. If a fresh session can't continue from the files alone, the file is missing something, so fix the file.
+Use a new session for each step: intent, spec, plan, build. The build session ends by opening the PR. The committed files carry the state, not the chat. A fresh session has no leftover assumptions, can't use anything that isn't written down, and doesn't suffer from a long, compacted conversation. You can also stop and resume, or hand over to someone else. If a fresh session can't continue from the files alone, the file is missing something, so fix the file.
 
 Every new session starts the same way: "Read the intent (and the spec and plan if they exist), then refresh them against Jira."
 
 **Exceptions:** small tickets can stay in one session. After the plan is approved, you can carry on building in the same session, because it already understands the code.
 
-## 4. Spec: what we will build
+## 2. Spec: what we will build
 
 1. Give the agent the intent and ask for a requirements and design spec for our codebase, following our skills (security, UX, compliance). Until we have skills, it follows the instruction file and the existing code.
 2. Concerns the agent flags go to the policy owners, such as security or privacy, before anyone builds.
 3. The product owner reads the spec, at least the open questions and the "what we will not do" part, and confirms in Jira with a comment. They don't need to use Git.
 4. Commit it as `specs/<ticket-key>-<short-name>.md` and link it from the ticket.
 
-## 5. Plan: how to build it in our code
+**Do we always need a separate spec?** The engineer runs both the spec and the plan sessions, but the spec exists for its audience, not its writer. It gives the product owner something readable to approve, lets security and privacy check the decisions before any code, and holds the "what we will not do" list that the PR is checked against.
+
+| Ticket | Do this |
+|---|---|
+| Feature with decisions the product owner must agree on (scope, data, rules) | A separate spec, as above |
+| Small or medium change | One file, `plans/<ticket-key>-<short-name>.md`: a "What we build" part on top (the spec, which the product owner confirms) and a "How and where" part below (the plan) |
+| Purely technical (refactor, clear bug fix, chore) | Plan only, no spec |
+
+## 3. Plan: how to build it in our code
 
 This is the first time the agent reads the real code. Until now it only worked with documents. The spec says what to build. The plan says how, in our codebase.
 
+**Who reads the code, and why**
+
+| Step | Reads code? | Why |
+|---|---|---|
+| Spec | No, or only lightly | Decides *what* to build (still an open question for us). |
+| Plan | **Yes, this is the analysis** | Decides *where* the change goes and *how*: which files, what to reuse, how similar code is written, what could break. The result goes into the plan. |
+| Build | Yes, in detail | Reads the files the plan names closely enough to write the code. It doesn't decide where things go. |
+
 1. Start the agent in plan mode, where it can read code but not change it, and give it the intent and the spec.
-2. Ask hard questions: where does the change belong, what can we reuse, what could break?
+2. Ask hard questions: where does the change belong, what can we reuse, how is similar code written today, what could break? This is where the research into the code happens, and the answers go into the plan.
 3. Ask it to split the work into **tasks**, with the files each task touches, and which tasks depend on others. Tasks that touch different files can be built in parallel. Tasks that need another task's result come after it.
 4. Repeat until someone who never saw the chat could build from the plan alone.
 5. Commit it as `plans/<ticket-key>-<short-name>.md` and link it from the ticket.
 
 If the plan shows the spec was wrong, update the spec too. Small changes are approved by the engineer. Risky ones go to a tech lead.
 
-## 6. Build: one main session, tasks to subagents
+## 4. Build: one main session, tasks to subagents
 
 One main session reads the plan and hands out the tasks (proposed).
 
 - **Independent tasks** go to subagents that run in parallel, each in its own git worktree, a separate checkout on its own branch, so edits can't collide. In Claude Code this is `isolation: worktree`. In Copilot CLI, `/fleet` runs subagents and `/worktree` makes worktrees. We still need to check whether Copilot can give each subagent its own worktree.
+- **Models (our choice for now):** the main session runs on the strongest model (Opus) for planning, merging and reviewing. Task subagents use the built-in general-purpose subagent, and we tell it the model in the prompt, for example: "Build tasks A and B in parallel, each with a general-purpose subagent on Sonnet, each in its own worktree. Then merge and build task C." Check the model with `/tasks`. If Claude forgets the model, set `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` as the default, or later move to a custom subagent with `model: sonnet`.
 - **Dependent tasks** run as subagents one after another in the normal checkout, so each sees the earlier result. Don't use worktrees for them: a subagent's worktree branches from the default branch, not from your current work (in Claude Code, unless `worktree.baseRef` is set to `"head"`).
-- **Helper subagents** check and report but don't build: a verifier runs the app and compares it with the plan, a researcher looks up how existing code does something.
+- **Helper subagents** look and report but don't build. Research into the code belongs in the plan. A researcher (built-in Explore, read-only) is only needed during the build if the plan missed something. A verifier runs **after** a task or the merge, starts the app and compares it with the plan. With built-in subagents, "don't change files" is only an instruction. A custom verifier with only read and run tools would enforce it.
 - **The agent checks its own work:** it runs build, test and lint and pastes the output. A failing test means it fixes the code, never the test. For a bug, the failing test is written and committed first. For UI work, it compares a screenshot with the design mock, usually in two or three rounds.
 - **Each subagent commits** its work on its own task branch, with the Jira key in the commit message.
 - **The main session merges** the task branches into the feature branch and runs the full suite on the combined result.
-- **Push the feature branch** regularly, so work isn't only on one laptop. The build is done when everything is merged on the feature branch, the full suite passes, the engineer has reviewed the diffs, and the branch is pushed. Opening the PR is the next step.
+- **Push the feature branch** regularly, so work isn't only on one laptop. The build is done when everything is merged on the feature branch, the full suite passes, the engineer has reviewed the diffs, and the branch is pushed. The same session then opens the PR (step 5).
 - **The engineer reviews the actual diffs,** not only the subagents' summaries.
 - **Start with two or three parallel subagents.** Add more only while you can still review the results well. Review is the limit, not the tools.
+- **If the build finds the plan was wrong** (a file isn't where the plan says, or the change belongs somewhere else), stop and update the plan first, then continue. Otherwise the plan and the code drift apart, and the reviewer can't trust the plan.
 - **Large or long tasks** that need back-and-forth get their own session in a worktree, so the engineer can steer them.
 
-## 7. PR: one PR per ticket
+## 5. PR: one PR per ticket
+
+Today our PRs are reviewed by coworkers, and that stays. We add an **optional AI review before them**, so coworkers get a cleaner PR and can focus on intent and risk.
+
+**Sessions:** opening the PR is the last step of the build session (session 4), which knows the work and can write a good description. The AI self-review runs in a **new session** (session 5): a reviewer that didn't write the code isn't biased toward it.
 
 1. Refresh once more, because the reviewer will compare the PR with the intent.
-2. Open one PR from the feature branch, with the Jira key in the title, for example "BILL-123: invoice CSV export". The PR contains the intent, spec, plan and code, so the reviewer sees what was asked, what was decided, how it was planned, and what was built.
-3. Link the PR to the ticket and move the ticket to "In review".
-4. The AI review runs first and ranks its findings. Tag the agent on a comment to get a finding fixed.
-5. A code owner approves. The agent that wrote the code can never approve it.
+2. Open one PR from the feature branch as a **draft**, with the Jira key in the title, for example "BILL-123: invoice CSV export". The PR contains the intent, spec, plan and code, so the reviewer sees what was asked, what was decided, how it was planned, and what was built.
+3. Link the PR to the ticket.
+4. **Optional AI review, in a new session.** Run the agent's code review on the branch, for example `/code-review` in Claude Code. Ask it to check the code against the spec and plan, not only for bugs. Fix what it finds in the same session and push.
+5. **Optional: ask Copilot to review the PR on GitHub,** by adding Copilot as a reviewer on the PR page, if our organisation has it turned on.
+6. Mark the PR ready, move the ticket to "In review", and coworkers review it as today. The agent that wrote the code can never approve it.
 
-## 8. Release
+## 6. Release: merge, deploy, check (session 6)
 
-CI deploys to dev and staging. For production, the agent may prepare the release, but a hook blocks the deploy until a named release manager approves. After release, the ticket moves to "Done".
+A new session, after coworkers approve the PR. It reads the intent, spec and plan, so it knows what changed and what "working" means. Our services run on AWS.
 
-## 9. Back to the start
+1. **Merge the approved PR.** The agent merges it, for example with `gh pr merge`. Branch protection makes sure the approvals are there. It can't merge an unapproved PR.
+2. **Deploy through our pipeline, not by hand.** The merge, or a pipeline run the agent starts, deploys to production. The agent never deploys with its own AWS credentials. A human approves the production deploy: the engineer or a release manager, depending on our process. A hook blocks any production deploy command that lacks that approval.
+3. **Check the logs and metrics, read-only.** The agent uses a read-only AWS role, with short-lived credentials, to read CloudWatch: errors in the service logs since the deploy, the 5xx rate and latency compared with before the deploy, and the new endpoint's own log lines. It can use the AWS CLI (for example `aws logs tail` or a Logs Insights query) or an AWS MCP server.
+4. **Smoke test.** If we have a safe test account in production, the agent calls the new feature once and checks the result against the plan's "Done when".
+5. **Report.** The agent posts a short summary to the Jira ticket: what was deployed, what it checked, and what it saw. If everything is fine, the ticket moves to "Done".
+6. **If something looks wrong,** the agent reports it and proposes a rollback. A human decides. The rollback runs through the pipeline's rollback step, not by hand.
+
+**Guardrails:** the agent's AWS access is read-only. Hooks and permissions deny any AWS command that changes something (deploy, delete, update). Everything the agent reads and reports is logged to the engineer's session.
+
+## 7. Back to the start
 
 When a metric in production goes out of its normal range, the agent diagnoses it (read-only) and writes its finding. The finding becomes a new Jira ticket, linked to the old one, and the flow starts again at step 1.
 
@@ -194,13 +239,14 @@ An eval is a test for the agent setup, not for the product code. It checks that 
 
 ## AI review of PRs
 
-1. Choose the review tool: a managed service that an admin turns on, or the agent running in our CI.
-2. The tech lead writes a `REVIEW.md` at the repo root. It lists the review passes: bugs, security, and compliance with the spec, the plan and our design rules. It says what counts as **Important** (breaks behaviour, leaks data, breaks a policy) and what is only a **nit** (style, naming). It lists what to skip, such as generated files and anything CI already checks.
-3. Findings don't approve or block a PR. Branch protection requires a code owner's approval.
-4. When the same mistake shows up twice in review, add the fix to the instruction file.
-5. Once a month, the tech lead rates the findings and caps nits (for example five per review).
+Our PRs are reviewed by coworkers. The AI review is an optional extra before them (see step 5).
 
-**How we know it works:** time to first review drops to minutes, and more defects are caught before merge than found in production.
+1. Agree the review prompt for the self-review session, so everyone checks the same things: bugs, security, and a match with the spec and plan.
+2. Check whether Copilot code review on GitHub is turned on for our organisation.
+3. Optional later: a tech lead writes a `REVIEW.md` at the repo root with the review rules: what counts as **Important** (breaks behaviour, leaks data, breaks a policy), what is only a **nit** (style, naming), and what to skip (generated files, anything CI already checks). Both the self-review and an automated review in CI could use it.
+4. When the same mistake shows up twice in review, by the AI or a coworker, add the fix to the instruction file.
+
+**How we know it works:** coworkers find fewer basic problems, and review rounds per PR go down.
 
 ## Release gates and locked-down settings
 
@@ -244,7 +290,7 @@ The course also shows an agent on call in Slack (Claude Tag). For us, the GitHub
 Proposed order (not from the course, for discussion). Each phase adds one thing, and humans stay in control of decisions and approvals at every step.
 
 1. **Start now:** `AGENTS.md` in each repo, one check command per repo, the hook that blocks test edits during a fix, and the per-ticket flow with a basic spec (no company skills yet): intake, refresh, spec, plan, build, PR.
-2. **Next:** the first skill, used in specs and builds, a verifier agent, parallel subagents with worktrees, AI review of PRs, and evals.
+2. **Next:** the first skill, used in specs and builds, a verifier agent, parallel subagents with worktrees, the optional AI self-review before coworker review, and evals.
 3. **Then:** agents in CI/CD (read-only first), release gates and locked-down settings.
 4. **Last:** the metrics loop, once we have a metrics store and a review gate we trust.
 
@@ -254,7 +300,7 @@ For the Copilot admin setup (managed settings, permissions, sandboxing), see Par
 
 **Access and tools**
 - Is the Atlassian MCP server allowed at work, and can it read attached images and linked Confluence pages?
-- Which AI review tool do we use with Copilot, and can it read a `REVIEW.md`-style rules file?
+- Is Copilot code review on GitHub turned on for us, and what is the Copilot CLI command for a code review in a session?
 - Can our CI run Copilot CLI without a person, and which model and cloud access is allowed from CI?
 - Can Copilot `/fleet` give each subagent its own worktree?
 - Which browser or screenshot tool may we use for UI checks?
@@ -268,11 +314,16 @@ For the Copilot admin setup (managed settings, permissions, sandboxing), see Par
 - Who triages findings from the metrics loop?
 
 **Process**
-- Which tickets count as small and skip the intent?
+- Which tickets count as small and skip the intent, and which get one combined spec-and-plan file or a plan only?
 - Should the agent read the code already in the spec step, or only in plan mode?
 - How do we stop people building from a file marked stale?
 - Which approvals in our change process must stay, and who approves each?
-- Do review findings stay advice only, or do we ever gate merges on them?
+- Is the AI self-review optional for everyone, or required for some repos?
+
+**Release on AWS**
+- How are production deploys triggered today, and who approves them?
+- Can we give the agent a read-only AWS role (CloudWatch logs and metrics only), and is an AWS MCP server allowed?
+- Do we have a safe test account in production for a smoke test?
 
 **Readiness and cost**
 - Can every repo run build, test and lint with one command each?
@@ -316,18 +367,54 @@ The agent posts the open question to Jira with its default.
 
 **Session 2: spec.** The next day the product owner has answered "same file is fine". The refresh shows the new comment, the engineer confirms, and the intent gets a changelog line. The agent writes `specs/BILL-123-invoice-csv.md`: endpoint `GET /invoices/export`, the columns, a 10,000-row limit, own invoices only, every export logged. The security skill flags that tax IDs are personal data, and the privacy team says to leave them out. The product owner confirms the spec with a Jira comment.
 
-**Session 3: plan.** The refresh finds no change. Plan mode reads the code, finds the existing `formatDate()` helper and the invoice repository, and writes `plans/BILL-123-invoice-csv.md` with three tasks: **A** the endpoint and CSV writer (`api/`, `core/`), **B** the "Download CSV" button (`web/`), and **C** the integration test, which needs A and B. A and B touch different files, so they can run in parallel.
+```markdown
+# Spec: invoice CSV export (BILL-123)
+Intent: intent/BILL-123-invoice-csv.md
+## What we build
+- `GET /invoices/export` returns a CSV of the customer's own invoices and credit notes from the last 2 years.
+- Columns: Invoice no, Date (UTC), Customer, Net, Tax, Total. Credit notes have negative amounts.
+- A "Download CSV" button on the invoices page.
+## Rules
+- At most 10,000 rows. Every export is logged: who, when, how many rows.
+- No tax IDs in the file (privacy team, 3 Oct).
+## What we will not do
+- No Excel (.xlsx) file, no scheduled exports, nothing older than 2 years.
+## Open questions
+- None.
+```
+
+**Session 3: plan.** The refresh finds no change. Plan mode reads the code, finds the existing `formatDate()` helper, the invoice repository and how existing endpoints are written, and writes `plans/BILL-123-invoice-csv.md` with three tasks: **A** the endpoint and CSV writer (`api/`, `core/`), **B** the "Download CSV" button (`web/`), and **C** the integration test, which needs A and B. A and B touch different files, so they can run in parallel.
+
+```markdown
+# Plan: invoice CSV export (BILL-123)
+Spec: specs/BILL-123-invoice-csv.md
+## Approach
+Stream the CSV from the existing invoice repository. Reuse `formatDate()` for UTC dates.
+Follow the existing endpoints, for example `api/InvoiceController`: gateway auth, errors through `ApiError`, one integration test per endpoint.
+## Tasks
+- A. Endpoint and CSV writer. Files: `api/InvoiceExportController`, `core/InvoiceCsvWriter`. Depends on: nothing.
+- B. "Download CSV" button. Files: `web/invoices/InvoicesPage`. Depends on: nothing.
+- C. Integration test. Files: `itest/InvoiceExportIT`. Depends on: A and B.
+Run A and B in parallel, then C.
+## Risks
+- Accounts near 10,000 rows may be slow. Stream the rows, don't build the file in memory.
+## Done when
+- `make build`, `make test` and `make lint` pass, and the verifier downloads a CSV with the columns from the screenshot.
+```
 
 **Session 4: build.** The refresh finds a new comment, "can we add a currency column?". The agent shows that the intent, spec and plan each need one more column. The engineer confirms, and the three files are updated before any code is written. Then:
 
-- The main session gives tasks A and B to two subagents that run in parallel, each in its own worktree.
-- A verifier subagent runs the app and reports what works and what doesn't. A researcher subagent looks up how existing endpoints are written. They fix nothing.
+- The main session gives tasks A and B to two subagents on Sonnet that run in parallel, each in its own worktree.
 - In task A the tests catch that a customer name with a comma breaks the columns. The agent fixes the code, and a hook stops it from editing the test instead.
 - Each subagent commits on its own task branch. The main session merges A and B into the feature branch. Task C then runs in the normal checkout: the integration test is written, and the full suite (`make build`, `make test`, `make lint`) runs on the combined result.
+- **Then verify.** A verifier subagent runs the app, downloads a CSV, checks the columns against the screenshot and tries a customer with a comma in the name. It reports what works and what doesn't, and changes no files. The main session decides what to fix.
 - The engineer reviews the diffs of each task, not only the subagents' summaries, and pushes the feature branch.
+- **Last step of session 4: open the PR.** One last refresh finds no change. The engineer opens "BILL-123: invoice CSV export" as a draft PR with the intent, spec, plan and code, and links it to the ticket.
 
-**PR.** One last refresh finds no change. The engineer opens "BILL-123: invoice CSV export" with the intent, spec, plan and code, links it to the ticket and moves the ticket to "In review". The AI review finds that the export query has no row limit, although the spec says 10,000. The engineer tags the agent, it fixes the query, and a code owner approves.
+**Session 5: AI self-review (optional).** A fresh session runs the code review against the spec and plan. It finds that the export query has no row limit, although the spec says 10,000. The agent fixes it in this session and pushes. Then the engineer adds Copilot as a reviewer on the PR page, and it only finds a naming nit. The engineer marks the PR ready and moves the ticket to "In review".
 
-**Release.** CI deploys to dev and staging. In production the hook blocks the deploy until the release manager approves. They approve, it goes out, and the ticket moves to "Done". The team adds an eval for the new export task.
+**Coworker review.** A coworker reviews the PR as today and approves it. Because the basic problems were already fixed, the review is about intent and risk.
+
+**Session 6: release.** A new session reads the intent, spec and plan. The agent merges the approved PR. The pipeline deploys to dev and staging, then waits: the engineer approves the production deploy, and it goes out. With a read-only AWS role, the agent reads CloudWatch for 30 minutes after the deploy: no new errors in the billing service logs, the 5xx rate and latency are the same as before, and the log shows the first real exports (largest one 2,400 rows, 1.1 seconds). It posts this summary to BILL-123 and the ticket moves to "Done". The team adds an eval for the new export task.
 
 **Back to the start.** A week later the 5xx rate on the billing service goes above its normal range. The detection script runs the agent read-only. It finds timeouts for customers with more than 10,000 invoices, and its finding becomes BILL-140, linked to BILL-123: "export in the background and email a link". The flow starts again at intake.
