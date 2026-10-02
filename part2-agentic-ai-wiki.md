@@ -2,11 +2,11 @@
 
 ← [Part A: LLM wikis and pin-llm-wiki](part2-llm-wiki.md)
 
-[agentic-ai-wiki](https://github.com/ndjordjevic/agentic-ai-wiki) is our map of the tools around coding agents. As of September 2026 it holds **268 sources in 16 categories**, collected since April 2026.
+[agentic-ai-wiki](https://github.com/ndjordjevic/agentic-ai-wiki) is our map of the tools around coding agents. As of October 2026 it holds **273 sources in 16 categories**, collected since April 2026.
 
-You don't need to know all of them. This page sorts the categories into three groups and gives a few "start here" picks for each.
+You don't need to know all of them. This page explains what each of its 16 categories contains and what it is for.
 
-Links below open the wiki page on GitHub. For clickable `[[wikilinks]]` and the graph, read the wiki in Obsidian (see Part A).
+To see the tools in a category, open the wiki. For clickable `[[wikilinks]]` and the graph, read the wiki in Obsidian (see Part A).
 
 ---
 
@@ -24,98 +24,85 @@ This is the important part. The wiki is not only notes for people to read. It is
 ## The session plan
 
 1. **Obsidian demo (10 min):** open the vault, start at `wiki/index.md`, go to `wiki/categories.md`, open one source, follow a link, check its `raw/` file, show the graph view and `log.md`.
-2. **Category tour (20 min):** the three groups below.
+2. **Category tour (20 min):** the 16 categories below. Spend the most time on harnesses, skills, spec-driven and knowledge.
 3. **Ask the wiki (5 min):** run `copilot` inside the wiki folder and ask a question. It reads `wiki/index.md` first and cites the pages it used.
 
 ---
 
-## Group 1: Core for us
+## The categories
 
-These categories change how we work with Copilot CLI today. Open two or three picks in each.
+The 16 categories, in the same order as the wiki's [`categories.md`](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/categories.md). The number in brackets is how many sources each one holds.
 
-### Coding-agent harnesses & methodologies (36)
+### 1. Agent frameworks & SDKs (30)
 
-Ready-made ways of working with an agent: rules, skills and loops that make it plan, test and finish the job.
+Libraries for building your own agents in code, in Python, TypeScript, .NET, Go or Java. They give you the agent loop, tool calling, memory and multi-agent patterns, so you don't write them yourself. Use them when you want an agent inside your own product or service, not to help you code.
 
-- [obra-superpowers](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/obra-superpowers.md): a full development method built from 14 skills that trigger on their own. Works with Copilot CLI.
-- [gsd-build-get-shit-done](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/gsd-build-get-shit-done.md): GSD, a spec-driven system that fights "context rot" in long sessions. Works with Copilot.
-- [snarktank-ralph](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/snarktank-ralph.md): Ralph, a loop that runs the agent again and again on a task list until every task passes.
-- [how-claude-code-works-in-large-codebases](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/how-claude-code-works-in-large-codebases.md): Anthropic's guide to agents in big and legacy codebases.
+### 2. Coding-agent harnesses & methodologies (38)
 
-### Agent Skills & plugins ecosystem (21)
+Ready-made ways of working with a coding agent: sets of rules, skills and loops that make it plan, write tests, check its work and finish the job. Some are full methods for the whole development cycle, others are loops that keep the agent running until a task list is done. It also holds guides and articles on how to work with agents well, for example in large codebases.
 
-Collections of skills (`SKILL.md` files) and places to find them. Copilot CLI reads the same skill format.
+### 3. Agent Skills & plugins ecosystem (22)
 
-- [anthropics-skills](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/anthropics-skills.md): Anthropic's official example skills, including a skill that helps you write skills.
-- [skills.sh](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/skills.sh.md): the open skills directory, and the `npx skills` installer we use for pin-llm-wiki.
-- [mattpocock-skills](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/mattpocock-skills.md): practical engineering skills, each aimed at one common agent failure.
+Collections of skills (`SKILL.md` files) and plugins, and the directories and marketplaces where you find them. A skill teaches the agent one job, such as reviewing code, writing docs or following a team rule. Copilot CLI reads the same skill format, so most of these work for us too.
 
-### Spec-driven dev, planning & tasks (15)
+### 4. MCP servers & integrations (15)
 
-Write the spec and the task list first, then let the agent build from them.
+MCP servers and APIs that connect an agent to outside tools and data: error monitoring, web search, email, notifications and more. Use them when the agent needs live data or needs to act in another system, not only read and write your code.
 
-- [github-spec-kit](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/github-spec-kit.md): Spec Kit, GitHub's own spec-driven toolkit. Supports Copilot.
-- [openspec.dev](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/openspec.dev.md): OpenSpec, a lighter option. No API keys, and it supports Copilot and 25+ other tools.
-- [eyaltoledano-claude-task-master](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/eyaltoledano-claude-task-master.md): Taskmaster, which turns a requirements doc into a task graph.
-- [gastownhall-beads](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/gastownhall-beads.md): Beads, an issue tracker the agent uses as memory across sessions. Works with Copilot CLI.
+### 5. Spec-driven dev, planning & tasks (15)
 
-### Knowledge, RAG, memory & context (38)
+Tools for writing the spec, the plan and the task list first, then letting the agent build from them. Some turn a requirements doc into tasks, some keep a task tracker the agent uses as memory across sessions, and some add a review step for plans. Use them for bigger features, where "just start coding" goes wrong.
 
-The biggest category. It covers giving the agent the right knowledge and saving tokens.
+### 6. Coding agents, IDEs & dev environments (22)
 
-- [deepwiki.com](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/deepwiki.com.md): DeepWiki, free auto-generated docs for any public GitHub repo.
-- [rtk-ai-rtk](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/rtk-ai-rtk.md): rtk, a proxy that shrinks command output before the agent reads it (60–90% fewer tokens). Works with Copilot.
-- [mksglu-context-mode](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/mksglu-context-mode.md): Context Mode, which keeps big tool outputs out of the context window. Works with Copilot CLI.
+Other coding agents, editors and terminals built around agents, plus AI code review tools. This is where you see what exists besides Copilot and Claude Code, and how other tools solve the same problems. Useful for ideas, and for comparing before choosing a tool.
 
-### MCP servers & integrations (15)
+### 7. Knowledge, RAG, memory & context (38)
 
-MCP servers that connect an agent to outside tools and data.
+The biggest category. It covers giving the agent the right knowledge and keeping its context small: auto-generated docs for repos, code knowledge graphs, long-term memory, LLM wikis like this one, and tools that shrink command output to save tokens. Use it when the agent doesn't know your codebase well, or when sessions get long and expensive.
 
-- [mcp.sentry.dev](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/mcp.sentry.dev.md): Sentry's official MCP server, which gives the agent live production errors.
-- [sequentialthinking-mcp](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/sequentialthinking-mcp.md): a tiny MCP server with one tool for step-by-step thinking. A good example to learn from.
+### 8. Browser & web automation (11)
 
-### Coding agents, IDEs & dev environments (22)
+Tools that let an agent use a browser: open pages, click, fill forms, take screenshots and read the web as clean text. Use them for UI testing, checking the agent's front-end work, or collecting data from websites.
 
-Other coding agents and review tools, so you know what else is out there.
+### 9. Terminal, session & parallel-agent runners (10)
 
-- [kiro.dev](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/kiro.dev.md): Kiro, Amazon's coding agent, built around specs (requirements, design, tasks).
-- [warp.dev](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/warp.dev.md): Warp, a terminal rebuilt around running agents.
-- [coderabbit.ai](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/coderabbit.ai.md): CodeRabbit, AI review for the flood of agent-written pull requests.
+Tools for running many agents side by side and keeping track of them: terminal multiplexers, git worktree helpers, and boards that show what each agent is doing. Use them when you work on several tasks in parallel, each with its own agent.
 
----
+### 10. Model infra, ML & providers (16)
 
-## Group 2: Good to know
+Gateways that give one API for many models, tools for running models on your own machine, model providers, and ML learning material. Use them to switch or compare models, control cost, or run a model locally when code can't leave your network.
 
-Useful when a specific need comes up. One pick each.
+### 11. Workflow automation & no-code platforms (10)
 
-| Category | Count | What it is | Start here |
-|---|---|---|---|
-| Agent frameworks & SDKs | 29 | Libraries for building your own agents in code. | [microsoft-agent-framework](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/microsoft-agent-framework.md) (Python and .NET). Also: [OpenAI Agents SDK](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/developers.openai.com.md), [LangGraph](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/langchain.com-langgraph.md), [Pydantic AI](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/pydantic-pydantic-ai.md) |
-| Browser & web automation | 10 | Let the agent use a browser: test, click, read pages. | [microsoft-playwright-mcp](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/microsoft-playwright-mcp.md) |
-| Terminal, session & parallel-agent runners | 10 | Run many agents side by side and keep track of them. | [vibekanban.com](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/vibekanban.com.md) |
-| Security | 4 | Scan skills before installing, and AI pentesting. | [nvidia-skillspector](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/nvidia-skillspector.md) |
-| Model infra, ML & providers | 16 | Gateways to many models, local models, ML basics. | [litellm.ai](https://github.com/ndjordjevic/agentic-ai-wiki/blob/main/wiki/sources/litellm.ai.md) |
+Platforms for building automations and AI workflows without much code, by connecting apps with triggers and steps. Use them for business processes, such as handling emails or syncing tools, rather than for coding.
 
----
+### 12. Design & UI generation (12)
 
-## Group 3: Mention only
+Skills, design files and tools that help agents produce better-looking UI. Many give the agent a design system or style guide to follow, so the result doesn't look like generic AI output. Use them when an agent builds a front end.
 
-Real tools, but outside our daily coding work. Name them and move on.
+### 13. Media, voice & content (8)
 
-| Category | Count | What it is |
-|---|---|---|
-| Design & UI generation | 12 | Tools and skills that make agents produce better-looking UI. |
-| Workflow automation & no-code platforms | 10 | n8n, Zapier and similar: automations without code. |
-| Infra, hosting, DB & observability | 13 | Where agent-built apps run: Vercel, Supabase, Sentry and more. |
-| Media, voice & content | 8 | Voice dictation, video and audio tools. |
-| Business, career & learning | 9 | AI for sales, job search and reading. |
+Voice dictation, video, audio and transcript tools. The most useful one for us is voice dictation, which lets you talk to the agent instead of typing long prompts.
+
+### 14. Infra, hosting, DB & observability (13)
+
+Places where agent-built apps run: hosting, databases, monitoring, and sandboxes for running agents safely. Use them when you need to deploy something quickly, or to run an agent in an isolated environment.
+
+### 15. Security (4)
+
+Security tools for the agent world: scanners that check a skill before you install it, and AI agents that do penetration testing. Use them before trusting skills from the internet, and for security testing.
+
+### 16. Business, career & learning (9)
+
+AI tools for sales, job search, reading and learning, plus courses and career guides. Not about coding, but useful context on where agents are used outside development.
 
 ---
 
 ### Try it (in Copilot CLI)
 
 1. Clone the wiki: `git clone https://github.com/ndjordjevic/agentic-ai-wiki` and open it in Obsidian.
-2. Pick one category from Group 1 and read two of its source pages.
+2. Pick one category (for example harnesses, skills or spec-driven) and read two of its source pages.
 3. `cd` into the wiki folder and start `copilot`.
 4. Ask: "Which spec-driven tools in this wiki work with Copilot?" Check that it answers from the wiki and cites pages.
 5. Pick one tool that works with Copilot (for example rtk, OpenSpec or Superpowers) and try it on a small side project.

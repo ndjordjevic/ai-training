@@ -2,7 +2,7 @@
 
 Course: [academy.claude.com/courses/ai-native-sdlc-playbook](https://academy.claude.com/courses/ai-native-sdlc-playbook/introduction)
 
-A short summary of Anthropic's free course. It is not part of our training, but it is worth reading.
+A short summary of Anthropic's free course. It is not part of our training, but it is worth reading. How this could work for us, starting from Jira tickets, is in [our-sdlc.md](our-sdlc.md).
 
 ## The idea
 
