@@ -7,7 +7,7 @@ Work in progress, built while reading Anthropic's [AI-native SDLC Playbook](http
 - **intent, spec, plan** are Markdown files per ticket. Features get an intent and a plan. Only big tasks also get a separate spec. See the table below.
 - The course calls its first stage "Plan", and that stage produces the **intent**. Our `plan.md` is something else: the implementation plan made before the build.
 
-Many ideas below come from Matt Pocock's [skills](https://github.com/mattpocock/skills). See [matt-skills-notes.md](matt-skills-notes.md) for what we took and why.
+Many ideas below come from Matt Pocock's [skills](https://github.com/mattpocock/skills). See [matt-skills-notes.md](matt-skills-notes.md) for what we took and why. More come from Lauren Tan's [pstack](https://github.com/cursor/plugins/tree/main/pstack), see [pstack-notes.md](pstack-notes.md).
 
 **Intent, spec and plan**
 
@@ -33,7 +33,7 @@ All our work comes from Jira tickets, and the product team will keep writing the
 1. **Intake:** the agent reads the ticket, interviews the engineer, and writes the intent. Gaps go to the product owner in Jira, who confirms the intent. Big tasks also get a spec, in the same session.
 2. **Refresh, then plan:** the agent reads the code and writes what we build and how, split into tasks.
 3. **Refresh, then build:** one main session builds the tasks with subagents. The agent checks its own work.
-4. **PR:** one PR with the intent, the spec if any, the plan and the code. An optional AI review first, then coworkers review it as today.
+4. **PR:** one PR with the intent, the spec if any, the plan and the code. An optional AI review first, then coworkers review it as today. The agent helps with their comments, CI and conflicts.
 5. **Release:** merge the approved PR, deploy to production with a human's approval, and check the AWS logs and metrics.
 6. **Back to the start:** problems found in production become new Jira tickets.
 
@@ -51,7 +51,7 @@ Steps 1 to 5 happen on every ticket (Part 1), with the same numbers as the secti
 
 1. Create the feature branch, named after the ticket, for example `BILL-123-invoice-csv`. All files for this ticket go on this branch.
 2. Give the agent the ticket through the Atlassian MCP server, or paste it in. It reads the description, all comments, the attachments and any linked Confluence page.
-3. **Already built?** The agent searches the code for the requested behaviour, by meaning and not only by the ticket's words, and says where it looked. If it already exists, tell the product owner.
+3. **Already built?** The agent searches the code for the requested behaviour, by meaning and not only by the ticket's words, and says where it looked. If it already exists, tell the product owner. If the ticket claims something about the code ("the API already returns X"), the agent checks it in the code.
 4. **For a bug,** follow the bug process below: try to reproduce it first.
 5. **Grilling.** The agent interviews the engineer in rounds. Each round lists every question it can ask now, numbered, each with its recommended answer. It looks up facts in the code itself and only asks the engineer for decisions. New project terms go into `GLOSSARY.md` straight away. It stops when nothing is left unclear.
 6. The agent writes the intent from the ticket and the answers.
@@ -102,8 +102,8 @@ Every new session starts the same way: "Read the intent (and the spec and plan i
 ## Rule for bug tickets: the bug process
 
 1. **One failing command first.** Before any theory, the agent shows one command it has already run that fails on this exact bug: fast, and the same result every time. In order of preference: a failing test locally, then a script against the dev env. **Try, don't block:** if neither works, it confirms the symptom from the production logs (read-only), writes "not reproduced" in the intent, and carries on.
-2. **Ranked causes.** The agent lists 3 to 5 possible causes, each with a check that would prove it wrong, and shows them to the engineer before testing them.
-3. **Fix.** The failing test is committed first, then the fix. Debug logs carry a unique tag so they can be removed with one search. Secrets are hidden in everything the agent shows.
+2. **Ranked causes.** The agent lists 3 to 5 possible causes, each with a check that would prove it wrong, and shows them to the engineer before testing them. If two fixes based on the same assumption fail, it writes the assumption down and tests it before a third try.
+3. **Fix.** Fix the cause, not the symptom: no null checks or retries that only hide the error. The failing test is committed first, then the fix. Debug logs carry a unique tag so they can be removed with one search. Secrets are hidden in everything the agent shows.
 4. **The real cause goes into the PR**, so the next person learns from it. If there is no good place for a regression test, note it for the architecture scan (Part 2).
 
 The same process is used in intake (step 1), in the build (step 3) and for production findings (step 6).
@@ -122,9 +122,10 @@ This is the first time the agent reads the code in depth. The intent (or spec) s
 
 1. Start the agent in plan mode, where it can read code but not change it, and give it the intent and the spec if there is one.
 2. **No spec?** The plan starts with a "What we build" part: decisions, what we will not do, and the Testing section (see step 1). The "How and where" part comes below it.
-3. Ask hard questions: where does the change belong, what can we reuse, how is similar code written today, what could break? Use our design words (module, interface, seam, deep or shallow; see Part 2) so plans and reviews talk the same way.
+3. Ask hard questions: where does the change belong, what can we reuse, how is similar code written today, what could break? For "what could break", the agent lists who calls or uses what we change, beyond the files in the diff. Use our design words (module, interface, seam, deep or shallow; see Part 2) so plans and reviews talk the same way.
 4. Split the work into **tasks**, with the files each task touches.
-   - **Prefactor first:** if the code is awkward for the change, task 0 makes it easy, with no change in behaviour and the tests still passing.
+   - **Prefactor first:** if the code is awkward for the change, task 0 makes it easy, with no change in behaviour and the tests still passing. Remove dead code before adding new code.
+   - **Sketch first** for a new module: types and function signatures with empty bodies, in the plan or as task 0. If the build shows the sketch is wrong, change the sketch, not only the code.
    - **How to split** is the engineer's choice per ticket. Thin end-to-end slices (for example, endpoint to button) when tasks run one after another. Split by layer (`api/`, `web/`) when we want parallel subagents, because they touch different files.
    - **Each task** can be checked on its own, fits in one session, and has a "Blocked by" line: "Blocked by: A", or "Blocked by: nothing". Too big for one session means split it.
 5. Repeat until someone who never saw the chat could build from the plan alone.
@@ -142,7 +143,9 @@ One main session reads the plan and hands out the tasks (proposed).
 - **Models (our choice for now):** the main session runs on the strongest model (Opus) for planning, merging and reviewing. Task subagents use the built-in general-purpose subagent, and we tell it the model in the prompt, for example: "Build tasks A and B in parallel, each with a general-purpose subagent on Sonnet, each in its own worktree. Then merge and build task C." Check the model with `/tasks`. If Claude forgets the model, set `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` as the default, or later move to a custom subagent with `model: sonnet`.
 - **Dependent tasks** run as subagents one after another in the normal checkout, so each sees the earlier result. Don't use worktrees for them: a subagent's worktree branches from the default branch, not from your current work (in Claude Code, unless `worktree.baseRef` is set to `"head"`).
 - **Helper subagents** look and report but don't build. Research into the code belongs in the plan. A researcher (built-in Explore, read-only) is only needed during the build if the plan missed something. A verifier runs **after** a task or the merge, starts the app and compares it with the plan. With built-in subagents, "don't change files" is only an instruction. A custom verifier with only read and run tools would enforce it.
-- **The agent checks its own work.** While building it runs the cheap checks often: the type check and the one test file it is working on. At the end it runs the full build, test and lint once, and pastes the output. A failing test means it fixes the code, never the test. For a bug, it follows the bug process. For UI work, it compares a screenshot with the design mock, usually in two or three rounds.
+- **The agent checks its own work.** While building it runs the cheap checks often: the type check and the one test file it is working on. At the end it runs the full build, test and lint once, and pastes the output. A failing test means it fixes the code, never the test. For a bug, it follows the bug process. For UI work, it compares a screenshot with the design mock, usually in two or three rounds. "Done" means checked on the real thing (run it, read the value), not "it compiles" or a subagent's own summary.
+- **Repeated edits get a script.** For the same change across many files, the agent writes a script or codemod and runs it, instead of editing each file by hand. The script goes in the PR, so a reviewer can rerun it.
+- **Small choices don't wait.** On small choices that are easy to undo, the agent decides and carries on, and adds one line to a "Build log" at the end of the plan: what, why. The engineer corrects it later. It still stops for anything the plan doesn't cover or that is hard to undo.
 - **Test rules:**
   - Test only at the points in the Testing section.
   - Write one failing test, then just enough code to pass it, then the next test. Not all tests first.
@@ -153,6 +156,7 @@ One main session reads the plan and hands out the tasks (proposed).
 - **The main session merges** the task branches into the feature branch and runs the full suite on the combined result.
 - **Watch out:** a worktree holds only files git tracks. Tests that need untracked files (fixtures, a local database, secrets) can skip without saying so and still pass. Run those in the main checkout.
 - **Remove the task worktrees** when the build is done.
+- **Clean up before the PR.** The agent removes AI leftovers from the diff: comments that repeat the code, needless defensive checks, style that doesn't match the file. It tidies the commits so they read in order: prefactor, failing test, then the change. No change in behaviour.
 - **Push the feature branch** regularly, so work isn't only on one laptop. The build is done when everything is merged on the feature branch, the full suite passes, the engineer has reviewed the diffs, and the branch is pushed. The same session then opens the PR (step 4).
 - **The engineer reviews the actual diffs,** not only the subagents' summaries.
 - **Start with two or three parallel subagents.** Add more only while you can still review the results well. Review is the limit, not the tools.
@@ -176,11 +180,12 @@ Today our PRs are reviewed by coworkers, and that stays. We add an **optional AI
    - **Standards:** our written rules (`CODING_STANDARDS.md`) plus common code smells, as judgement calls.
    - **Spec:** what the spec or plan asked for that is missing, what was built but not asked for, and what looks wrong. Each finding quotes the line it refers to.
 
-   Fix what it finds in the same session and push.
+   Fix what it finds in the same session and push. For big tasks or a one-way door, run the same review on a second, different model too. Different models miss different things.
 6. **Optional: ask Copilot to review the PR on GitHub,** by adding Copilot as a reviewer on the PR page, if our organisation has it turned on.
 7. Mark the PR ready, move the ticket to "In review", and coworkers review it as today. The agent that wrote the code can never approve it.
+8. **Follow through until it can merge.** Resume session 4, or start a new one. The agent summarises the coworkers' comments, fixes failing CI checks and merge conflicts, and makes the simple requested changes, then pushes. The engineer answers the rest and resolves the threads. Each fix is a new commit, so reviewers see what changed.
 
-**Retro, when something went wrong.** If the build or review hit problems, the agent looks back over the session and suggests changes to our setup, not the code. A mistake a tool could catch becomes a check (a lint rule, a hook, a CI job). A judgement call goes into `CODING_STANDARDS.md`. The engineer picks what to apply.
+**Retro, when something went wrong.** If the build or review hit problems, the agent looks back over the session and suggests changes to our setup, not the code. A mistake a tool could catch becomes a check. Prefer, in this order: a type or code structure that makes the mistake impossible, then a lint rule or hook whose message says the fix, then a test. A judgement call goes into `CODING_STANDARDS.md`. Show that a new check fails on the real past mistake. The engineer picks what to apply.
 
 ## 5. Release: merge, deploy, check (session 5)
 
@@ -273,7 +278,7 @@ Full test suites belong at commit or PR time. Hooks that need a human approval b
 
 Turn jobs we repeat into custom agents (Claude Code calls them subagents): a small file with a name, when to use it, the tools it may use, and its instructions. Commit them so the whole team uses the same ones.
 
-**First one: a verifier.** It starts the app, tries the changed behaviour plus two neighbouring flows, and reports what it ran, what it saw, and where it differs from the plan. It fixes nothing. Its tools are limited to running commands and reading files.
+**First one: a verifier.** It starts the app, tries the changed behaviour plus two neighbouring flows, and reports what it ran, what it saw, and where it differs from the plan. It fixes nothing. Its tools are limited to running commands and reading files. pstack's `create-verification-skill` can write a first draft for a repo: how to start the app, use each feature, and capture evidence.
 
 **Permissions:** pre-approve the commands we consider safe (git, build, test, lint), so parallel subagents don't stop the main session with a prompt for each one. Hooks and permission settings in the repo apply to every session. What each session does is logged to the engineer who ran it.
 
@@ -350,7 +355,7 @@ The course also shows an agent on call in Slack (Claude Tag). For us, the GitHub
 Proposed order (not from the course, for discussion). Each phase adds one thing, and humans stay in control of decisions and approvals at every step.
 
 1. **Start now:** a short `AGENTS.md` in each repo, one check command per repo, the hook that blocks test edits during a fix, and the per-ticket flow (no company skills yet): intake with grilling, refresh, plan with a Testing section, build with the test rules, the bug process, and the PR template.
-2. **Next:** `GLOSSARY.md`, the first skill, a verifier agent, parallel subagents with worktrees, the two-report AI self-review, the retro, and evals.
+2. **Next:** `GLOSSARY.md`, the first skill, a verifier agent, parallel subagents with worktrees, the two-report AI self-review, PR follow-through, the retro, and evals.
 3. **Then:** ADRs, `CODING_STANDARDS.md`, the monthly architecture scan, agents in CI/CD (read-only first), release gates and locked-down settings.
 4. **Last:** the metrics loop, once we have a metrics store and a review gate we trust, and our own flow skills (setup, router, bug diagnosis).
 
@@ -366,6 +371,8 @@ For the Copilot admin setup (managed settings, permissions, sandboxing), see Par
 - Which browser or screenshot tool may we use for UI checks?
 - Do we use only `AGENTS.md`, or also `.github/copilot-instructions.md`?
 - Do skills copied from other agents (such as Matt Pocock's) load properly in Copilot CLI?
+- Do we install the pstack plugin for Copilot CLI (`copilot plugin install pstack@pstack-claude`), or only copy its ideas? Its README says `copilot -p` loses plugin skills on 1.0.92.
+- Which second model can we use for the second review?
 
 **Ownership**
 - Who owns the agent setup in each repo (instruction file, glossary, skills, hooks, coding standards) and approves changes?
@@ -482,7 +489,7 @@ Run A and B in parallel, then C.
 
 **Session 4: AI self-review (optional).** A fresh session runs the code review. The Standards report finds only a vague function name. The Spec report finds that the export query has no row limit, although the spec says 10,000. The agent fixes it in this session and pushes. Then the engineer adds Copilot as a reviewer on the PR page, and it only finds a naming nit. The engineer marks the PR ready and moves the ticket to "In review".
 
-**Coworker review.** A coworker reviews the PR as today and approves it. Because the basic problems were already fixed, the review is about intent and risk.
+**Coworker review.** A coworker reviews the PR as today. Because the basic problems were already fixed, the review is about intent and risk. They leave two comments: rename a variable, and "why not reuse the PDF export's query?". The engineer resumes session 4. The agent renames the variable and fixes a lint check that failed after a rebase. The engineer answers the question, and the coworker approves.
 
 **Session 5: release.** A new session reads the intent, spec and plan. The agent merges the approved PR. The pipeline deploys to dev and staging, then waits: the engineer approves the production deploy, and it goes out. With a read-only AWS role, the agent reads CloudWatch for 30 minutes after the deploy: no new errors in the billing service logs, the 5xx rate and latency are the same as before, and the log shows the first real exports (largest one 2,400 rows, 1.1 seconds). It posts this summary to BILL-123 and the ticket moves to "Done". The team adds an eval for the new export task.
 
