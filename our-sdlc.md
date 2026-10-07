@@ -43,6 +43,18 @@ Steps 1 to 5 happen on every ticket (Part 1), with the same numbers as the secti
 
 # Part 1: Per ticket
 
+## Before the first ticket: getting to know a new repo
+
+When you are new to a repo, spend one session getting to know it before you start a ticket. The agent only reads. It changes nothing.
+
+1. **Prime.** The agent reads the README, the docs and `git log`, finds the entry points, and follows one request through the code. It writes a one-page summary: what the service does, how a request flows, and the surprises. You check it before going on.
+2. **Ticket context.** The agent reads the epic and its tickets (Atlassian MCP) and compares each ticket's status with the code. This shows what is really done, branches that will clash, and where your ticket fits.
+3. **Folder by folder.** Ask for two sentences on each folder and file: the code, infrastructure, CI, build scripts. Ask about any tool you don't know.
+4. **Check the docs against the code.** Trust the code first, then the README, then other docs. Write down what is out of date.
+5. **Save it.** Keep personal notes in `.notes/` in the repo, hidden from git with `.git/info/exclude` (like `.gitignore`, but only on your machine). Add a short personal instruction file that points to the notes, so every later session starts with them. If the repo has no `AGENTS.md` yet, this is a good first draft for one (Part 2).
+
+Problems found here are not fixed now. They go into the notes, and real ones become Jira tickets.
+
 ## 1. Intake: ticket to intent (and spec for big tasks)
 
 **Default:** write an intent for every feature or story, however good or bad the ticket is. The agent does the writing, so it takes minutes. It gives the plan one clean input, and it forces the questions that find gaps before anyone builds.
