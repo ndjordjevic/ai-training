@@ -1,0 +1,2 @@
+# OpenAPI lint: vacuum's recommended rules plus all OWASP API security rules.
+extends: [[vacuum:oas, recommended], [vacuum:owasp, all]]

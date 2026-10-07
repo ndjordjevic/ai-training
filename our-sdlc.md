@@ -55,6 +55,27 @@ When you are new to a repo, spend one session getting to know it before you star
 
 Problems found here are not fixed now. They go into the notes, and real ones become Jira tickets.
 
+## Auditing an existing repo
+
+A code review checks a diff. An audit checks the whole repo as it is today: code, Terraform, CI workflows, build scripts, tests and docs. Run it read-only: the agent changes no tracked files and makes no commits. Problems it finds become Jira tickets and go through the normal flow.
+
+1. **Tools first.** Run the free, exact tools from one script per repo, writing to a local `audit-out/` folder. One tool per area:
+   - Go: golangci-lint with our curated config, govulncheck, tests with `-race -shuffle=on`.
+   - Terraform: `fmt` and `validate`, TFLint with the AWS rules, Checkov.
+   - GitHub Actions: actionlint, zizmor.
+   - Scripts: ShellCheck. Secrets: TruffleHog over the full git history.
+
+   The script does the repeat work for no tokens: about 2.5 minutes for a full run. It keeps going when a tool fails and records each tool's result in one summary file, which the AI audit reads next. A generic version of the script and its configs is in [audit-kit/](audit-kit/README.md).
+2. **Then the AI audit,** in a fresh session. Give it the tool results and tell it not to repeat them but to look further. Name Terraform, CI and the scripts in the prompt, or it looks mostly at the code. We tried shadcn's `/improve` skill (`/improve deep`): it only writes fix plans and never edits code.
+3. **Verify every finding.** A fresh subagent opens the cited code and marks each one confirmed or rejected. Two AI runs can differ, so nothing is trusted unchecked.
+4. **Turn findings into tickets.** Group them by area. Each fix plan becomes a Jira ticket.
+
+**Treat scanners as a risk too.** Pin every tool to a fixed version or checksum, never "latest" (Trivy and KICS were both hacked in 2026). Run them without AWS, GitHub or Terraform tokens, on a throwaway copy of the repo.
+
+**How often:** every PR gets the CI tools and the AI review of the diff (step 4 below). Once a month, a light re-check with the architecture scan (Part 2). Once a quarter, or before a big release, a full audit.
+
+**Why both layers:** in our first run (finacle adapter), the AI found 45 problems the tools missed, such as secrets and customer data in logs and wrong data mapping. 63 of 65 findings were confirmed. The tools found the many small issues. It took about an hour the first time.
+
 ## 1. Intake: ticket to intent (and spec for big tasks)
 
 **Default:** write an intent for every feature or story, however good or bad the ticket is. The agent does the writing, so it takes minutes. It gives the plan one clean input, and it forces the questions that find gaps before anyone builds.
@@ -252,7 +273,7 @@ One file at the root of each repo that tells the agent how the project works. Th
 
 ## Check commands
 
-Each repo needs one command each for build, test and lint, that fails when something is wrong, such as `make test`. If it takes several commands today, wrap them. List them in the instruction file. For UI work, the agent needs a browser or screenshot tool through MCP.
+Each repo needs one command each for build, test and lint, that fails when something is wrong, such as `make test`. If it takes several commands today, wrap them. List them in the instruction file. Give the linter a curated config of bug-finding linters: golangci-lint with no config runs only 5 linters, and "all" gives thousands of style issues. On the finacle repo the curated config also cut the run from 6.5 minutes to 5 seconds. For UI work, the agent needs a browser or screenshot tool through MCP.
 
 **How we know it works:** more agent-written changes pass CI the first time, and review time per PR goes down.
 
@@ -385,6 +406,7 @@ For the Copilot admin setup (managed settings, permissions, sandboxing), see Par
 - Do skills copied from other agents (such as Matt Pocock's) load properly in Copilot CLI?
 - Do we install the pstack plugin for Copilot CLI (`copilot plugin install pstack@pstack-claude`), or only copy its ideas? Its README says `copilot -p` loses plugin skills on 1.0.92.
 - Which second model can we use for the second review?
+- Does the `/improve` audit skill work in Copilot CLI? Who owns the audit script in each repo?
 
 **Ownership**
 - Who owns the agent setup in each repo (instruction file, glossary, skills, hooks, coding standards) and approves changes?
