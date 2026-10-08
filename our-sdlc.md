@@ -165,6 +165,19 @@ This is the first time the agent reads the code in depth. The intent (or spec) s
 5. Repeat until someone who never saw the chat could build from the plan alone.
 6. Commit it as `.plans/<ticket-key>-<short-name>.md` and link it from the ticket.
 
+**Design first, while waiting on the product owner.** The plan doesn't have to wait for every answer. Open questions are usually values (ids, error codes) that drop into any design. So start the plan session early and do only the design:
+1. In plan mode, the agent takes each "Parked for the plan" question and gives 2 or 3 options, the trade-offs, and a recommendation, based on the code.
+2. Product owner answers it depends on are written as assumptions. If an answer could change the design, it says so.
+3. It writes the plan file with only a **Design** part and "Status: draft, waiting on product owner answers". No tasks yet.
+4. The team reviews the design early, above all one-way doors. A decision that outlives the ticket becomes an ADR.
+5. When the answers arrive, refresh the intent, check the design still holds, then finish the plan (steps 2 to 6) in a new session.
+
+**Looking in AWS.** All our services run on AWS, so the plan (and a bug hunt) sometimes needs facts from the real account: a gateway setting, a parameter, a log. The agent never guesses how to get in. Before its first AWS command, it asks the engineer which way this repo uses, unless the instruction file already says:
+- **Local AWS CLI:** for accounts we can reach from our laptops. The agent runs read-only commands itself.
+- **Script for the engineer:** for accounts reachable only from a locked-down desktop, such as AWS WorkSpaces. The agent writes a short read-only bash script, the engineer runs it there and pastes the output back.
+
+Either way the commands are read-only, and secrets are hidden in what comes back. Record the answer in the repo's instruction file (for example, "AWS: script for the engineer, run from AWS WorkSpaces"), so the agent asks only once per repo.
+
 If the plan shows the spec was wrong, update the spec too. Small changes are approved by the engineer. Risky ones go to a tech lead.
 
 ## 3. Build: one main session, tasks to subagents
@@ -250,7 +263,7 @@ One file at the root of each repo that tells the agent how the project works. Th
 
 1. Ask the agent to write a first draft from the codebase.
 2. Cut it to what a new teammate needs on day one: **commands** (build, test, lint, with what success looks like), a few **rules** that matter, and **pointers** to other files: `GLOSSARY.md`, `CODING_STANDARDS.md`, `docs/adr/`, and our design words.
-3. Add the rule: "Run the build, tests and lint before reporting a task complete, and paste the output. If a test fails, fix the code, not the test."
+3. Add the rule: "Run the build, tests and lint before reporting a task complete, and paste the output. If a test fails, fix the code, not the test." Also add how the agent reaches AWS for this repo: local AWS CLI, or a script the engineer runs (see "Looking in AWS" in step 2).
 4. Keep it short. Every line is loaded in every session and costs tokens each turn. Details go in other files, behind a pointer that says when to read them.
 5. Commit it at the repo root. Code owners review changes to it like any code.
 6. When the agent makes the same mistake twice, run a retro (step 4). A mistake a tool could catch becomes a check. Only what the agent can't look up itself goes into this file.
