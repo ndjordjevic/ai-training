@@ -19,6 +19,7 @@ Many ideas below come from Matt Pocock's [skills](https://github.com/mattpocock/
 
 They are connected in three ways:
 - **Same name, different folders:** `.intent/BILL-123-invoice-csv.md`, `.specs/BILL-123-invoice-csv.md`, `.plans/BILL-123-invoice-csv.md`. The Jira key ties them to the ticket.
+- **They live in a private worknotes repo, not in the work repo.** The worknotes repo has one folder per work repo. `.intent/`, `.specs/` and `.plans/` in the work repo are links to that folder, hidden with `.git/info/exclude`. So the files sync between our computers through the worknotes repo, and never go into the work repo or the PR.
 - **Each file links to the one before it:** the spec starts with "Intent: …", and the plan with "Spec: …", or "Intent: …" when there is no spec.
 - **Changes flow down:** the refresh updates the intent first, then the spec if there is one, then the plan.
 
@@ -88,8 +89,8 @@ A code review checks a diff. An audit checks the whole repo as it is today: code
 4. **Grilling.** The agent interviews the engineer in rounds about the problem only: why, for whom, outcome, scope, behaviour and constraints. Each round lists every question it can ask now, numbered, each with its recommended answer. It only asks the engineer for decisions. **Design questions** (which component, where data is stored, how to wire it) are not asked here: they go into "Parked for the plan" in the intent, one line each. Questions only the product owner, another team or a customer can answer are not asked here either: they go straight into the Jira comment (step 6), and the agent checks the code or tickets first in case the answer is already there. New project terms go into `GLOSSARY.md` straight away. It stops when nothing is left unclear.
 5. The agent writes the intent from the ticket and the answers, in business terms: no file paths, line numbers, mechanisms or build details (such as CI), and nothing the plan owns, such as where a request is rejected. The Outcome covers only this ticket: work that belongs to other tickets goes under Constraints as out of scope. It never states as fact something the product owner still has to confirm (for example, what callers send today), and it adds no promises the ticket didn't ask for, such as timings. Those belong in the plan. A short note of what the code already does goes under Problem.
 6. Questions only the product owner can answer go to them as a Jira comment in questionnaire shape: most important first, one idea per question, each with a default, and a short "why this matters" where it could be misread. Example: "Should it include invoices older than 2 years? Default if I hear nothing: no." A default must be safe. If none is, write "blocked until answered"; never guess ids, values or names. The same goes for any question about what callers send today or what a change could break for them. Every question in the draft also appears in the intent's list for the product owner. An engineer answer that changes what callers or customers see is copied here too, for the product owner to confirm.
-7. Update the intent with the answers. Stop when the problem, outcome, constraints and scope are clear, and the rest are answered or written down as assumptions. One or two rounds is normal. If it takes more, have a short call. The product owner confirms the intent with a Jira comment.
-8. Commit it as `.intent/<ticket-key>-<short-name>.md` and link it from the ticket.
+7. Update the intent with the answers. Stop when the problem, outcome, constraints and scope are clear, and the rest are answered or written down as assumptions. One or two rounds is normal. If it takes more, have a short call. The product owner can't see the worknotes repo, so the agent posts a short summary of the intent (problem, outcome, scope) on the ticket, and the product owner confirms it with a Jira comment.
+8. Save it as `.intent/<ticket-key>-<short-name>.md`, then commit and push the worknotes repo.
 
 **Model:** run intake on the strongest model (Opus). In our DSM-960 trial with the same prompt, Sonnet broke one or two rules on every run (design questions asked, guessed defaults, an Outcome that went past the ticket), and Opus broke none. It also found more in the code check. Intake runs once per ticket, and mistakes there are expensive later.
 
@@ -98,7 +99,7 @@ A code review checks a diff. An audit checks the whole repo as it is today: code
 **A separate spec, for big tasks only.** Most tickets don't need one: the plan starts with a "What we build" part instead (step 2). The engineer decides, using this guide: the change spans several services, needs a security or privacy review, or takes more than a few days. The agent gives no "big or small" verdict and does not estimate days. Its answers stay in the chat and are not written into the intent. It answers each of the three questions with evidence from the ticket and the code (which services, which review, which dependencies), and the engineer decides. They can ask a tech lead. For a big task, still in this session:
 1. Ask the agent for a spec for our codebase, following our skills (security, UX, compliance). Until we have skills, it follows the instruction file and the existing code.
 2. Concerns the agent flags go to the policy owners, such as security or privacy, before anyone builds.
-3. Commit it as `.specs/<ticket-key>-<short-name>.md` and link it from the ticket.
+3. Save it as `.specs/<ticket-key>-<short-name>.md`, then commit and push the worknotes repo.
 
 The spec, or the plan's "What we build" part, has: decisions, rules, what we will not do, open questions, and a **Testing** section. The Testing section says which behaviour we test, at which points (for example, one integration test through the endpoint), and which existing tests to copy. The product owner doesn't read it. The engineer checks it, and coworkers see it in the PR.
 
@@ -124,7 +125,7 @@ Prompt to reuse:
 
 ## Rule for every step: one session per step
 
-Use a new session for each step: intake, plan, build. The build session ends by opening the PR. The committed files carry the state, not the chat. A fresh session has no leftover assumptions, can't use anything that isn't written down, and doesn't suffer from a long, compacted conversation. You can also stop and resume, or hand over to someone else. If a fresh session can't continue from the files alone, the file is missing something, so fix the file.
+Use a new session for each step: intake, plan, build. The build session ends by opening the PR. The saved files carry the state, not the chat. A fresh session has no leftover assumptions, can't use anything that isn't written down, and doesn't suffer from a long, compacted conversation. You can also stop and resume, or hand over to someone else. If a fresh session can't continue from the files alone, the file is missing something, so fix the file.
 
 Every new session starts the same way: "Read the intent (and the spec and plan if they exist), then refresh them against Jira."
 
@@ -156,21 +157,24 @@ This is the first time the agent reads the code in depth. The intent (or spec) s
 
 1. Start the agent in plan mode, where it can read code but not change it, and give it the intent and the spec if there is one. The intent's "Parked for the plan" list is the first set of questions to answer.
 2. **No spec?** The plan starts with a "What we build" part: decisions, what we will not do, and the Testing section (see step 1). The "How and where" part comes below it.
-3. Ask hard questions: where does the change belong, what can we reuse, how is similar code written today, what could break? For "what could break", the agent lists who calls or uses what we change, beyond the files in the diff. Use our design words (module, interface, seam, deep or shallow; see Part 2) so plans and reviews talk the same way.
+3. Ask hard questions: where does the change belong, what can we reuse, how is similar code written today, what could break? For "what could break", the agent lists who calls or uses what we change, beyond the files in the diff. Use our design words (module, interface, seam, deep or shallow; see Part 2) so plans and reviews talk the same way. Serious problems the agent finds while reading code but outside the ticket, such as a secret written to the logs, become their own ticket at once; they don't wait for this one to ship.
 4. Split the work into **tasks**, with the files each task touches.
    - **Prefactor first:** if the code is awkward for the change, task 0 makes it easy, with no change in behaviour and the tests still passing. Remove dead code before adding new code.
    - **Sketch first** for a new module: types and function signatures with empty bodies, in the plan or as task 0. If the build shows the sketch is wrong, change the sketch, not only the code.
    - **How to split** is the engineer's choice per ticket. Thin end-to-end slices (for example, endpoint to button) when tasks run one after another. Split by layer (`api/`, `web/`) when we want parallel subagents, because they touch different files.
-   - **Each task** can be checked on its own, fits in one session, and has a "Blocked by" line: "Blocked by: A", or "Blocked by: nothing". Too big for one session means split it.
+   - **Each task** can be checked on its own, fits in one session, and has a "Blocked by" line naming tasks or a person's answer ("Blocked by: A", "Blocked by: product owner's ids"), or "Blocked by: nothing". Too big for one session means split it.
 5. Repeat until someone who never saw the chat could build from the plan alone.
-6. Commit it as `.plans/<ticket-key>-<short-name>.md` and link it from the ticket.
+6. Save it as `.plans/<ticket-key>-<short-name>.md`, then commit and push the worknotes repo.
 
 **Design first, while waiting on the product owner.** The plan doesn't have to wait for every answer. Open questions are usually values (ids, error codes) that drop into any design. So start the plan session early and do only the design:
-1. In plan mode, the agent takes each "Parked for the plan" question and gives 2 or 3 options, the trade-offs, and a recommendation, based on the code.
-2. Product owner answers it depends on are written as assumptions. If an answer could change the design, it says so.
-3. It writes the plan file with only a **Design** part and "Status: draft, waiting on product owner answers". No tasks yet.
-4. The team reviews the design early, above all one-way doors. A decision that outlives the ticket becomes an ADR.
-5. When the answers arrive, refresh the intent, check the design still holds, then finish the plan (steps 2 to 6) in a new session.
+1. First, draw how callers reach us today: who calls, through what, and who picks our address. Check it with the product owner or the caller's team, because a fact from outside the repo can remove options. (In DSM-960 a short call showed the caller already picks our URL per bank, which made a simpler design possible.)
+2. In plan mode, the agent takes each "Parked for the plan" question and gives 2 or 3 options, the trade-offs, and a recommendation, based on the code.
+3. Product owner answers it depends on are written as assumptions. If an answer could change the design, it says so.
+4. It writes the plan file with only a **Design** part and "Status: draft, waiting on product owner answers". No tasks yet.
+5. The team reviews the design early, above all one-way doors.
+6. When the answers arrive, refresh the intent, check the design still holds, then finish the plan (steps 2 to 6). Use a new session, or the same one if it still has room: it already knows the code.
+
+**Plan mode writes nothing until you accept.** In plan mode the agent keeps its draft in its own plans folder, not in the repo. To get the plan file written, accept the plan when the agent asks. Rejecting it to read it first leaves nothing written.
 
 **Looking in AWS.** All our services run on AWS, so the plan (and a bug hunt) sometimes needs facts from the real account: a gateway setting, a parameter, a log. The agent never guesses how to get in. Before its first AWS command, it asks the engineer which way this repo uses, unless the instruction file already says:
 - **Local AWS CLI:** for accounts we can reach from our laptops. The agent runs read-only commands itself.
@@ -217,7 +221,7 @@ Today our PRs are reviewed by coworkers, and that stays. We add an **optional AI
 **Sessions:** opening the PR is the last step of the build session (session 3), which knows the work and can write a good description. The AI self-review runs in a **new session** (session 4): a reviewer that didn't write the code isn't biased toward it.
 
 1. Refresh once more, because the reviewer will compare the PR with the intent.
-2. Open one PR from the feature branch as a **draft**, with the Jira key in the title, for example "BILL-123: invoice CSV export". The PR contains the intent, the spec if any, the plan and the code, so the reviewer sees what was asked, what was decided, how it was planned, and what was built.
+2. Open one PR from the feature branch as a **draft**, with the Jira key in the title, for example "BILL-123: invoice CSV export". The PR contains the code. Its description gives a short summary of the intent, the plan's decisions and the Testing section, because the files themselves stay in the worknotes repo. So the reviewer still sees what was asked, what was decided, and what was built.
 3. **The PR description** has three parts:
    - **Summary:** the smallest picture that shows the change, such as a call tree, a file tree or a small diff.
    - **Evidence:** before and after, such as a screenshot or the test output.
@@ -262,7 +266,7 @@ Done once by tech leads and the platform team, then kept up to date.
 One file at the root of each repo that tells the agent how the project works. The agent reads it at the start of every session. Both Copilot CLI and Claude Code read `AGENTS.md`, so we use that name (proposed).
 
 1. Ask the agent to write a first draft from the codebase.
-2. Cut it to what a new teammate needs on day one: **commands** (build, test, lint, with what success looks like), a few **rules** that matter, and **pointers** to other files: `GLOSSARY.md`, `CODING_STANDARDS.md`, `docs/adr/`, and our design words.
+2. Cut it to what a new teammate needs on day one: **commands** (build, test, lint, with what success looks like), a few **rules** that matter, and **pointers** to other files: `GLOSSARY.md`, `CODING_STANDARDS.md`, and our design words.
 3. Add the rule: "Run the build, tests and lint before reporting a task complete, and paste the output. If a test fails, fix the code, not the test." Also add how the agent reaches AWS for this repo: local AWS CLI, or a script the engineer runs (see "Looking in AWS" in step 2).
 4. Keep it short. Every line is loaded in every session and costs tokens each turn. Details go in other files, behind a pointer that says when to read them.
 5. Commit it at the repo root. Code owners review changes to it like any code.
@@ -276,14 +280,12 @@ One file at the root of each repo that tells the agent how the project works. Th
 
 **How we know it works:** the agent repeats fewer mistakes, and new people merge their first PR sooner.
 
-## Glossary and decision records
+## Glossary
 
 **`GLOSSARY.md`**, one per repo at the root. Each project term gets one or two sentences that say what it is, plus an "Avoid" list of other words for the same thing. Example: **Invoice**: a request for payment sent to a customer after delivery. _Avoid_: bill, payment request. General programming words don't belong in it.
 - It grows from the intake grilling: the agent adds a term when it is settled, and the engineer confirms it in the session. Code owners review it in the PR.
 - No big upfront effort. The first sessions in a repo are slower, until the main terms are in.
 - Shared words make intents, plans and code names shorter and consistent, and the agent spends fewer tokens.
-
-**ADRs (decision records)** in `docs/adr/`, numbered `0001-short-name.md`. One to three sentences: the context, what we decided, and why. Write one only when all three are true: it is hard to reverse, it would surprise a future reader, and it was a real trade-off. Example: "Exports never include tax IDs, because the privacy team treats them as personal data." The agent reads the ADRs in the area it touches and doesn't argue them again.
 
 ## Check commands
 
@@ -354,7 +356,7 @@ Our PRs are reviewed by coworkers. The AI review is an optional extra before the
 
 ## Architecture scan
 
-Once a month, a tech lead runs a read-only scan of each repo. It looks first at the code that changed most, finds shallow modules that make changes hard, and writes an HTML report with a before and after picture for each candidate. Nothing in the repo changes. The tech lead picks candidates, and each one becomes a Jira ticket that goes through the normal flow. It uses the glossary and respects the ADRs. Bug fixes that found no good place for a regression test feed into it.
+Once a month, a tech lead runs a read-only scan of each repo. It looks first at the code that changed most, finds shallow modules that make changes hard, and writes an HTML report with a before and after picture for each candidate. Nothing in the repo changes. The tech lead picks candidates, and each one becomes a Jira ticket that goes through the normal flow. It uses the glossary. Bug fixes that found no good place for a regression test feed into it.
 
 **How we know it works:** fewer bug fixes without a regression test, and changes in the scanned areas get smaller.
 
@@ -403,7 +405,7 @@ Proposed order (not from the course, for discussion). Each phase adds one thing,
 
 1. **Start now:** a short `AGENTS.md` in each repo, one check command per repo, the hook that blocks test edits during a fix, and the per-ticket flow (no company skills yet): intake with grilling, refresh, plan with a Testing section, build with the test rules, the bug process, and the PR template.
 2. **Next:** `GLOSSARY.md`, the first skill, a verifier agent, parallel subagents with worktrees, the two-report AI self-review, PR follow-through, the retro, and evals.
-3. **Then:** ADRs, `CODING_STANDARDS.md`, the monthly architecture scan, agents in CI/CD (read-only first), release gates and locked-down settings.
+3. **Then:** `CODING_STANDARDS.md`, the monthly architecture scan, agents in CI/CD (read-only first), release gates and locked-down settings.
 4. **Last:** the metrics loop, once we have a metrics store and a review gate we trust, and our own flow skills (setup, router, bug diagnosis).
 
 For the Copilot admin setup (managed settings, permissions, sandboxing), see Part 1 of the training, Tab 4 (Administration).
@@ -488,7 +490,7 @@ Customers see only their own invoices. Dates in UTC (Confluence).
 
 The agent posts the open question to Jira in questionnaire shape, with its default.
 
-The next day the product owner answers "same file is fine" and confirms the intent. The engineer resumes the same session. The refresh shows the new comment, the engineer confirms, and the intent gets a changelog line. This ticket needs a privacy review, so the engineer decides it is a big task and asks for a separate spec. The agent writes `.specs/BILL-123-invoice-csv.md`: endpoint `GET /invoices/export`, the columns, a 10,000-row limit, own invoices only, every export logged. The security skill flags that tax IDs are personal data, and the privacy team says to leave them out. That decision lasts beyond this ticket, so it also becomes an ADR.
+The next day the product owner answers "same file is fine" and confirms the intent. The engineer resumes the same session. The refresh shows the new comment, the engineer confirms, and the intent gets a changelog line. This ticket needs a privacy review, so the engineer decides it is a big task and asks for a separate spec. The agent writes `.specs/BILL-123-invoice-csv.md`: endpoint `GET /invoices/export`, the columns, a 10,000-row limit, own invoices only, every export logged. The security skill flags that tax IDs are personal data, and the privacy team says to leave them out.
 
 ```markdown
 # Spec: invoice CSV export (BILL-123)
