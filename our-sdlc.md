@@ -232,11 +232,12 @@ Today our PRs are reviewed by coworkers, and that stays. We add an **optional AI
    - **Evidence:** before and after, such as a screenshot or the test output.
    - **Merge danger:** can we roll it back easily (a "two-way door") or not (a "one-way door"), and what it could affect.
 4. Link the PR to the ticket.
-5. **Optional AI review, in a new session.** Run the agent's code review on the branch, for example `/code-review` in Claude Code. It gives **two separate reports**, so one can't hide the other:
-   - **Standards:** our written rules (`CODING_STANDARDS.md`) plus common code smells, as judgement calls.
-   - **Spec:** what the spec or plan asked for that is missing, what was built but not asked for, and what looks wrong. Each finding quotes the line it refers to.
+5. **AI review, by fresh reviewers.** It can run on the staged diff before the engineer's own review, so the engineer reviews cleaner code. Three parts, so one can't hide another:
+   - **Bugs:** `/code-review high --max-findings all` in Claude Code. It reviews the branch plus uncommitted changes, in its own subagent with a fresh context, and follows `CLAUDE.md` (which points to `CODING_STANDARDS.md`). Ask it to fix the findings you agree with; fixes land as unstaged changes, apart from the staged build.
+   - **Security:** `/security-review`, above all when the change touches secrets, certificates or auth.
+   - **Spec vs code,** in a new session, because neither command checks it: "Check the staged changes against the plan and the intent. Report only what is missing, what was built but not asked for, and anything that breaks a constraint. Quote file:line. Don't change any files."
 
-   Fix what it finds in the same session and push. For big tasks or a one-way door, run the same review on a second, different model too. Different models miss different things.
+   For big tasks or a one-way door, add a second, different model too, for example `/code-review ultra` (a deeper multi-agent review in the cloud, billed) or Copilot's review on GitHub. Different models miss different things.
 6. **Optional: ask Copilot to review the PR on GitHub,** by adding Copilot as a reviewer on the PR page, if our organisation has it turned on.
 7. Mark the PR ready, move the ticket to "In review", and coworkers review it as today. The agent that wrote the code can never approve it.
 8. **Follow through until it can merge.** Resume session 4, or start a new one. The agent summarises the coworkers' comments, fixes failing CI checks and merge conflicts, and makes the simple requested changes, then pushes. The engineer answers the rest and resolves the threads. Each fix is a new commit, so reviewers see what changed.
