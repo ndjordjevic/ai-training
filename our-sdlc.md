@@ -282,8 +282,8 @@ One file at the root of each repo that tells the agent how the project works. Th
 
 ## Glossary
 
-**`GLOSSARY.md`**, one per repo at the root. Each project term gets one or two sentences that say what it is, plus an "Avoid" list of other words for the same thing. Example: **Invoice**: a request for payment sent to a customer after delivery. _Avoid_: bill, payment request. General programming words don't belong in it.
-- It grows from the intake grilling: the agent adds a term when it is settled, and the engineer confirms it in the session. Code owners review it in the PR.
+**`GLOSSARY.md`**, one per repo. Like the intent and plan, it lives in the worknotes repo and is linked into the work repo's root, hidden with `.git/info/exclude`. Each project term gets one or two sentences that say what it is, plus an "Avoid" list of other words for the same thing. Example: **Invoice**: a request for payment sent to a customer after delivery. _Avoid_: bill, payment request. General programming words don't belong in it.
+- It grows from the intake grilling: the agent adds a term when it is settled, and the engineer confirms it in the session.
 - No big upfront effort. The first sessions in a repo are slower, until the main terms are in.
 - Shared words make intents, plans and code names shorter and consistent, and the agent spends fewer tokens.
 
@@ -308,7 +308,7 @@ A skill is a folder with a `SKILL.md` file. It teaches the agent one company rul
 **How we know it works:** review findings about that policy fall towards zero. If they don't, the skill isn't triggering, or it no longer matches the policy.
 
 **Our own flow skills, later.** Once the flow is stable, we write three skills of our own:
-- A **setup skill**, run once per repo: it creates `AGENTS.md` with pointers, an empty `GLOSSARY.md`, the Jira settings and the check commands.
+- A **setup skill**, run once per repo: it creates `AGENTS.md` with pointers, the links to the worknotes folder (`.intent/`, `.specs/`, `.plans/`, `GLOSSARY.md`) and their `.git/info/exclude` lines, the Jira settings and the check commands.
 - A **router** ("ask our SDLC"): a teammate describes their situation, and it points to the right step.
 - A **bug diagnosis skill** that runs the bug process from Part 1.
 
