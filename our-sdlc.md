@@ -211,6 +211,7 @@ One main session reads the plan and hands out the tasks (proposed). It works thr
 - **Tools that clash in parallel:** some tools refuse to run twice at once (for example golangci-lint). The main session runs them one at a time, or retries.
 - **A check that already fails before the build** is checked against the base commit. If it failed there too, the agent logs it and leaves it; fixing it is another ticket.
 - **Remove the task worktrees** when the build is done.
+- **Comments are one line at most.** Every comment the agent adds is a single line, never a block of several lines. If it needs more, the code or a name should say it instead.
 - **Clean up before the PR.** The agent removes AI leftovers from the diff: comments that repeat the code, needless defensive checks, style that doesn't match the file. No change in behaviour. The engineer commits after the review, in order if useful: prefactor, tests, then the change.
 - **The engineer commits and pushes,** never the agent. The build is done when the result is on the feature branch, the full suite passes, and the engineer has reviewed the diff, committed and pushed. The same session then opens the PR (step 4).
 - **The engineer reviews the actual diffs,** not only the subagents' summaries.
