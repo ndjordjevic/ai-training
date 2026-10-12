@@ -237,6 +237,11 @@ Today our PRs are reviewed by coworkers, and that stays. We add an **optional AI
    - **Security:** `/security-review`, above all when the change touches secrets, certificates or auth.
    - **Spec vs code,** in a new session, because neither command checks it: "Check the staged changes against the plan and the intent. Report only what is missing, what was built but not asked for, and anything that breaks a constraint. Quote file:line. Don't change any files."
 
+   **Rules for the reviewers:**
+   - Each finding gives a concrete failing case (input or state → wrong result). A finding without one is dropped or marked "unsure".
+   - When the agent fixes "by best guess", it decides each finding and gives a reason for every one it doesn't fix.
+   - A check that compares against git's index (for example `make verify-generated`) can fail while the fixes are unstaged. The agent proves the real property another way, and doesn't stage the fixes just to make it pass.
+
    For big tasks or a one-way door, add a second, different model too, for example `/code-review ultra` (a deeper multi-agent review in the cloud, billed) or Copilot's review on GitHub. Different models miss different things.
 6. **Optional: ask Copilot to review the PR on GitHub,** by adding Copilot as a reviewer on the PR page, if our organisation has it turned on.
 7. Mark the PR ready, move the ticket to "In review", and coworkers review it as today. The agent that wrote the code can never approve it.
