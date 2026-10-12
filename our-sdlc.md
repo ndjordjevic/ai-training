@@ -244,9 +244,17 @@ Today our PRs are reviewed by coworkers, and that stays. We add an **optional AI
    - A check that compares against git's index (for example `make verify-generated`) can fail while the fixes are unstaged. The agent proves the real property another way, and doesn't stage the fixes just to make it pass.
 
    For big tasks or a one-way door, add a second, different model too, for example `/code-review ultra` (a deeper multi-agent review in the cloud, billed) or Copilot's review on GitHub. Different models miss different things.
-6. **Optional: ask Copilot to review the PR on GitHub,** by adding Copilot as a reviewer on the PR page, if our organisation has it turned on.
-7. Mark the PR ready, move the ticket to "In review", and coworkers review it as today. The agent that wrote the code can never approve it.
-8. **Follow through until it can merge.** Resume session 4, or start a new one. The agent summarises the coworkers' comments, fixes failing CI checks and merge conflicts, and makes the simple requested changes, then pushes. The engineer answers the rest and resolves the threads. Each fix is a new commit, so reviewers see what changed.
+6. **The engineer's own review,** in the same session as the AI review: the engineer is the reviewer now, and that session already knows every finding, fix and reason (start a new one only if its context is nearly full, and point it to the Build log).
+   - Open each file in the IDE and have the agent explain it in 2–3 plain sentences, read from the diff, not from memory.
+   - Go in data-flow order (config, wiring, logic, infrastructure, API docs), so the design shows before the detail. Spend the most time on high-risk tasks.
+   - Ask "why?" wherever the intent isn't clear from the code, and "did you check X?" to force a real check.
+   - Ask what should have changed but didn't: generated code, docs, CI, rollout order. A walkthrough of the diff can't show what's missing.
+   - Short explanations drop caveats. For each trade-off the build kept, read its entry in the Build log.
+   - Decide what the AI review left open. The agent changes only what you ask for, and stages it when you say so.
+   - Then commit the build and the fixes you keep, push, and open or update the draft PR. The engineer commits, never the agent.
+7. **Optional: ask Copilot to review the PR on GitHub,** by adding Copilot as a reviewer on the PR page, if our organisation has it turned on.
+8. Mark the PR ready, move the ticket to "In review", and coworkers review it as today. The agent that wrote the code can never approve it.
+9. **Follow through until it can merge.** Resume session 4, or start a new one. The agent summarises the coworkers' comments, fixes failing CI checks and merge conflicts, and makes the simple requested changes, then pushes. The engineer answers the rest and resolves the threads. Each fix is a new commit, so reviewers see what changed.
 
 **Retro, when something went wrong.** If the build or review hit problems, the agent looks back over the session and suggests changes to our setup, not the code. A mistake a tool could catch becomes a check. Prefer, in this order: a type or code structure that makes the mistake impossible, then a lint rule or hook whose message says the fix, then a test. A judgement call goes into `CODING_STANDARDS.md`. Show that a new check fails on the real past mistake. The engineer picks what to apply.
 
