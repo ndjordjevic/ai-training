@@ -19,7 +19,7 @@ Many ideas below come from Matt Pocock's [skills](https://github.com/mattpocock/
 
 They are connected in three ways:
 - **Same name, different folders:** `.intent/BILL-123-invoice-csv.md`, `.specs/BILL-123-invoice-csv.md`, `.plans/BILL-123-invoice-csv.md`. The Jira key ties them to the ticket.
-- **They live in a private worknotes repo, not in the work repo.** The worknotes repo has one folder per work repo. `.intent/`, `.specs/` and `.plans/` in the work repo are links to that folder, hidden with `.git/info/exclude`. So the files sync between our computers through the worknotes repo, and never go into the work repo or the PR.
+- **They live in a private worknotes repo, not in the work repo.** The worknotes repo has one folder per work repo. `.intent/`, `.specs/`, `.plans/` and `.verify/` in the work repo are links to that folder, hidden with `.git/info/exclude`. So the files sync between our computers through the worknotes repo, and never go into the work repo or the PR.
 - **Each file links to the one before it:** the spec starts with "Intent: …", and the plan with "Spec: …", or "Intent: …" when there is no spec.
 - **Changes flow down:** the refresh updates the intent first, then the spec if there is one, then the plan.
 
@@ -164,7 +164,8 @@ This is the first time the agent reads the code in depth. The intent (or spec) s
    - **How to split** is the engineer's choice per ticket. Thin end-to-end slices (for example, endpoint to button) when tasks run one after another. Split by layer (`api/`, `web/`) when we want parallel subagents, because they touch different files.
    - **Each task** can be checked on its own, fits in one session, and has a "Blocked by" line naming tasks or a person's answer ("Blocked by: A", "Blocked by: product owner's ids"), or "Blocked by: nothing". Too big for one session means split it.
 5. Repeat until someone who never saw the chat could build from the plan alone.
-6. Save it as `.plans/<ticket-key>-<short-name>.md`, then commit and push the worknotes repo.
+6. **Write the checks for the verify step,** in `.verify/<ticket-key>-<short-name>.md`, and link it from the plan. If the repo's `.verify/VERIFY.md` is still the empty template, fill it in first (see PR step 7). The planner knows what the change does and what can be seen from outside. Each check says what to do and what to expect, which environment can test it, and what it needs: test data, an id, credentials, or a person's answer. Chase the needs while the code is built, not after the deploy. The plan's "done when" list stays the short, business-level view.
+7. Save the plan as `.plans/<ticket-key>-<short-name>.md`, then commit and push the worknotes repo.
 
 **Design first, while waiting on the product owner.** The plan doesn't have to wait for every answer. Open questions are usually values (ids, error codes) that drop into any design. So start the plan session early and do only the design:
 1. First, draw how callers reach us today: who calls, through what, and who picks our address. Check it with the product owner or the caller's team, because a fact from outside the repo can remove options. (In DSM-960 a short call showed the caller already picks our URL per bank, which made a simpler design possible.)
@@ -179,6 +180,8 @@ This is the first time the agent reads the code in depth. The intent (or spec) s
 **Looking in AWS.** All our services run on AWS, so the plan (and a bug hunt) sometimes needs facts from the real account: a gateway setting, a parameter, a log. The agent never guesses how to get in. Before its first AWS command, it asks the engineer which way this repo uses, unless the instruction file already says:
 - **Local AWS CLI:** for accounts we can reach from our laptops. The agent runs read-only commands itself.
 - **Script for the engineer:** for accounts reachable only from a locked-down desktop, such as AWS WorkSpaces. The agent writes a short read-only bash script, the engineer runs it there and pastes the output back.
+
+The way in can also depend on **which computer the engineer is on today** (for example, a work laptop on the company network, or a private computer that reaches the network through a remote desktop). So the agent asks that too, and picks the local CLI or the script.
 
 Either way the commands are read-only, and secrets are hidden in what comes back. Record the answer in the repo's instruction file (for example, "AWS: script for the engineer, run from AWS WorkSpaces"), so the agent asks only once per repo.
 
@@ -251,10 +254,35 @@ Today our PRs are reviewed by coworkers, and that stays. We add an **optional AI
    - Ask what should have changed but didn't: generated code, docs, CI, rollout order. A walkthrough of the diff can't show what's missing.
    - Short explanations drop caveats. For each trade-off the build kept, read its entry in the Build log.
    - Decide what the AI review left open. The agent changes only what you ask for, and stages it when you say so.
+   - **Before you present a large PR to a coworker, walk it once more in the same session,** as a second review pass. Explaining each file forces a check that the code does what the description says:
+     - Go in the order of GitHub's file view, one package or file at a time, from the real diff against the base (`git diff <base> HEAD -- <path>`).
+     - Group files with the same mechanical change and explain one. Give each "Before" and "Now" in plain English, 2–3 sentences, one for a move or rename. Spend longer on the risky or surprising part.
+     - Fix the project's terms once at the top (for example, "data holder" is the bank, "backend" is the core banking system) and keep them.
+     - Check rename and move claims against git (`git diff -M`, grep for callers).
+     - Read the infrastructure the same way, including changes from other people's PRs. A missing Terraform `moved` block would have destroyed and recreated a live API.
+     - Turn the reader's questions into follow-ups. Naming questions lead to renames, and "why not X" questions expose design choices made silently.
+     - End with a status block: what was tested, what is blocked and on whom, and what must happen before prod. Post it on the ticket.
    - Then commit the build and the fixes you keep, push, and open or update the draft PR. The engineer commits, never the agent.
-7. **Optional: ask Copilot to review the PR on GitHub,** by adding Copilot as a reviewer on the PR page, if our organisation has it turned on.
-8. Mark the PR ready, move the ticket to "In review", and coworkers review it as today. The agent that wrote the code can never approve it.
-9. **Follow through until it can merge.** Resume session 4, or start a new one. The agent summarises the coworkers' comments, fixes failing CI checks and merge conflicts, and makes the simple requested changes, then pushes. The engineer answers the rest and resolves the threads. Each fix is a new commit, so reviewers see what changed.
+7. **Deploy to a lower environment and verify, in a new session.** The engineer deploys the branch through our pipeline (the agent never deploys). A fresh session then reads the intent, the plan, the Build log and `.verify/VERIFY.md`, and checks what really runs. It only reads and reports, and changes no files.
+   - **`.verify/VERIFY.md`, one per repo:** how to test this repo after a deploy. It holds the environment URLs and how to sign in, how to call the service (example requests, test data), how to read logs and metrics (with the repo's AWS access rule), the standard smoke tests, and known gotchas. It says where credentials come from and never holds them. It is created once per repo: the setup skill adds the link and an empty template, and the plan phase of the first ticket fills in what the agent can read from the repo (how to run it, the endpoints, the log groups) and asks the engineer for what only they know (environments, accounts and roles, the login for each computer). Anything unconfirmed is marked "to confirm". The verify session confirms or corrects it from real runs and proposes additions, and the engineer decides what to keep. Later tickets read it and don't ask again. If the plan phase was skipped, the first verify session drafts it.
+   - **`.verify/<ticket-key>-<short-name>.md`, one per ticket:** the checks, written in the plan phase (step 2, point 6) and updated by the build if what can be checked changed. The verify session adds the results: what was run, what was seen, in which environment. Anything not verified is marked, with the reason. The PR summary links to the results.
+   - **The agent needs a working AWS CLI to verify, so settle access first.** Ask: which computer you're on today, which account and role, and who gives you test credentials if you have none. Then one of:
+     - **Local CLI:** you sign in and give the agent a working session. Depending on the repo, that is a login tool that sets up profiles (for example `saml2aws`), or the access portal: pick the account and role, copy the three `export` lines into the terminal. Non-production and production can need different logins and accounts, so check which one this check needs.
+     - **Remote desktop:** from a computer that can't reach AWS, the agent gives you read-only commands to paste into the remote desktop, and you paste the output back.
+     - Credentials are short-lived. When they expire, get new ones, and each role is a separate sign-in.
+   - **Also ask before the first check:** how the branch gets deployed (the pipeline, and which account runs it) and which environment to use. Put all the answers in `VERIFY.md`: the environments, the account groups, the role for each kind of check, and the login method for each computer. The next ticket then doesn't ask again.
+   - **Know which environments can test this change.** Some can't (for example, a backend that only exists in one of them). Write it in `VERIFY.md`, marked "confirmed" or "assumed".
+   - **Credentials:** use short-lived, read-only ones. The agent keeps them in a scratch file it deletes afterwards, never in a repo or a note. Pasting them into the chat leaves them in the history, so let them expire and don't reuse them.
+   - **Say what was not tested.** Each time, list what the checks couldn't reach (for example a private API, a real backend, or test data that doesn't exist yet) and what each one is waiting for.
+   - This step is a first draft, and it will change after the first full end-to-end test.
+   - If it finds a problem, go back to the build session to fix it, then redeploy.
+8. **Optional: ask Copilot to review the PR on GitHub,** by adding Copilot as a reviewer on the PR page, if our organisation has it turned on.
+9. Mark the PR ready, move the ticket to "In review", and coworkers review it as today. The agent that wrote the code can never approve it.
+10. **Follow through until it can merge.** Resume session 4, or start a new one. The agent summarises the coworkers' comments, fixes failing CI checks and merge conflicts, and makes the simple requested changes, then pushes. The engineer answers the rest and resolves the threads. Each fix is a new commit, so reviewers see what changed.
+    - **After a review-driven refactor, sweep once for the same pattern elsewhere.** Don't widen the PR with what the sweep finds. Write it to a refactor backlog note in the worknotes repo (linked from `CLAUDE.md`, with a one-line pointer in the ticket's Build log), because these items outlive the ticket:
+      - A header: when it was postponed, what triggered the sweep, and the one idea the items share.
+      - **Worth doing,** ranked. Each item says what it is today, what to change, the risk and the best timing.
+      - **Checked, not worth it now,** each with a one-line reason, so a later session doesn't repeat the sweep.
 
 **Retro, when something went wrong.** If the build or review hit problems, the agent looks back over the session and suggests changes to our setup, not the code. A mistake a tool could catch becomes a check. Prefer, in this order: a type or code structure that makes the mistake impossible, then a lint rule or hook whose message says the fix, then a test. A judgement call goes into `CODING_STANDARDS.md`. Show that a new check fails on the real past mistake. The engineer picks what to apply.
 
@@ -328,7 +356,7 @@ A skill is a folder with a `SKILL.md` file. It teaches the agent one company rul
 **How we know it works:** review findings about that policy fall towards zero. If they don't, the skill isn't triggering, or it no longer matches the policy.
 
 **Our own flow skills, later.** Once the flow is stable, we write three skills of our own:
-- A **setup skill**, run once per repo: it creates `AGENTS.md` with pointers, the links to the worknotes folder (`.intent/`, `.specs/`, `.plans/`, `GLOSSARY.md`) and their `.git/info/exclude` lines, the Jira settings and the check commands.
+- A **setup skill**, run once per repo: it creates `AGENTS.md` with pointers, the links to the worknotes folder (`.intent/`, `.specs/`, `.plans/`, `.verify/`, `GLOSSARY.md`) and their `.git/info/exclude` lines, an empty `.verify/VERIFY.md` template, the Jira settings and the check commands.
 - A **router** ("ask our SDLC"): a teammate describes their situation, and it points to the right step.
 - A **bug diagnosis skill** that runs the bug process from Part 1.
 
