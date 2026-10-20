@@ -31,8 +31,8 @@ All our work comes from Jira tickets, and the product team will keep writing the
 
 ## The flow in one view
 
-1. **Intake:** the agent reads the ticket, interviews the engineer, and writes the intent. Gaps go to the product owner in Jira, who confirms the intent. Big tasks also get a spec, in the same session.
-2. **Refresh, then plan:** the agent reads the code and writes what we build and how, split into tasks.
+1. **Intake:** the agent reads the ticket, interviews the engineer, and writes the intent. Only the questions the work can't go ahead without go to the ticket creator in Jira.
+2. **Refresh, then plan:** the agent reads the code and writes what we build and how, split into tasks. Big tasks get a separate spec first, in the same session.
 3. **Refresh, then build:** one main session builds the tasks with subagents. The agent checks its own work.
 4. **PR:** one PR with the intent, the spec if any, the plan and the code. An optional AI review first, then coworkers review it as today. The agent helps with their comments, CI and conflicts.
 5. **Release:** merge the approved PR, deploy to production with a human's approval, and check the AWS logs and metrics.
@@ -77,7 +77,7 @@ A code review checks a diff. An audit checks the whole repo as it is today: code
 
 **Why both layers:** in our first run (finacle adapter), the AI found 45 problems the tools missed, such as secrets and customer data in logs and wrong data mapping. 63 of 65 findings were confirmed. The tools found the many small issues. It took about an hour the first time.
 
-## 1. Intake: ticket to intent (and spec for big tasks)
+## 1. Intake: ticket to intent
 
 **Default:** write an intent for every feature or story, however good or bad the ticket is. The agent does the writing, so it takes minutes. It gives the plan one clean input, and it forces the questions that find gaps before anyone builds.
 
@@ -85,23 +85,16 @@ A code review checks a diff. An audit checks the whole repo as it is today: code
 
 1. Give the agent the ticket through the Atlassian MCP server, or paste it in. It reads the description, all comments, the attachments and any linked Confluence page.
 2. **Already built?** The agent searches the code only to check whether the requested behaviour exists, by meaning and not only by the ticket's words, and says where it looked. It does not research how to build it. If it already exists, tell the product owner. If the ticket claims something about the code ("the API already returns X"), the agent checks it in the code.
-3. **For a bug,** follow the bug process below: try to reproduce it first.
+3. **For a bug,** don't reproduce it yet. Write down the symptom and the evidence from the ticket (error, time, environment, ids). Reproducing it needs environment access, like the verify step, so it happens at the start of the plan.
 4. **Grilling.** The agent interviews the engineer in rounds about the problem only: why, for whom, outcome, scope, behaviour and constraints. Each round lists every question it can ask now, numbered, each with its recommended answer. It only asks the engineer for decisions. **Design questions** (which component, where data is stored, how to wire it) are not asked here: they go into "Parked for the plan" in the intent, one line each. Questions only the product owner, another team or a customer can answer are not asked here either: they go straight into the Jira comment (step 6), and the agent checks the code or tickets first in case the answer is already there. New project terms go into `GLOSSARY.md` straight away. It stops when nothing is left unclear.
 5. The agent writes the intent from the ticket and the answers, in business terms: no file paths, line numbers, mechanisms or build details (such as CI), and nothing the plan owns, such as where a request is rejected. The Outcome covers only this ticket: work that belongs to other tickets goes under Constraints as out of scope. It never states as fact something the product owner still has to confirm (for example, what callers send today), and it adds no promises the ticket didn't ask for, such as timings. Those belong in the plan. A short note of what the code already does goes under Problem.
-6. Questions only the product owner can answer go to them as a Jira comment in questionnaire shape: most important first, one idea per question, each with a default, and a short "why this matters" where it could be misread. Example: "Should it include invoices older than 2 years? Default if I hear nothing: no." A default must be safe. If none is, write "blocked until answered"; never guess ids, values or names. The same goes for any question about what callers send today or what a change could break for them. Every question in the draft also appears in the intent's list for the product owner. An engineer answer that changes what callers or customers see is copied here too, for the product owner to confirm.
-7. Update the intent with the answers. Stop when the problem, outcome, constraints and scope are clear, and the rest are answered or written down as assumptions. One or two rounds is normal. If it takes more, have a short call. The product owner can't see the worknotes repo, so the agent posts a short summary of the intent (problem, outcome, scope) on the ticket, and the product owner confirms it with a Jira comment.
+6. **Questions for the ticket creator,** as a Jira comment: only the ones the work can't go ahead without, such as a missing id or value, or a choice that changes what we build. Everything else becomes an assumption in the intent. Plain, simple English, one short question per line, most important first. No default answers, no summary, no background. The same questions go into the intent's Open questions. The engineer approves the text before it is posted.
+7. Update the intent with the answers. Stop when the problem, outcome, constraints and scope are clear, and the rest are answered or written down as assumptions. One or two rounds is normal. If it takes more, have a short call.
 8. Save it as `.intent/<ticket-key>-<short-name>.md`, then commit and push the worknotes repo.
 
 **Model:** run intake on the strongest model (Opus). In our DSM-960 trial with the same prompt, Sonnet broke one or two rules on every run (design questions asked, guessed defaults, an Outcome that went past the ticket), and Opus broke none. It also found more in the code check. Intake runs once per ticket, and mistakes there are expensive later.
 
 **The intent has these parts:** Source (Jira key, the ticket's last-updated time, the Confluence page version, when we last synced, with the time), Problem, Outcome, Affected systems, Constraints, Decisions from comments (only what people wrote on the ticket, with who and when; the engineer's answers go in Open questions as assumptions), From attachments, Parked for the plan (design questions for the plan session), Open questions, and a Changelog.
-
-**A separate spec, for big tasks only.** Most tickets don't need one: the plan starts with a "What we build" part instead (step 2). The engineer decides, using this guide: the change spans several services, needs a security or privacy review, or takes more than a few days. The agent gives no "big or small" verdict and does not estimate days. Its answers stay in the chat and are not written into the intent. It answers each of the three questions with evidence from the ticket and the code (which services, which review, which dependencies), and the engineer decides. They can ask a tech lead. For a big task, still in this session:
-1. Ask the agent for a spec for our codebase, following our skills (security, UX, compliance). Until we have skills, it follows the instruction file and the existing code.
-2. Concerns the agent flags go to the policy owners, such as security or privacy, before anyone builds.
-3. Save it as `.specs/<ticket-key>-<short-name>.md`, then commit and push the worknotes repo.
-
-The spec, or the plan's "What we build" part, has: decisions, rules, what we will not do, open questions, and a **Testing** section. The Testing section says which behaviour we test, at which points (for example, one integration test through the endpoint), and which existing tests to copy. The product owner doesn't read it. The engineer checks it, and coworkers see it in the PR.
 
 **Prototype (optional).** When a UI or logic question can't be settled on paper, the agent builds throwaway code that answers it: for UI, a few very different versions on one page. It lives on a throwaway branch, and only the answer goes into the intent, spec or plan.
 
@@ -130,7 +123,7 @@ Use a new session for each step: intake, plan, build. The build session ends by 
 Every new session starts the same way: "Read the intent (and the spec and plan if they exist), then refresh them against Jira."
 
 **Exceptions**
-- **Intake and spec share one session.** The spec needs the reasoning from the grilling, and a summary loses it. If the product owner takes days to answer, resume the same session.
+- **Intake resumes in the same session** when the ticket creator answers days later. **Spec and plan share one session:** the spec needs the code reading, and the plan builds on the spec.
 - Small tickets can stay in one session.
 - After the plan is approved, you can carry on building in the same session, because it already understands the code.
 
@@ -141,7 +134,7 @@ Every new session starts the same way: "Read the intent (and the spec and plan i
 3. **Fix.** Fix the cause, not the symptom: no null checks or retries that only hide the error. The failing test is committed first, then the fix. Debug logs carry a unique tag so they can be removed with one search. Secrets are hidden in everything the agent shows.
 4. **The real cause goes into the PR**, so the next person learns from it. If there is no good place for a regression test, note it for the architecture scan (Part 2).
 
-The same process is used in intake (step 1), in the build (step 3) and for production findings (step 6).
+Step 1 runs at the start of the plan (step 2), with the same environment access as the verify step (`.verify/VERIFY.md`). Steps 2–4 run in the plan and the build (step 3), and for production findings (step 6).
 
 ## 2. Plan: what we build, and how in our code
 
@@ -155,8 +148,15 @@ This is the first time the agent reads the code in depth. The intent (or spec) s
 | Plan | **Yes, this is the analysis** | Decides *where* the change goes and *how*: which files, what to reuse, how similar code is written, what could break. The result goes into the plan. |
 | Build | Yes, in detail | Reads the files the plan names closely enough to write the code. It doesn't decide where things go. |
 
-1. Start the agent in plan mode, where it can read code but not change it, and give it the intent and the spec if there is one. The intent's "Parked for the plan" list is the first set of questions to answer.
-2. **No spec?** The plan starts with a "What we build" part: decisions, what we will not do, and the Testing section (see step 1). The "How and where" part comes below it.
+**A separate spec, for big tasks only.** Most tickets don't need one: the plan starts with a "What we build" part instead (point 2 below). The engineer decides, using this guide: the change spans several services, needs a security or privacy review, or takes more than a few days. It is decided at the start of the plan, because the evidence comes from the code. The agent gives no "big or small" verdict and does not estimate days. Its answers stay in the chat. It answers each of the three questions with evidence from the ticket and the code (which services, which review, which dependencies), and the engineer decides. They can ask a tech lead. For a big task, before the detailed plan and in the same session:
+1. Ask the agent for a spec for our codebase, following our skills (security, UX, compliance). Until we have skills, it follows the instruction file and the existing code.
+2. Concerns the agent flags go to the policy owners, such as security or privacy, before anyone builds.
+3. Save it as `.specs/<ticket-key>-<short-name>.md`, then commit and push the worknotes repo.
+
+The spec, or the plan's "What we build" part, has: decisions, rules, what we will not do, open questions, and a **Testing** section. The Testing section says which behaviour we test, at which points (for example, one integration test through the endpoint), and which existing tests to copy. The product owner doesn't read it. The engineer checks it, and coworkers see it in the PR.
+
+1. Start the agent in plan mode, where it can read code but not change it, and give it the intent. For a big task, the spec comes first (above). The intent's "Parked for the plan" list is the first set of questions to answer.
+2. **No spec?** The plan starts with a "What we build" part: decisions, what we will not do, and the Testing section (see above). The "How and where" part comes below it.
 3. Ask hard questions: where does the change belong, what can we reuse, how is similar code written today, what could break? For "what could break", the agent lists who calls or uses what we change, beyond the files in the diff. Use our design words (module, interface, seam, deep or shallow; see Part 2) so plans and reviews talk the same way. Serious problems the agent finds while reading code but outside the ticket, such as a secret written to the logs, become their own ticket at once; they don't wait for this one to ship.
 4. Split the work into **tasks**, with the files each task touches.
    - **Prefactor first:** if the code is awkward for the change, task 0 makes it easy, with no change in behaviour and the tests still passing. Remove dead code before adding new code.
@@ -505,7 +505,7 @@ For the Copilot admin setup (managed settings, permissions, sandboxing), see Par
 
 **The ticket.** "Customers want to download invoices as CSV." The description says customers keep asking for an Excel-friendly export. A support lead commented "credit notes too please", and the product owner commented "nothing older than 2 years". A screenshot shows the Excel layout customers use (Invoice no, Date, Customer, Net, Tax, Total). A Confluence page, "Billing export requirements", says dates are UTC.
 
-**Session 1: intake and spec.** The agent reads the ticket, comments, screenshot and Confluence page, and finds no existing export in the code. Then it grills the engineer:
+**Session 1: intake.** The agent reads the ticket, comments, screenshot and Confluence page, and finds no existing export in the code. Then it grills the engineer:
 
 > **Q1. Drafts:** does "invoice" include draft invoices? ➡️ Recommended: no, only issued ones.
 > **Q2. Who can export:** only the customer's own invoices, or also an admin view? ➡️ Recommended: own invoices only.
@@ -531,14 +531,16 @@ Customers see only their own invoices. Dates in UTC (Confluence).
 ## Parked for the plan
 - Stream from the invoice repository or build the file in memory?
 ## Open questions
-- Credit notes in the same file or a separate one? (default: same file, negative amounts)
+- Credit notes in the same file or a separate one?
 ## Changelog
 - 2 Oct: first version from the ticket.
 ```
 
-The agent posts the open question to Jira in questionnaire shape, with its default.
+The agent drafts one question for the ticket creator, "Should credit notes be in the same file?", and posts it after the engineer approves.
 
-The next day the product owner answers "same file is fine" and confirms the intent. The engineer resumes the same session. The refresh shows the new comment, the engineer confirms, and the intent gets a changelog line. This ticket needs a privacy review, so the engineer decides it is a big task and asks for a separate spec. The agent writes `.specs/BILL-123-invoice-csv.md`: endpoint `GET /invoices/export`, the columns, a 10,000-row limit, own invoices only, every export logged. The security skill flags that tax IDs are personal data, and the privacy team says to leave them out.
+The next day the product owner answers "same file is fine". The engineer resumes the same session. The refresh shows the new comment, the engineer confirms, and the intent gets a changelog line.
+
+**Session 2: spec and plan.** The refresh finds no change. The agent answers the three big-task questions from the ticket and the code: one service, a few days, but customer data in a file needs a privacy review. So the engineer decides it is a big task and asks for a separate spec first. The agent writes `.specs/BILL-123-invoice-csv.md`: endpoint `GET /invoices/export`, the columns, a 10,000-row limit, own invoices only, every export logged. The security skill flags that tax IDs are personal data, and the privacy team says to leave them out.
 
 ```markdown
 # Spec: invoice CSV export (BILL-123)
@@ -559,7 +561,7 @@ Intent: .intent/BILL-123-invoice-csv.md
 - None.
 ```
 
-**Session 2: plan.** The refresh finds no change. Plan mode reads the code, finds the existing `formatDate()` helper, the invoice repository and how existing endpoints are written, and writes `.plans/BILL-123-invoice-csv.md` with three tasks: **A** the endpoint and CSV writer (`api/`, `core/`), **B** the "Download CSV" button (`web/`), and **C** the integration test, which needs A and B. A and B touch different files, so they can run in parallel.
+**Then the plan, in the same session.** Plan mode reads the code, finds the existing `formatDate()` helper, the invoice repository and how existing endpoints are written, and writes `.plans/BILL-123-invoice-csv.md` with three tasks: **A** the endpoint and CSV writer (`api/`, `core/`), **B** the "Download CSV" button (`web/`), and **C** the integration test, which needs A and B. A and B touch different files, so they can run in parallel.
 
 ```markdown
 # Plan: invoice CSV export (BILL-123)
