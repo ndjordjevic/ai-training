@@ -15,9 +15,10 @@ This is the first time the code is read in depth. The intent says what is wanted
 
 - **Read only.** Change no code. If your tool has a plan mode, use it. In plan mode nothing is written until the engineer accepts the plan, so ask them to accept it to get the file saved.
 - **Never guess** ids, values, names or what callers send. Write them as assumptions, or "Blocked by: <person>'s answer".
+- **Look before you ask.** Check the code, tickets, Confluence pages and attachments first. Never ask what they answer.
 - **AWS and other environments:** read-only. Before the first command, check the instruction file and `.verify/VERIFY.md` for how to get in. If they don't say, ask the engineer which computer they're on and which account and role, then use the local CLI or give them read-only commands to run and paste back. Hide secrets in what comes back. Record the answer in `VERIFY.md`.
 - **Problems outside the ticket** (for example, a secret written to the logs): tell the engineer now, and draft a new ticket. Don't fix them here.
-- Never create or switch branches. Never touch the work repo's git.
+- **Git: read only.** Use only commands that change nothing (`log`, `branch -a`, `show`). No `fetch`, `pull`, `checkout` or branches; ask the engineer if you need fresher refs.
 
 ## 0. Read and refresh
 
@@ -45,8 +46,9 @@ Give no "big or small" verdict and no estimate. The engineer decides. For a big 
 1. **How callers reach us today:** who calls, through what, and who picks our address. Ask the engineer to check it with the caller's team, because a fact from outside the repo can remove options.
 2. **Each "Parked for the plan" question** from the intent: 2 or 3 options, the trade-offs, and a recommendation, based on the code.
 3. **Unanswered questions** the design depends on: write them as assumptions, and say which answer would change the design.
+4. **Questions for others:** only those the code and docs can't answer and the design can't go ahead without. Address each to the person who can answer (the ticket creator, or the owner of a design page). Plain, simple English, one short question per line, no default answers, no summary. Show the draft to the engineer and post it as a Jira comment only after they approve the text.
 
-**If the ticket creator hasn't answered yet,** stop here. Save the plan with only the Design part and "Status: draft, waiting on answers". The team can review the design early, above all anything hard to undo. Resume with `/sdlc-plan <ticket key>` when the answers arrive.
+**If the answers aren't in yet,** stop here. Save the plan with only the Design part and "Status: draft, waiting on answers". The team can review the design early, above all anything hard to undo. Resume with `/sdlc-plan <ticket key>` when the answers arrive.
 
 ## 4. What we build
 
