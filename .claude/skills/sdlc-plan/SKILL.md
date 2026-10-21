@@ -1,0 +1,87 @@
+---
+name: sdlc-plan
+description: Turn a ticket's intent into a plan - what we build and how in our code, split into tasks - plus the checks for the verify step. Decides first whether a big task needs a separate spec. For a bug, reproduces it first. Use after intake, in a new session.
+disable-model-invocation: true
+argument-hint: "<ticket key>"
+---
+
+# Plan: what we build, and how in our code
+
+Ticket: $ARGUMENTS
+
+This is the first time the code is read in depth. The intent says what is wanted. The plan says what we build and how, so that someone who never saw this chat could build from it.
+
+## Rules
+
+- **Read only.** Change no code. If your tool has a plan mode, use it. In plan mode nothing is written until the engineer accepts the plan, so ask them to accept it to get the file saved.
+- **Never guess** ids, values, names or what callers send. Write them as assumptions, or "Blocked by: <person>'s answer".
+- **AWS and other environments:** read-only. Before the first command, check the instruction file and `.verify/VERIFY.md` for how to get in. If they don't say, ask the engineer which computer they're on and which account and role, then use the local CLI or give them read-only commands to run and paste back. Hide secrets in what comes back. Record the answer in `VERIFY.md`.
+- **Problems outside the ticket** (for example, a secret written to the logs): tell the engineer now, and draft a new ticket. Don't fix them here.
+- Never create or switch branches. Never touch the work repo's git.
+
+## 0. Read and refresh
+
+Read `.intent/<ticket key>-*.md`, and the spec and plan if they exist. Refresh against Jira: compare the ticket's last-updated time and any Confluence page version with the ones in the intent's Source. If nothing changed, say "no change". If something did, list every change, update the intent after the engineer confirms, then show what must change in the spec and plan.
+
+If a plan with "Status: draft" exists, go on from it (step 4 onwards).
+
+## 1. For a bug: reproduce it first
+
+Show one command you have already run that fails on this exact bug: fast, and the same result every time. In order of preference: a failing test locally, then a read-only call or script against a test environment (access as in Rules). If neither works, confirm the symptom from the logs, write "not reproduced" in the plan, and carry on.
+
+Then list 3 to 5 possible causes, each with a check that would prove it wrong, and show them to the engineer before testing them.
+
+## 2. Big task? Answer three questions, don't decide
+
+In the chat, answer each with evidence from the ticket and the code:
+1. Does it span several services? Which?
+2. Does it need a security or privacy review? Which part?
+3. Does it take more than a few days? Which dependencies?
+
+Give no "big or small" verdict and no estimate. The engineer decides. For a big task, write the spec first, as `.specs/<ticket key>-<short-name>.md`, starting with "Intent: <path>". It has: decisions, rules, what we will not do, open questions, and a Testing section. Flag concerns for security or privacy owners before anyone builds.
+
+## 3. Design
+
+1. **How callers reach us today:** who calls, through what, and who picks our address. Ask the engineer to check it with the caller's team, because a fact from outside the repo can remove options.
+2. **Each "Parked for the plan" question** from the intent: 2 or 3 options, the trade-offs, and a recommendation, based on the code.
+3. **Unanswered questions** the design depends on: write them as assumptions, and say which answer would change the design.
+
+**If the ticket creator hasn't answered yet,** stop here. Save the plan with only the Design part and "Status: draft, waiting on answers". The team can review the design early, above all anything hard to undo. Resume with `/sdlc-plan <ticket key>` when the answers arrive.
+
+## 4. What we build
+
+Skip if there is a spec. Otherwise: decisions, what we will not do, and a **Testing** section: which behaviour we test, at which points (for example, one integration test through the endpoint), and which existing tests to copy.
+
+## 5. How and where
+
+- Where does the change belong? What can we reuse? How is similar code written today?
+- **What could break:** list who calls or uses what we change, beyond the files in the diff.
+
+## 6. Tasks
+
+Use `plan-template.md` next to this file. Each task has a goal, the files it touches, a check, and a "Blocked by" line (tasks, a person's answer, or "nothing").
+- **Prefactor first:** if the code is awkward for the change, task 0 makes it easy, with no change in behaviour.
+- **Sketch first** for a new module: types and function signatures with empty bodies.
+- **How to split:** ask the engineer. Thin end-to-end slices when tasks run one after another; split by layer when tasks should run in parallel, because they touch different files.
+- **Each task** can be checked on its own and fits in one session. Too big means split it.
+- **Mark high-risk tasks** (for example, a change on a live path existing users depend on), with what extra checks they need. The build runs them on the strongest model.
+- Say which tasks can run in parallel and which in order.
+
+## 7. Checks for the verify step
+
+1. If `.verify/VERIFY.md` is missing or still the empty template, fill in what you can read from the repo (how to run it, endpoints, logs), ask the engineer for what only they know (environments, accounts and roles, the login on each computer), and mark the rest "to confirm".
+2. Write `.verify/<ticket key>-<short-name>.md` with a "Checks" part: for each check, what to do, what to expect, which environment can test it, and what it needs (test data, an id, credentials, a person's answer). Leave a "Results" heading empty.
+3. List the needs in the chat, so the engineer can chase them while the code is built.
+
+## 8. Save
+
+Save the plan as `.plans/<ticket key>-<short-name>.md`, starting with "Intent: <path>" (or "Spec: <path>"). Set "Status: ready to build" when no task is blocked by a design question. Commit and push the worknotes repo.
+
+## Done when
+
+- Someone who never saw this chat could build from the plan alone.
+- Every task has a goal, files, a check and a "Blocked by" line. High-risk tasks are marked.
+- The verify checks file exists, and its needs are listed for the engineer.
+- The worknotes repo is pushed.
+
+**Next:** `/sdlc-build <ticket key>` in a new session, or carry on in this one if it still has room, because it already knows the code.
