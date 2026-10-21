@@ -31,10 +31,10 @@ All our work comes from Jira tickets, and the product team will keep writing the
 
 ## The flow in one view
 
-1. **Intake:** the agent reads the ticket, interviews the engineer, and writes the intent. Only the questions the work can't go ahead without go to the ticket creator in Jira.
+1. **Intake:** the agent reads the ticket, interviews the engineer, and writes the intent: the general picture of what is wanted. Most tickets need no questions in Jira; detail questions wait for the plan.
 2. **Refresh, then plan:** the agent reads the code and writes what we build and how, split into tasks. Big tasks get a separate spec first, in the same session.
 3. **Refresh, then build:** one main session builds the tasks with subagents. The agent checks its own work.
-4. **PR:** one PR with the intent, the spec if any, the plan and the code. An optional AI review first, then coworkers review it as today. The agent helps with their comments, CI and conflicts.
+4. **PR:** an AI review and the engineer's own walkthrough first, then one PR, then coworkers review it as today. The agent helps with their comments, CI and conflicts.
 5. **Release:** merge the approved PR, deploy to production with a human's approval, and check the AWS logs and metrics.
 6. **Back to the start:** problems found in production become new Jira tickets.
 
@@ -83,18 +83,19 @@ A code review checks a diff. An audit checks the whole repo as it is today: code
 
 **Proposed exception (not agreed yet):** skip it for small bugs and chores, like a typo or a one-line config change.
 
-1. Give the agent the ticket through the Atlassian MCP server, or paste it in. It reads the description, all comments, the attachments and any linked Confluence page.
+1. Give the agent the ticket through the Jira tool the instruction file names, or paste it in. It reads the description, all comments, the attachments and any linked Confluence page. Then every subtask, the parent or epic, and every linked item, and it flags anything odd (a subtask marked "Not Required", a link to an older, similar ticket). Then it searches for what isn't linked: Confluence pages by the ticket keys, the epic name and the main terms (design and mapping pages are often not linked), and Jira tickets that explain a term the ticket doesn't. If one tool can't do it (an attachment, Confluence not logged in), it uses the REST API from the instruction file before asking.
 2. **Already built?** The agent searches the code only to check whether the requested behaviour exists, by meaning and not only by the ticket's words, and says where it looked. It does not research how to build it. If it already exists, tell the product owner. If the ticket claims something about the code ("the API already returns X"), the agent checks it in the code.
 3. **For a bug,** don't reproduce it yet. Write down the symptom and the evidence from the ticket (error, time, environment, ids). Reproducing it needs environment access, like the verify step, so it happens at the start of the plan.
-4. **Grilling.** The agent interviews the engineer in rounds about the problem only: why, for whom, outcome, scope, behaviour and constraints. Each round lists every question it can ask now, numbered, each with its recommended answer. It only asks the engineer for decisions. **Design questions** (which component, where data is stored, how to wire it) are not asked here: they go into "Parked for the plan" in the intent, one line each. Questions only the product owner, another team or a customer can answer are not asked here either: they go straight into the Jira comment (step 6), and the agent checks the code or tickets first in case the answer is already there. New project terms go into `GLOSSARY.md` straight away. It stops when nothing is left unclear.
-5. The agent writes the intent from the ticket and the answers, in business terms: no file paths, line numbers, mechanisms or build details (such as CI), and nothing the plan owns, such as where a request is rejected. The Outcome covers only this ticket: work that belongs to other tickets goes under Constraints as out of scope. It never states as fact something the product owner still has to confirm (for example, what callers send today), and it adds no promises the ticket didn't ask for, such as timings. Those belong in the plan. A short note of what the code already does goes under Problem.
-6. **Questions for the ticket creator,** as a Jira comment: only the ones the work can't go ahead without, such as a missing id or value, or a choice that changes what we build. Everything else becomes an assumption in the intent. Plain, simple English, one short question per line, most important first. No default answers, no summary, no background. The same questions go into the intent's Open questions. The engineer approves the text before it is posted.
-7. Update the intent with the answers. Stop when the problem, outcome, constraints and scope are clear, and the rest are answered or written down as assumptions. One or two rounds is normal. If it takes more, have a short call.
-8. Save it as `.intent/<ticket-key>-<short-name>.md`, then commit and push the worknotes repo.
+4. **Scope first, on its own.** If the ticket has subtasks, the first round asks only which ones are the engineer's. The Outcome covers only those. If the engineer is new to the area, the agent offers a short who-calls-whom picture first.
+5. **Grilling.** The agent interviews the engineer in short rounds about the problem only: why, for whom, outcome, scope, behaviour and constraints. Each round lists every question it can ask now, numbered, each with its recommended answer. It only asks the engineer for decisions, and never asks what the code, tickets, Confluence or attachments can answer. **Design and detail questions** (which component, field mappings, error formats, what to return in an edge case) are not asked here: they go into "Parked for the plan", one line each, even when someone else must answer them. Questions about another team's area (for example, their UI) go under Constraints as theirs. The aim is the general picture, not every detail. New project terms go into `GLOSSARY.md` straight away. It stops when nothing is left unclear.
+6. The agent writes the intent from the ticket and the answers, in business terms: no file paths, line numbers, mechanisms or build details (such as CI), and nothing the plan owns, such as where a request is rejected. The Outcome covers only this ticket: work that belongs to other tickets goes under Constraints as out of scope. It never states as fact something the product owner still has to confirm (for example, what callers send today), and it adds no promises the ticket didn't ask for, such as timings. Those belong in the plan. A short note of what the code already does goes under Problem.
+7. **Questions for the ticket creator,** as a Jira comment, only if the general picture is still unclear (for example, the ticket contradicts itself). Most tickets need none here. Plain, simple English, one short question per line, most important first, written as the engineer ("I", not "we"). No default answers, no summary, no background. The same questions go into the intent's Open questions. The engineer approves the text before it is posted.
+8. Update the intent with the answers. Stop when the problem, outcome, constraints and scope are clear, and the rest are answered or written down as assumptions. One or two rounds is normal. If it takes more, have a short call.
+9. Save it as `.intent/<ticket-key>-<short-name>.md`, then commit and push the worknotes repo.
 
 **Model:** run intake on the strongest model (Opus). In our DSM-960 trial with the same prompt, Sonnet broke one or two rules on every run (design questions asked, guessed defaults, an Outcome that went past the ticket), and Opus broke none. It also found more in the code check. Intake runs once per ticket, and mistakes there are expensive later.
 
-**The intent has these parts:** Source (Jira key, the ticket's last-updated time, the Confluence page version, when we last synced, with the time), Problem, Outcome, Affected systems, Constraints, Decisions from comments (only what people wrote on the ticket, with who and when; the engineer's answers go in Open questions as assumptions), From attachments, Parked for the plan (design questions for the plan session), Open questions, and a Changelog.
+**The intent has these parts:** Source (Jira key, the ticket's last-updated time, its subtasks and linked items (which are the engineer's), the Confluence page version, when we last synced, with the time), Problem, Outcome, Affected systems, Constraints, Decisions from comments (only what people wrote on the ticket, with who and when; the engineer's answers go in Open questions as assumptions), From attachments, Parked for the plan (design questions for the plan session), Open questions, and a Changelog.
 
 **Prototype (optional).** When a UI or logic question can't be settled on paper, the agent builds throwaway code that answers it: for UI, a few very different versions on one page. It lives on a throwaway branch, and only the answer goes into the intent, spec or plan.
 
@@ -102,9 +103,9 @@ A code review checks a diff. An audit checks the whole repo as it is today: code
 
 The ticket keeps changing after the intent is written: new comments, edits, a changed Confluence page. So **before each step (plan, build, PR)** the agent refreshes the intent **and every file after it** that exists.
 
-1. **Quick check.** Compare the ticket's last-updated time and the Confluence page version with the ones stored in the intent. If both are the same, the agent says "no change" and stops. This costs almost nothing.
+1. **Quick check.** Compare the last-updated times of the ticket, its subtasks and linked items, and the Confluence page versions, with the ones stored in the intent. Also look for new subtasks or links. If both are the same, the agent says "no change" and stops. This costs almost nothing.
 2. **Compare, don't edit yet.** If something changed, the agent lists every change: description edits, new comments, new or changed attachments, Confluence edits.
-3. **Update the intent.** The engineer confirms the proposed changes. The agent updates the intent, adds a changelog line, and sets the new sync time.
+3. **Update the intent.** The agent updates it without asking, adds a changelog line, sets the new sync time, and tells the engineer what changed. Any step that learns something new does the same.
 4. **Cascade.** The agent shows what must change in the spec, if there is one, then in the plan, and the engineer confirms each.
 5. **Code can't be refreshed automatically.** If building has started, the agent lists the parts of the code the change affects. We stop, bring intent, spec and plan up to date, and only then continue.
 
@@ -118,7 +119,7 @@ Prompt to reuse:
 
 ## Rule for every step: one session per step
 
-Use a new session for each step: intake, plan, build. The build session ends by opening the PR. The saved files carry the state, not the chat. A fresh session has no leftover assumptions, can't use anything that isn't written down, and doesn't suffer from a long, compacted conversation. You can also stop and resume, or hand over to someone else. If a fresh session can't continue from the files alone, the file is missing something, so fix the file.
+Use a new session for each step: intake, plan, build, review. The review session ends by opening the PR. The saved files carry the state, not the chat. A fresh session has no leftover assumptions, can't use anything that isn't written down, and doesn't suffer from a long, compacted conversation. You can also stop and resume, or hand over to someone else. If a fresh session can't continue from the files alone, the file is missing something, so fix the file.
 
 Every new session starts the same way: "Read the intent (and the spec and plan if they exist), then refresh them against Jira."
 
@@ -157,21 +158,25 @@ The spec, or the plan's "What we build" part, has: decisions, rules, what we wil
 
 1. Start the agent in plan mode, where it can read code but not change it, and give it the intent. For a big task, the spec comes first (above). The intent's "Parked for the plan" list is the first set of questions to answer.
 2. **No spec?** The plan starts with a "What we build" part: decisions, what we will not do, and the Testing section (see above). The "How and where" part comes below it.
-3. Ask hard questions: where does the change belong, what can we reuse, how is similar code written today, what could break? For "what could break", the agent lists who calls or uses what we change, beyond the files in the diff. Use our design words (module, interface, seam, deep or shallow; see Part 2) so plans and reviews talk the same way. Serious problems the agent finds while reading code but outside the ticket, such as a secret written to the logs, become their own ticket at once; they don't wait for this one to ship.
+3. Ask hard questions: where does the change belong, what can we reuse, how is similar code written today, what could break? For "what could break", the agent lists who calls or uses what we change, beyond the files in the diff. It also searches the repo docs (README, architecture docs, runbooks, endpoint tables) for lists that name what we add or change, and puts their updates into a task. Use our design words (module, interface, seam, deep or shallow; see Part 2) so plans and reviews talk the same way. Serious problems the agent finds while reading code but outside the ticket, such as a secret written to the logs, become their own ticket at once; they don't wait for this one to ship.
 4. Split the work into **tasks**, with the files each task touches.
    - **Prefactor first:** if the code is awkward for the change, task 0 makes it easy, with no change in behaviour and the tests still passing. Remove dead code before adding new code.
    - **Sketch first** for a new module: types and function signatures with empty bodies, in the plan or as task 0. If the build shows the sketch is wrong, change the sketch, not only the code.
    - **How to split** is the engineer's choice per ticket. Thin end-to-end slices (for example, endpoint to button) when tasks run one after another. Split by layer (`api/`, `web/`) when we want parallel subagents, because they touch different files.
+   - **Tasks are code only.** Deploying and checking in an environment is the verify step, not a task.
+   - **A ticket ask with no pattern in the repo** (for example, "integration tests" where the repo has none): the plan says how it reads it and adds it to Open points for the engineer to confirm.
    - **Each task** can be checked on its own, fits in one session, and has a "Blocked by" line naming tasks or a person's answer ("Blocked by: A", "Blocked by: product owner's ids"), or "Blocked by: nothing". Too big for one session means split it.
 5. Repeat until someone who never saw the chat could build from the plan alone.
 6. **Write the checks for the verify step,** in `.verify/<ticket-key>-<short-name>.md`, and link it from the plan. If the repo's `.verify/VERIFY.md` is still the empty template, fill it in first (see PR step 7). The planner knows what the change does and what can be seen from outside. Each check says what to do and what to expect, which environment can test it, and what it needs: test data, an id, credentials, or a person's answer. Chase the needs while the code is built, not after the deploy. The plan's "done when" list stays the short, business-level view.
-7. Save the plan as `.plans/<ticket-key>-<short-name>.md`, then commit and push the worknotes repo.
+7. Save the plan as `.plans/<ticket-key>-<short-name>.md`, with a Sources list (pages and versions, tickets, attachments, specs, mocks) and a Status that names any task waiting on an answer, for example "ready to build (Task 2 waits on <person>'s answer)". Then commit and push the worknotes repo.
+
+**Look before you ask.** Before any question for someone else, the plan checks the code, tickets, attachments, test mocks and Confluence. One linked page is not enough: it reads the pages around it (parent and siblings) and searches the space by the feature's terms. In DSM-964 the first draft had five questions; after a second look at the sibling pages and the mock, three were left. Older pages often hold rules the newer ones dropped (the co-borrower rule was only on an older page). Questions that are left go to whoever can answer them, plain and short, posted only after the engineer approves. Bugs found in someone else's work (for example, a branch we build on) become a short note the engineer sends, not a question.
 
 **Design first, while waiting on the product owner.** The plan doesn't have to wait for every answer. Open questions are usually values (ids, error codes) that drop into any design. So start the plan session early and do only the design:
 1. First, draw how callers reach us today: who calls, through what, and who picks our address. Check it with the product owner or the caller's team, because a fact from outside the repo can remove options. (In DSM-960 a short call showed the caller already picks our URL per bank, which made a simpler design possible.)
 2. In plan mode, the agent takes each "Parked for the plan" question and gives 2 or 3 options, the trade-offs, and a recommendation, based on the code.
 3. Product owner answers it depends on are written as assumptions. If an answer could change the design, it says so.
-4. It writes the plan file with only a **Design** part and "Status: draft, waiting on product owner answers". No tasks yet.
+4. If an answer could change the overall design, it writes the plan file with only a **Design** part and "Status: draft, waiting on answers". If the answers only touch one isolated part (for example, one mapper), it writes the full plan on assumptions and marks those tasks "Blocked by: <person>'s answer".
 5. The team reviews the design early, above all one-way doors.
 6. When the answers arrive, refresh the intent, check the design still holds, then finish the plan (steps 2 to 6). Use a new session, or the same one if it still has room: it already knows the code.
 
@@ -215,8 +220,10 @@ One main session reads the plan and hands out the tasks (proposed). It works thr
 - **A check that already fails before the build** is checked against the base commit. If it failed there too, the agent logs it and leaves it; fixing it is another ticket.
 - **Remove the task worktrees** when the build is done.
 - **Comments are one line at most.** Every comment the agent adds is a single line, never a block of several lines. If it needs more, the code or a name should say it instead.
+- **Tool leftovers:** some checks create files (`terraform init` makes a lock file and a `.terraform` folder). The agent removes what the tool made, and ends with `git status` showing only the files it meant to change.
+- **Checks the engineer must run** (a cloud plan, a check that needs a clean tree): the report says exactly how, the command or the CI workflow and its inputs, read from the repo's CI files.
 - **Clean up before the PR.** The agent removes AI leftovers from the diff: comments that repeat the code, needless defensive checks, style that doesn't match the file. No change in behaviour. The engineer commits after the review, in order if useful: prefactor, tests, then the change.
-- **The engineer commits and pushes,** never the agent. The build is done when the result is on the feature branch, the full suite passes, and the engineer has reviewed the diff, committed and pushed. The same session then opens the PR (step 4).
+- **The engineer commits and pushes,** never the agent. The build is done when the result is on the feature branch, the full suite passes, and the engineer has reviewed the diff, committed and pushed. Then a new session runs the review (step 4), which ends with the PR.
 - **The engineer reviews the actual diffs,** not only the subagents' summaries.
 - **Start with two or three parallel subagents.** Add more only while you can still review the results well. Review is the limit, not the tools.
 - **If the build finds the plan was wrong** (a file isn't where the plan says, or the change belongs somewhere else), the agent updates the plan first, notes it in the Build log, then continues. Otherwise the plan and the code drift apart, and the reviewer can't trust the plan. It stops only when it can't continue without the engineer, or the change would break what existing users see.
@@ -227,19 +234,25 @@ One main session reads the plan and hands out the tasks (proposed). It works thr
 
 Today our PRs are reviewed by coworkers, and that stays. We add an **optional AI review before them**, so coworkers get a cleaner PR and can focus on intent and risk.
 
-**Sessions:** opening the PR is the last step of the build session (session 3), which knows the work and can write a good description. The AI self-review runs in a **new session** (session 4): a reviewer that didn't write the code isn't biased toward it.
+**Sessions:** the review runs in a **new session** (session 4): a reviewer that didn't write the code isn't biased toward it. The same session then hosts the engineer's walkthrough, and opens the PR after the engineer commits.
+
+**Find the base first.** A stacked branch doesn't start from main. The review and the walkthrough diff from where this branch left its base (`git merge-base HEAD <base>`), so new commits on the base don't show up as changes. If the base has moved on, pull it in before the walkthrough.
 
 1. Refresh once more, because the reviewer will compare the PR with the intent.
-2. Open one PR from the feature branch as a **draft**, with the Jira key in the title, for example "BILL-123: invoice CSV export". The PR contains the code. Its description gives a short summary of the intent, the plan's decisions and the Testing section, because the files themselves stay in the worknotes repo. So the reviewer still sees what was asked, what was decided, and what was built.
+2. After the engineer's review and commit (step 6), open one PR from the feature branch as a **draft**, with the Jira key in the title, for example "BILL-123: invoice CSV export". The PR contains the code. Its description gives a short summary of the intent, the plan's decisions and the Testing section, because the files themselves stay in the worknotes repo. So the reviewer still sees what was asked, what was decided, and what was built.
 3. **The PR description** has three parts:
    - **Summary:** the smallest picture that shows the change, such as a call tree, a file tree or a small diff.
    - **Evidence:** before and after, such as a screenshot or the test output.
    - **Merge danger:** can we roll it back easily (a "two-way door") or not (a "one-way door"), and what it could affect.
 4. Link the PR to the ticket.
 5. **AI review, by fresh reviewers.** It can run on the staged diff before the engineer's own review, so the engineer reviews cleaner code. Three parts, so one can't hide another:
-   - **Bugs:** `/code-review high --max-findings all` in Claude Code. It reviews the branch plus uncommitted changes, in its own subagent with a fresh context, and follows `CLAUDE.md` (which points to `CODING_STANDARDS.md`). Ask it to fix the findings you agree with; fixes land as unstaged changes, apart from the staged build.
-   - **Security:** `/security-review`, above all when the change touches secrets, certificates or auth.
+   - **Bugs:** `/code-review high --max-findings all` in Claude Code (a skill can start it, and `/security-review`, itself; other tools use a reviewer subagent). It reviews the branch plus uncommitted changes, in its own subagent with a fresh context, and follows `CLAUDE.md` (which points to `CODING_STANDARDS.md`). Ask it to fix the findings you agree with; fixes land as unstaged changes, apart from the staged build.
+   - **Security:** `/security-review`, above all when the change touches secrets, certificates or auth. It diffs against the default branch, so on a stacked branch keep only findings in files the ticket changed.
    - **Spec vs code,** in a new session, because neither command checks it: "Check the staged changes against the plan and the intent. Report only what is missing, what was built but not asked for, and anything that breaks a constraint. Quote file:line. Don't change any files."
+
+   **The report** is in groups: fix now; needs an answer (questions drafted for the person who can answer); plan or verify text that is wrong (fixed without asking, with a Build log line); outside the ticket; dropped, with a reason. It starts with 3 to 5 lines: what was done, what's left, what the engineer must decide.
+
+   **Before any question for someone else,** the agent checks the specs, pages, code and mocks, and reads the ticket's comments. In DSM-964 the review first drafted six questions; four were already asked on the ticket, and the docs answered most of the rest. Never ask again what is already asked.
 
    **Rules for the reviewers:**
    - Each finding gives a concrete failing case (input or state → wrong result). A finding without one is dropped or marked "unsure".
@@ -248,12 +261,12 @@ Today our PRs are reviewed by coworkers, and that stays. We add an **optional AI
 
    For big tasks or a one-way door, add a second, different model too, for example `/code-review ultra` (a deeper multi-agent review in the cloud, billed) or Copilot's review on GitHub. Different models miss different things.
 6. **The engineer's own review,** in the same session as the AI review: the engineer is the reviewer now, and that session already knows every finding, fix and reason (start a new one only if its context is nearly full, and point it to the Build log).
-   - Open each file in the IDE and have the agent explain it in 2–3 plain sentences, read from the diff, not from memory.
+   - Run it with the walkthrough skill (`/sdlc-walkthrough <base>`): one file at a time, the agent waits for "next". Open each file in the IDE while the agent explains it in 2–3 plain sentences, read from the diff, not from memory: for a new file, what it copies; for a changed one, before and now; for a deleted one, where its job went.
    - Go in data-flow order (config, wiring, logic, infrastructure, API docs), so the design shows before the detail. Spend the most time on high-risk tasks.
    - Ask "why?" wherever the intent isn't clear from the code, and "did you check X?" to force a real check.
    - Ask what should have changed but didn't: generated code, docs, CI, rollout order. A walkthrough of the diff can't show what's missing.
    - Short explanations drop caveats. For each trade-off the build kept, read its entry in the Build log.
-   - Decide what the AI review left open. The agent changes only what you ask for, and stages it when you say so.
+   - Decide what the AI review left open. The agent changes only what you ask for, and stages it when you say so. If a fix changes behaviour after the walkthrough (a new call, for example), walk those files again.
    - **Before you present a large PR to a coworker, walk it once more in the same session,** as a second review pass. Explaining each file forces a check that the code does what the description says:
      - Go in the order of GitHub's file view, one package or file at a time, from the real diff against the base (`git diff <base> HEAD -- <path>`).
      - Group files with the same mechanical change and explain one. Give each "Before" and "Now" in plain English, 2–3 sentences, one for a move or rename. Spend longer on the risky or surprising part.
@@ -263,6 +276,9 @@ Today our PRs are reviewed by coworkers, and that stays. We add an **optional AI
      - Turn the reader's questions into follow-ups. Naming questions lead to renames, and "why not X" questions expose design choices made silently.
      - End with a status block: what was tested, what is blocked and on whom, and what must happen before prod. Post it on the ticket.
    - Then commit the build and the fixes you keep, push, and open or update the draft PR. The engineer commits, never the agent.
+   - **Tell the ticket.** The summary skill (`/sdlc-summary <ticket> <base>`) drafts a comment: one sentence on what the change does, one or two per file or group, what the tests run against, what is still open and on whom, and the PR link. Best run once the PR exists.
+
+   **Posts for others** (Jira comments, chat messages), in every step: 2 to 4 short sentences, plain English, written as the engineer ("I found", not "we"), with no recommendation unless the engineer asks. Nothing is posted before the engineer approves the text.
 7. **Deploy to a lower environment and verify, in a new session.** The engineer deploys the branch through our pipeline (the agent never deploys). A fresh session then reads the intent, the plan, the Build log and `.verify/VERIFY.md`, and checks what really runs. It only reads and reports, and changes no files.
    - **`.verify/VERIFY.md`, one per repo:** how to test this repo after a deploy. It holds the environment URLs and how to sign in, how to call the service (example requests, test data), how to read logs and metrics (with the repo's AWS access rule), the standard smoke tests, and known gotchas. It says where credentials come from and never holds them. It is created once per repo: the setup skill adds the link and an empty template, and the plan phase of the first ticket fills in what the agent can read from the repo (how to run it, the endpoints, the log groups) and asks the engineer for what only they know (environments, accounts and roles, the login for each computer). Anything unconfirmed is marked "to confirm". The verify session confirms or corrects it from real runs and proposes additions, and the engineer decides what to keep. Later tickets read it and don't ask again. If the plan phase was skipped, the first verify session drafts it.
    - **`.verify/<ticket-key>-<short-name>.md`, one per ticket:** the checks, written in the plan phase (step 2, point 6) and updated by the build if what can be checked changed. The verify session adds the results: what was run, what was seen, in which environment. Anything not verified is marked, with the reason. The PR summary links to the results.
@@ -355,10 +371,15 @@ A skill is a folder with a `SKILL.md` file. It teaches the agent one company rul
 
 **How we know it works:** review findings about that policy fall towards zero. If they don't, the skill isn't triggering, or it no longer matches the policy.
 
-**Our own flow skills, later.** Once the flow is stable, we write three skills of our own:
-- A **setup skill**, run once per repo: it creates `AGENTS.md` with pointers, the links to the worknotes folder (`.intent/`, `.specs/`, `.plans/`, `.verify/`, `GLOSSARY.md`) and their `.git/info/exclude` lines, an empty `.verify/VERIFY.md` template, the Jira settings and the check commands.
-- A **router** ("ask our SDLC"): a teammate describes their situation, and it points to the right step.
-- A **bug diagnosis skill** that runs the bug process from Part 1.
+**Our own flow skills (drafts, tried on DSM-964).** One skill per step, started by the engineer with `/<name> <ticket>`. Each is self-contained: it doesn't need this document. They live in `.claude/skills/` in this repo for now and will move to their own repo, installable for Claude Code, Cursor and Copilot.
+- `sdlc-setup`, once per repo: worknotes links and exclude lines, the `.verify/VERIFY.md` template, and an instruction file with the check commands and the exact Jira and Confluence commands (with the REST fallback for attachments and search).
+- `sdlc-intake`, `sdlc-plan`, `sdlc-build`: steps 1 to 3.
+- `sdlc-review`: the AI review, the engineer's review and the draft PR (step 4).
+- `sdlc-walkthrough`: one file at a time in data-flow order, for your own review, before showing a PR, or for a coworker's PR.
+- `sdlc-summary`: a short ticket comment on what changed.
+- Later: verify, follow-through, release, a router ("ask our SDLC") and a bug diagnosis skill.
+
+What the first run taught us went into the skills: scope first, look before you ask, keep the intent current without asking, short posts in the engineer's voice, and exact steps for anything the engineer must run.
 
 ## Build hooks (hard stops)
 
