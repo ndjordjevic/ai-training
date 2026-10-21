@@ -3,6 +3,9 @@
 Intent: .intent/<ticket key>-<short-name>.md
 Status: <draft, waiting on answers | ready to build>
 
+## Sources
+- Pages (title, version), tickets, attachments, specs and mocks the design rests on.
+
 ## Design
 
 ### How callers reach us
@@ -44,6 +47,9 @@ In parallel: <tasks>. Then in order: <tasks>.
 
 ## Open points: assumed for now, confirm later
 1.
+
+## Questions posted
+- <ticket, comment date, to whom>: the questions, and which design point each answer changes.
 
 ## Build log
 - <date>: <what was decided during the build, and why>.

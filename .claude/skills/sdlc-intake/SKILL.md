@@ -23,7 +23,7 @@ The intent says **why** and **what is wanted**, from the business's view. It is 
 
 ## 0. Resume or start
 
-If `.intent/<ticket key>-*.md` exists, this is a resume (for example, the ticket creator answered). Refresh first: compare the last-updated times of the ticket, its subtasks and linked items, and any Confluence page version, with the ones in the intent's Source. Also check for new subtasks or links. If nothing changed, say "no change". If something did, list every change, and update the intent only after the engineer confirms. Then go on from where it stopped.
+If `.intent/<ticket key>-*.md` exists, this is a resume (for example, the ticket creator answered). Refresh first: compare the last-updated times of the ticket, its subtasks and linked items, and any Confluence page version, with the ones in the intent's Source. Also check for new subtasks or links. If nothing changed, say "no change". If something did, update the intent and list every change. Then go on from where it stopped.
 
 ## 1. Read the ticket
 
