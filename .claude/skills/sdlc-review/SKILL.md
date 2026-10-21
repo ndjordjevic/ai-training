@@ -18,7 +18,9 @@ Coworkers still review the PR. This review comes first, so they get cleaner code
 - **Git:** never commit, push or switch branches. The engineer commits. Never open or update a PR without the engineer approving the text.
 - **Every finding has a failing case:** an input or state, and the wrong result it gives. Without one, drop it or mark it "unsure".
 - **Read from the diff, not from memory.** Quote `file:line`.
-- **Plain, short English.** Fix the project's terms once (from `GLOSSARY.md`) and keep them.
+- **Plain, short English.** Start every report with 3 to 5 lines: what was done, what's left, what the engineer must decide. Details after. Fix the project's terms once (from `GLOSSARY.md`) and keep them.
+- **Posts and messages for others** (Jira comments, chat messages): 2 to 4 short sentences, plain English, no lists unless the engineer asks. One request per post is fine; don't bundle background.
+- **Look before you ask.** Before any question for someone else, check the specs, Confluence pages, code, mocks and test environments. Only ask what none of them answers.
 - **Problems outside the ticket:** tell the engineer and draft a new ticket. Don't fix them here.
 
 ## 0. Read and refresh
@@ -42,7 +44,13 @@ Three reviews, each with a fresh context, read only. Each reports findings, not 
 
 Give each of our own reviewers the base, the paths to the plan and intent, and the rules above. Run them in parallel where you can.
 
-Then **check every finding yourself** against the code: confirmed, unsure, or wrong (say why). Report the confirmed and unsure ones, most severe first, each with its failing case and a suggested fix.
+Then **check every finding yourself** against the code: confirmed, unsure, or wrong (say why). Report in these groups, most severe first in each, one short entry per finding (`file:line`, failing case, fix):
+
+1. **Fix now:** confirmed and small enough for this ticket.
+2. **Needs an answer:** the right code depends on someone else (the ticket creator, a design page owner). First look for the answer yourself (see Rules); if the sources settle it, it moves to "Fix now". Then read the ticket's comments and the plan's "Questions posted": never ask again what is already asked; say "already asked on <date>" instead. Draft only the new questions: one or two short lines each, one thing each, no background. Say if one blocks the merge. Post only after the engineer approves the text.
+3. **Plan or verify text is wrong** (the code is right): fix the plan or checks file, add a Build log line, and say what you changed. Don't ask first.
+4. **Outside the ticket:** a draft ticket each.
+5. **Dropped:** one line each, with the reason.
 
 For a big change or a one-way door, suggest a second review by a different model, such as `/code-review ultra` in Claude Code (billed, started by the engineer) or a review on GitHub. Different models miss different things.
 
@@ -63,11 +71,11 @@ The engineer is the reviewer now. Walk the diff with them, in this session, beca
 - **Trade-offs:** for each choice the build made, point to its Build log line.
 - **Questions:** answer "why?" from the code and plan. "Did you check X?" means run a real check, not answer from memory. Naming questions and "why not X?" become follow-ups.
 
-The engineer decides what's left open. Change only what they ask for.
+The engineer decides what's left open. Change only what they ask for. If a fix changes behaviour after the walkthrough (for example, a new call), walk those files again.
 
 ## 4. Status, then commit
 
-Write a short status block: what was tested, what is blocked and on whom, and what must happen before production. Add it to the plan's Build log, commit and push the worknotes repo, and offer to post it on the ticket (only with the engineer's approval).
+Write a short status block: what was tested, what is blocked and on whom, and what must happen before production. For each step the engineer must run, say exactly how (the command, or the CI workflow and its inputs, read from the repo's CI files). Add it to the plan's Build log, commit and push the worknotes repo, and offer to post it on the ticket (only with the engineer's approval).
 
 Then the engineer commits the build and the fixes they keep, and pushes.
 

@@ -61,6 +61,7 @@ Skip if there is a spec. Otherwise: decisions, what we will not do, and a **Test
 
 - Where does the change belong? What can we reuse? How is similar code written today?
 - **What could break:** list who calls or uses what we change, beyond the files in the diff.
+- **Docs that name it:** search the repo docs (README, architecture docs, runbooks, endpoint tables) for lists of what we add or change, and put their updates into a task.
 
 ## 6. Tasks
 

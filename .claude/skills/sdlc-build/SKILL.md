@@ -88,7 +88,7 @@ Start each task as soon as its blockers are done, not in fixed rounds.
 - What was built on an assumption, and what was skipped because it waits on an answer.
 - The Build log lines added.
 - The full check output, and any failure that was there before the build.
-- What the engineer must run that you couldn't (for example, a cloud plan or a check that needs a clean tree).
+- What the engineer must run that you couldn't (for example, a cloud plan or a check that needs a clean tree), and exactly how: the command, or the CI workflow and its inputs. Read the repo's CI files to find out; don't guess.
 
 ## Done when
 
