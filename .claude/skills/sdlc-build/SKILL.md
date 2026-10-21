@@ -67,6 +67,8 @@ Start each task as soon as its blockers are done, not in fixed rounds.
   - Mock only external systems (outside APIs, time). Never mock our own code.
   - A failing test means fix the code, never the test.
 - **Check often:** the type check and the test file you're working on.
+- **Files the plan doesn't name** (for example, a README line): fine if small; add a Build log line.
+- **Tool leftovers:** some checks create files (`terraform init` makes a lock file and a `.terraform` folder). Remove what the tool made, or run it in a scratch copy.
 - **Copy how similar code is written** in this repo: names, errors, logging, layout. Follow the instruction file (for example, generated code is regenerated, never hand-edited).
 - **Same change in many files:** write a script and run it, instead of editing each file by hand. Mention it in the report so a reviewer can rerun it.
 - **For a bug:** the failing test first, then the fix. Fix the cause, not the symptom. Debug logs carry one unique tag, so one search removes them.
@@ -75,8 +77,8 @@ Start each task as soon as its blockers are done, not in fixed rounds.
 ## 5. Finish
 
 1. **Clean up the diff:** remove comments that repeat the code, needless defensive checks, debug logs, and style that doesn't match the file. No change in behaviour.
-2. **Full checks:** run the full build, test and lint once, and paste the output.
-3. **Parallel only:** bring the build branch onto the feature branch as uncommitted changes (`git merge --squash <ticket>-build`). Remove the worktrees. Keep the build and task branches until the engineer has committed, then delete them.
+2. **Full checks:** run the full build, test and lint once, and paste the output. Then `git status`: only the files the build meant to change.
+3. **Parallel only:** bring the build branch onto the feature branch as uncommitted changes (`git merge --squash <ticket>-build`). Remove the worktrees. Keep the build and task branches until the engineer has committed after the review, then delete them.
 4. Update the plan's Build log, then commit and push the worknotes repo.
 
 ## 6. Report
@@ -86,7 +88,7 @@ Start each task as soon as its blockers are done, not in fixed rounds.
 - What was built on an assumption, and what was skipped because it waits on an answer.
 - The Build log lines added.
 - The full check output, and any failure that was there before the build.
-- A suggested commit order, if useful: prefactor, tests, then the change.
+- What the engineer must run that you couldn't (for example, a cloud plan or a check that needs a clean tree).
 
 ## Done when
 
@@ -95,4 +97,4 @@ Start each task as soon as its blockers are done, not in fixed rounds.
 - The whole result is uncommitted on the feature branch, and no worktrees are left.
 - The plan's Build log is up to date and the worknotes repo is pushed.
 
-**Next:** the engineer reviews the diff (high-risk tasks first), commits and pushes. Then the PR.
+**Next:** `/sdlc-review <ticket key>` in a new session: the AI review of the uncommitted diff, then the engineer's own review (high-risk tasks first). Commit and push after that.
