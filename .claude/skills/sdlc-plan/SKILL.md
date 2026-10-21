@@ -71,6 +71,8 @@ Use `plan-template.md` next to this file. Each task has a goal, the files it tou
 - **Each task** can be checked on its own and fits in one session. Too big means split it.
 - **Mark high-risk tasks** (for example, a change on a live path existing users depend on), with what extra checks they need. The build runs them on the strongest model.
 - Say which tasks can run in parallel and which in order.
+- Tasks are code only. Deploying and checking in an environment is the verify step, not a task.
+- If the ticket asks for something the repo has no pattern for (for example, "integration tests" with no integration test setup), say how you read it and add it to Open points, so the engineer can confirm.
 
 ## 7. Checks for the verify step
 
@@ -80,7 +82,7 @@ Use `plan-template.md` next to this file. Each task has a goal, the files it tou
 
 ## 8. Save
 
-Save the plan as `.plans/<ticket key>-<short-name>.md`, starting with "Intent: <path>" (or "Spec: <path>"). Set "Status: ready to build" when no task is blocked by a design question. Commit and push the worknotes repo.
+Save the plan as `.plans/<ticket key>-<short-name>.md`, starting with "Intent: <path>" (or "Spec: <path>"). Set "Status: ready to build" when no task is blocked by a design question. If some tasks wait on an answer, say which: "ready to build (Task 2 waits on <person>'s answer)". Commit and push the worknotes repo.
 
 ## Done when
 
