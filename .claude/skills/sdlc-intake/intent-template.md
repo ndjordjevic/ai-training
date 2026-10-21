@@ -3,6 +3,8 @@
 ## Source
 - Jira: <key> "<summary>" (<type>, <status>), epic <key> "<name>".
 - Ticket last updated: <date time>.
+- Subtasks: <key> "<summary>" (<status>, <assignee>, updated <date time>). Mine: <keys>.
+- Linked: <key> "<summary>" (<link type>, <status>, updated <date time>): how it relates.
 - Confluence: <page and version, or "none linked">.
 - Last synced: <date time>.
 

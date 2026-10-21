@@ -21,11 +21,13 @@ The intent says **why** and **what is wanted**, from the business's view. It is 
 
 ## 0. Resume or start
 
-If `.intent/<ticket key>-*.md` exists, this is a resume (for example, the ticket creator answered). Refresh first: compare the ticket's last-updated time and any Confluence page version with the ones in the intent's Source. If nothing changed, say "no change". If something did, list every change, and update the intent only after the engineer confirms. Then go on from where it stopped.
+If `.intent/<ticket key>-*.md` exists, this is a resume (for example, the ticket creator answered). Refresh first: compare the last-updated times of the ticket, its subtasks and linked items, and any Confluence page version, with the ones in the intent's Source. Also check for new subtasks or links. If nothing changed, say "no change". If something did, list every change, and update the intent only after the engineer confirms. Then go on from where it stopped.
 
 ## 1. Read the ticket
 
-Read it with the Jira tool the instruction file names: the description, all comments, attachments, linked tickets and any linked Confluence page. Note the ticket's last-updated time and the page version.
+Read it with the Jira tool the instruction file names: the description, all comments, attachments and any linked Confluence page. Note the ticket's last-updated time and the page version.
+
+Then read every subtask, the parent or epic, and every linked work item: summary, status, assignee, description and comments. Note each one's key, how it is linked, and its last-updated time. Flag anything odd, such as a subtask marked "Not Required" or a link to an older, similar ticket.
 
 ## 2. Already built?
 
@@ -39,7 +41,9 @@ For a bug: don't try to reproduce it here. Write down the symptom and the eviden
 
 ## 3. Grill the engineer
 
-Interview the engineer in rounds about the problem: why, for whom, the outcome, scope, behaviour and constraints. Each round lists every question you can ask now, numbered, each with your recommended answer. Ask only for decisions. Sort every question into one of three piles:
+**First, the scope.** If the ticket has subtasks, ask which ones are the engineer's. The Outcome covers only those; the others go under Constraints as out of scope, with their keys. For each linked item, ask how it relates if that isn't clear (for example, done before, blocks us, or same work in another repo).
+
+Then interview the engineer in rounds about the problem: why, for whom, the outcome, behaviour and constraints. Each round lists every question you can ask now, numbered, each with your recommended answer. Ask only for decisions. Sort every question into one of three piles:
 
 1. **The engineer's decision about the problem:** ask it now.
 2. **Design** (which component, where data lives, how to wire it): don't ask. Write one line under "Parked for the plan".
