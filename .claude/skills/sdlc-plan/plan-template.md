@@ -4,7 +4,7 @@ Intent: .intent/<ticket key>-<short-name>.md
 Status: <draft, waiting on answers | ready to build>
 
 ## Sources
-- Pages (title, version), tickets, attachments, specs and mocks the design rests on.
+- Pages (title, version), tickets, attachments, specs and mocks the design rests on. The full list is in .intent/<ticket key>-sources.md.
 
 ## Design
 

@@ -6,6 +6,7 @@
 - Subtasks: <key> "<summary>" (<status>, <assignee>, updated <date time>). Mine: <keys>.
 - Linked: <key> "<summary>" (<link type>, <status>, updated <date time>): how it relates.
 - Confluence: <page and version, or "none linked">.
+- Related docs and tickets: .intent/<ticket key>-sources.md.
 - Last synced: <date time>.
 
 ## Problem

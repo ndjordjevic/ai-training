@@ -26,9 +26,11 @@ Coworkers still review the PR. This review comes first, so they get cleaner code
 ## 0. Read and refresh
 
 1. Read the plan `.plans/<ticket key>-*.md` (with its Build log), the intent and spec it links, the verify checks file, the instruction file, `GLOSSARY.md`, and any coding standards file.
-2. Refresh against Jira: compare the last-updated times of the ticket, its subtasks and linked items, and the Confluence page versions, with the ones in the intent's Source. If nothing changed, say "no change". If something did, update the intent, list the changes, and say what the code may now be missing.
+2. Refresh against Jira: compare the last-updated times of the ticket, its subtasks and linked items, and the Confluence page versions, with the ones in the intent's Source and the sources file (`.intent/<ticket key>-sources.md`). Don't search again. If nothing changed, say "no change". If something did, update the intent, list the changes, and say what the code may now be missing.
 3. **Find the base:** the branch this one was made from (stacked branches don't start from main). Take it from the plan, or ask. The review covers `git diff <base>` plus uncommitted changes, nothing else.
-4. If the build is uncommitted and unstaged, ask the engineer to stage it (or stage it when they say so), so later fixes show apart from it.
+4. **Same session as the build?** If this session wrote the code, say so and ask once: go on here, or start a new session. The reviewers still start fresh, but your own checking of their findings doesn't.
+5. **A second review** of the same ticket: bugs cover only what changed since the last review (say from which commit); security and plan vs code still cover the whole branch.
+6. If the build is uncommitted and unstaged, ask the engineer to stage it (or stage it when they say so), so later fixes show apart from it.
 
 ## 1. AI review: three fresh reviewers
 
@@ -47,7 +49,7 @@ Give each of our own reviewers the base, the paths to the plan and intent, and t
 Then **check every finding yourself** against the code: confirmed, unsure, or wrong (say why). Report in these groups, most severe first in each, one short entry per finding (`file:line`, failing case, fix):
 
 1. **Fix now:** confirmed and small enough for this ticket.
-2. **Needs an answer:** the right code depends on someone else (the ticket creator, a design page owner). First look for the answer yourself (see Rules); if the sources settle it, it moves to "Fix now". Then read the ticket's comments and the plan's "Questions posted": never ask again what is already asked; say "already asked on <date>" instead. Draft only the new questions: one or two short lines each, one thing each, no background. Say if one blocks the merge. Post only after the engineer approves the text.
+2. **Needs an answer:** the right code depends on someone else (the ticket creator, a design page owner). First look for the answer yourself (see Rules); if the sources settle it, it moves to "Fix now". **Check every question before you show it, every time** (also when you redraft one or add one later): (1) look for the answer in the specs, the sources file, the code, mocks and sample data; (2) check the case really happens (the spec's definitions, sample data, logs); (3) check the answer would change the code or the outcome. Drop any question that fails one. In a tool with subagents, also give the questions to a fresh read-only one and keep only what it can't answer. Under the draft, say in one line per question where you looked. Then read the ticket's comments and the plan's "Questions posted": never ask again what is already asked; say "already asked on <date>" instead. Draft only the new questions: one or two short lines each, one thing each, no background. Say if one blocks the merge. Post only after the engineer approves the text.
 3. **Plan or verify text is wrong** (the code is right): fix the plan or checks file, add a Build log line, and say what you changed. Don't ask first.
 4. **Outside the ticket:** a draft ticket each.
 5. **Dropped:** one line each, with the reason.
@@ -56,13 +58,13 @@ For a big change or a one-way door, suggest a second review by a different model
 
 ## 2. Fix what the engineer agrees with
 
-The engineer picks which findings to fix. If they say "fix by best guess", decide each one and give a reason for every one you don't fix. Run the checks the fix touches, then the full build, test and lint once, and paste the output.
+The engineer picks which findings to fix. A fix that adds new behaviour on a live path (for example, dropping data) gets a verify check, and is marked high risk for the walkthrough. If they say "fix by best guess", decide each one and give a reason for every one you don't fix. Run the checks the fix touches, then the full build, test and lint once, and paste the output.
 
 A check that compares against git's index (for example "generated code matches") can fail while fixes are unstaged. Prove the real property another way; don't stage just to make it pass.
 
 ## 3. The engineer's own review: a walkthrough
 
-The engineer is the reviewer now. Do it in this session, because it already knows every finding and fix. Tell the engineer to run `/sdlc-walkthrough <base>` here (in Claude Code; elsewhere, follow that skill's steps): one file at a time, in data-flow order, ending with what's missing.
+The engineer is the reviewer now. Do it in this session, because it already knows every finding and fix. Tell the engineer to run `/sdlc-walkthrough <base>` here (on a second review, `/sdlc-walkthrough HEAD`, so only the new changes are walked) (in Claude Code; elsewhere, follow that skill's steps): one file at a time, in data-flow order, ending with what's missing.
 
 The engineer decides what's left open. Change only what they ask for. If a fix changes behaviour after the walkthrough (for example, a new call), walk those files again.
 

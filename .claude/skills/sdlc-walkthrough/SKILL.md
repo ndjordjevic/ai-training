@@ -26,6 +26,7 @@ The engineer is the reviewer. Your job is to make the diff easy to understand, s
    - A PR number: the PR's base branch, and `gh pr diff <number>`.
    - A branch name: diff from where this branch left it, `git diff -M $(git merge-base HEAD <base>)`, so new commits on the base don't show as changes. It covers uncommitted changes too. If the base has moved on, say so and suggest the engineer pulls it in first.
    - Nothing given: the base the plan names, or the branch this one was made from (stacked branches don't start from main). Ask if unsure.
+   - **Walked before?** If the branch was already walked (an open PR, or a walkthrough in the Build log), walk only what is new: `HEAD` for the uncommitted changes (`git diff HEAD`, staged and unstaged), or the commit last walked. Say which, and offer the full diff instead.
 2. **Read the context, if it exists:** the ticket's intent and plan (with its Build log), `GLOSSARY.md`, and the review findings in this session.
 3. **Fix the terms once,** at the top, in one line each (for example: "data holder" = the bank; "backend" = its core banking system). Keep them for the whole walkthrough.
 4. **Show the order** (below) as a short numbered list of files and groups, with high-risk ones marked. Let the engineer change it.

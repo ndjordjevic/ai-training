@@ -373,10 +373,12 @@ A skill is a folder with a `SKILL.md` file. It teaches the agent one company rul
 
 **Our own flow skills (drafts, tried on DSM-964).** One skill per step, started by the engineer with `/<name> <ticket>`. Each is self-contained: it doesn't need this document. They live in `.claude/skills/` in this repo for now and will move to their own repo, installable for Claude Code, Cursor and Copilot.
 - `sdlc-setup`, once per repo: worknotes links and exclude lines, the `.verify/VERIFY.md` template, and an instruction file with the check commands and the exact Jira and Confluence commands (with the REST fallback for attachments and search).
-- `sdlc-intake`, `sdlc-plan`, `sdlc-build`: steps 1 to 3.
+- `sdlc-research`: finds the related docs and tickets once (the pages around the linked ones, a search of the same spaces, exact keys across the site) and saves them to a sources file next to the intent. Intake runs it; later steps read the file and only check page versions. Run it yourself before there's a ticket, or for a new lead.
+- `sdlc-intake`, `sdlc-plan`, `sdlc-build`: steps 1 to 3. Before any question for someone else, every time: look for the answer in specs, sources, code and mocks; check the case really happens; check the answer would change the code. Otherwise drop it.
 - `sdlc-review`: the AI review, the engineer's review and the draft PR (step 4).
-- `sdlc-walkthrough`: one file at a time in data-flow order, for your own review, before showing a PR, or for a coworker's PR.
+- `sdlc-walkthrough`: one file at a time in data-flow order, for your own review, before showing a PR, or for a coworker's PR. On a second pass, `/sdlc-walkthrough HEAD` walks only the new changes.
 - `sdlc-summary`: a short ticket comment on what changed.
+- `sdlc-pr`: opens the draft PR, or updates an open one: short, one sentence per change, real blockers only, no AI attribution.
 - Later: verify, follow-through, release, a router ("ask our SDLC") and a bug diagnosis skill.
 
 What the first run taught us went into the skills: scope first, look before you ask, keep the intent current without asking, short posts in the engineer's voice, and exact steps for anything the engineer must run.

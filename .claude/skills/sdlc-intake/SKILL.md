@@ -23,7 +23,7 @@ The intent says **why** and **what is wanted**, from the business's view. It is 
 
 ## 0. Resume or start
 
-If `.intent/<ticket key>-*.md` exists, this is a resume (for example, the ticket creator answered). Refresh first: compare the last-updated times of the ticket, its subtasks and linked items, and any Confluence page version, with the ones in the intent's Source. Also check for new subtasks or links. If nothing changed, say "no change". If something did, update the intent and list every change. Then go on from where it stopped.
+If `.intent/<ticket key>-*.md` exists, this is a resume (for example, the ticket creator answered). Refresh first: compare the last-updated times of the ticket, its subtasks and linked items, and any Confluence page version, with the ones in the intent's Source and the sources file. Also check for new subtasks or links; if there are, run the research steps again for them only. If nothing changed, say "no change". If something did, update the intent and list every change. Then go on from where it stopped.
 
 ## 1. Read the ticket
 
@@ -31,9 +31,7 @@ Read it with the Jira and Confluence tools the instruction file names: the descr
 
 Then read every subtask, the parent or epic, and every linked work item: summary, status, assignee, description and comments. Note each one's key, how it is linked, and its last-updated time. Flag anything odd, such as a subtask marked "Not Required" or a link to an older, similar ticket.
 
-Then search for what isn't linked:
-- **Confluence:** pages about this feature, by the ticket keys, the epic name and the main terms. Design and mapping pages are often not linked to the ticket.
-- **Jira:** other tickets that explain a term, setting or acronym the ticket uses but doesn't explain.
+Then find what isn't linked: follow the steps of the `sdlc-research` skill (its `SKILL.md` is in the folder next to this one). It walks the pages around the linked ones, searches the same spaces and Jira, and saves `.intent/<ticket key>-sources.md`. Use what it finds before asking anything.
 
 ## 2. Already built?
 
@@ -73,6 +71,8 @@ Write it from the ticket and the answers, using `intent-template.md` next to thi
 
 Only if the general picture is still unclear: for example, the ticket contradicts itself, or it's unclear what the outcome is. Questions about how or details go to "Parked for the plan"; the plan asks them. Most tickets need no questions here. If there are none, say so and skip this step.
 
+**Check every question before you show it, every time** (also when you redraft one or add one later): (1) look for the answer in the specs, the sources file, the code, mocks and sample data; (2) check the case really happens (the spec's definitions, sample data, logs); (3) check the answer would change what is wanted. Drop any question that fails one. In a tool with subagents, also give the questions to a fresh read-only one and keep only what it can't answer. Under the draft, say in one line per question where you looked.
+
 - Plain, simple English. One short question per line, numbered, most important first.
 - No default answers, no summary, no background. Written as the engineer ("I", not "we").
 
@@ -85,7 +85,7 @@ Commit and push the worknotes repo.
 ## Done when
 
 - The problem, outcome, constraints and scope are clear. The rest are answered, written down as assumptions, or in the Jira draft.
-- The intent is saved, with its Source times filled in.
+- The intent is saved, with its Source times filled in, and the sources file is saved.
 - Any questions are posted, or the engineer has the draft.
 - The worknotes repo is pushed.
 

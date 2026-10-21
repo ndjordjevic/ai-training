@@ -26,7 +26,7 @@ The plan says what to build and where. The build writes the code, checks it, and
 ## 0. Read and refresh
 
 1. Read the plan `.plans/<ticket key>-*.md`, the intent and spec it links, the verify checks file, the instruction file and `GLOSSARY.md`.
-2. Refresh against Jira: compare the last-updated times of the ticket, its subtasks and linked items, and the Confluence page versions, with the ones in the intent's Source. If nothing changed, say "no change". If something did, update the intent and list the changes. Then show what must change in the plan, and update it. If code is already written, list the parts the change affects and stop until the plan is right.
+2. Refresh against Jira: compare the last-updated times of the ticket, its subtasks and linked items, and the Confluence page versions, with the ones in the intent's Source and the sources file (`.intent/<ticket key>-sources.md`). Don't search again. If nothing changed, say "no change". If something did, update the intent and list the changes. Then show what must change in the plan, and update it. If code is already written, list the parts the change affects and stop until the plan is right.
 3. Check the plan's Status and "Open points". A task blocked by a person's answer: if the plan gives an assumption for it, build on the assumption and say so in the final report. If not, skip it.
 4. `git status` must be clean and on the feature branch. If not, stop and ask.
 
@@ -65,7 +65,7 @@ Start each task as soon as its blockers are done, not in fixed rounds.
   - Test behaviour through the public interface, not private functions.
   - Expected values are known values (`15`), not worked out the way the code does it.
   - Mock only external systems (outside APIs, time). Never mock our own code.
-  - A failing test means fix the code, never the test.
+  - A failing test means fix the code, never the test. Change a test only when the plan changes the behaviour it checks, and name it in the report.
 - **Check often:** the type check and the test file you're working on.
 - **Files the plan doesn't name** (for example, a README line): fine if small; add a Build log line.
 - **Tool leftovers:** some checks create files (`terraform init` makes a lock file and a `.terraform` folder). Remove what the tool made, or run it in a scratch copy.

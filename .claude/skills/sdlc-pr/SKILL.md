@@ -23,9 +23,9 @@ Reviewers read the description first. It says what changed, why, how it was test
 ## 0. Check
 
 1. The branch is pushed and `git status` is clean. If not, stop and tell the engineer.
-2. **The base:** the one given, the one the plan names, or the branch this one was made from (stacked branches don't start from main). Ask if unsure.
+2. **The base:** the one given, the one the plan names, or the branch this one was made from (stacked branches don't start from main). Ask if unsure. It must be a branch name, not a commit; if given a commit, find the branch that holds it.
 3. The PR covers only this ticket: `git log --oneline $(git merge-base HEAD <base>)..HEAD` and `git diff --stat` against the same point. If it shows someone else's commits, the base is wrong.
-4. Read the plan (with its Build log and status block), the intent and the verify checks file, if they exist. Check there's no open PR for this branch already (`gh pr list --head <branch>`); if there is, offer to update it instead.
+4. Read the plan (with its Build log and status block), the intent and the verify checks file, if they exist. Check there's no open PR for this branch already (`gh pr list --head <branch>`); if there is, update it instead (step 2).
 
 ## 1. Draft
 
@@ -55,7 +55,8 @@ Rollback
 - Group files the way the code flows: wiring, logic, infrastructure, docs. No file-by-file lists, no code.
 - "Testing" says what the tests run against (for example, a fake server). Don't call them integration or end-to-end tests unless they are.
 - Changes to code that belongs to another ticket or branch (for example, fixing its CI) get their own line, naming that ticket, so its owner knows.
-- "Before merge" holds real blockers only: open questions, missing test data, another PR that must merge first.
+- "Before merge" holds real blockers only: open questions whose answer can change the code, missing test data, another PR that must merge first. A question asked only to confirm stays on the ticket, not here.
+- **One sentence per Changes line.** If the whole text doesn't fit on one screen, shorten it (also text kept from an earlier version) and say what you cut.
 - If this PR is stacked on another branch, say so in one line under the link ("Stacked on <branch>; merge that first").
 
 ## 2. Open
@@ -65,6 +66,8 @@ Show the title and description. After the engineer approves:
 ```
 gh pr create --draft --base <base> --title "<title>" --body-file <scratch file>
 ```
+
+To update an open PR, read its current text first (`gh pr view <number>`), keep what the engineer wrote by hand, show the new text, and after approval run `gh pr edit <number> --title "<title>" --body-file <scratch file>`.
 
 Write the body to a scratch file outside the repo, and delete it after. Give the engineer the PR link, add a Build log line, and push the worknotes repo.
 
