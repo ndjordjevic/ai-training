@@ -74,23 +74,13 @@ Then the engineer commits the build and the fixes they keep, and pushes.
 
 ## 5. The draft PR
 
-After the push, draft the PR for the engineer to approve:
-
-- **Title:** the ticket key and a short name ("BILL-123: invoice CSV export").
-- **Base:** the base branch from step 0.
-- **Description:** the intent in two or three lines, the plan's main decisions, and the Testing section (the worknotes files aren't in the repo, so the PR must carry this). Then three parts:
-  - **Summary:** the smallest picture of the change: a call tree, a file tree or a small diff.
-  - **Evidence:** test output, or before and after.
-  - **Merge danger:** easy to roll back or not, and what it could affect.
-- Link the ticket.
-
-Open it as a **draft** with the engineer's approval, using the account the instruction file names.
+After the push, tell the engineer to run `/sdlc-pr <ticket key> <base>` here (in Claude Code; elsewhere, follow that skill's steps). It opens the PR as a draft, with a short description and no AI attribution.
 
 ## Done when
 
 - Every finding is fixed, or left open with the engineer's reason.
 - The engineer has walked the whole diff, and the full checks pass.
 - The status block is in the Build log and the worknotes repo is pushed.
-- The draft PR is open, or the engineer has the text.
+- The engineer knows the next step: `/sdlc-pr`.
 
 **Next:** deploy to a lower environment and run the verify checks, in a new session.
