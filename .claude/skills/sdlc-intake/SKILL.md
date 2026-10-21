@@ -74,7 +74,7 @@ Write it from the ticket and the answers, using `intent-template.md` next to thi
 Only if the general picture is still unclear: for example, the ticket contradicts itself, or it's unclear what the outcome is. Questions about how or details go to "Parked for the plan"; the plan asks them. Most tickets need no questions here. If there are none, say so and skip this step.
 
 - Plain, simple English. One short question per line, numbered, most important first.
-- No default answers, no summary, no background.
+- No default answers, no summary, no background. Written as the engineer ("I", not "we").
 
 The same questions go into the intent's Open questions. Show the draft to the engineer, and post it as a Jira comment only after they approve the text.
 

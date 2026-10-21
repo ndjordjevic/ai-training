@@ -19,7 +19,7 @@ Coworkers still review the PR. This review comes first, so they get cleaner code
 - **Every finding has a failing case:** an input or state, and the wrong result it gives. Without one, drop it or mark it "unsure".
 - **Read from the diff, not from memory.** Quote `file:line`.
 - **Plain, short English.** Start every report with 3 to 5 lines: what was done, what's left, what the engineer must decide. Details after. Fix the project's terms once (from `GLOSSARY.md`) and keep them.
-- **Posts and messages for others** (Jira comments, chat messages): 2 to 4 short sentences, plain English, no lists unless the engineer asks. One request per post is fine; don't bundle background.
+- **Posts and messages for others** (Jira comments, chat messages): 2 to 4 short sentences, plain English, no lists unless the engineer asks. One request per post is fine; don't bundle background. Write as the engineer ("I found", not "we"), and leave out your own recommendation unless the engineer asks for it.
 - **Look before you ask.** Before any question for someone else, check the specs, Confluence pages, code, mocks and test environments. Only ask what none of them answers.
 - **Problems outside the ticket:** tell the engineer and draft a new ticket. Don't fix them here.
 
@@ -62,14 +62,7 @@ A check that compares against git's index (for example "generated code matches")
 
 ## 3. The engineer's own review: a walkthrough
 
-The engineer is the reviewer now. Walk the diff with them, in this session, because it already knows every finding and fix.
-
-- **Order:** data flow: config, wiring, logic, infrastructure, API docs. The design shows before the detail. Spend the most time on high-risk tasks.
-- **Each file:** 2 or 3 plain sentences, read from the diff: what it does, "before" and "now". Group files with the same mechanical change and explain one.
-- **Check claims:** renames and moves against git (`git diff -M`, search for callers). Read infrastructure changes closely: a missing step there can destroy and recreate a live resource.
-- **What's missing:** say what should have changed but didn't: generated code, docs, CI, config, the order things must be deployed in. A walkthrough can't show what's absent unless you look.
-- **Trade-offs:** for each choice the build made, point to its Build log line.
-- **Questions:** answer "why?" from the code and plan. "Did you check X?" means run a real check, not answer from memory. Naming questions and "why not X?" become follow-ups.
+The engineer is the reviewer now. Do it in this session, because it already knows every finding and fix. Tell the engineer to run `/sdlc-walkthrough <base>` here (in Claude Code; elsewhere, follow that skill's steps): one file at a time, in data-flow order, ending with what's missing.
 
 The engineer decides what's left open. Change only what they ask for. If a fix changes behaviour after the walkthrough (for example, a new call), walk those files again.
 
