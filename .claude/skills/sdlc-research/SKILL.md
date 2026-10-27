@@ -27,7 +27,7 @@ If `.intent/<ticket key>-sources.md` exists, read it first. Check each listed pa
 
 ## 1. Collect the leads
 
-From the ticket, its parent or epic, subtasks and linked items (read them if intake hasn't):
+From the ticket, its parent and epic (the epic may be the parent's parent), subtasks and linked items (read them if intake hasn't):
 - **Pages:** every linked page, with its id and space.
 - **Keys:** the ticket, epic, subtask and linked keys.
 - **Terms:** the epic name, the feature's main nouns, system and API names, field names. Note other words for the same thing (from `GLOSSARY.md`, if it exists).

@@ -29,7 +29,7 @@ If `.intent/<ticket key>-*.md` exists, this is a resume (for example, the ticket
 
 Read it with the Jira and Confluence tools the instruction file names: the description, all comments, attachments and any linked Confluence page. Note the ticket's last-updated time and the page version. If one tool can't do something (for example, download an attachment or reach Confluence), use the other way the instruction file gives, such as the REST API, before asking the engineer.
 
-Then read every subtask, the parent or epic, and every linked work item: summary, status, assignee, description and comments. Note each one's key, how it is linked, and its last-updated time. Flag anything odd, such as a subtask marked "Not Required" or a link to an older, similar ticket.
+Then read every subtask, the parent (and the epic above it, if the parent isn't the epic), and every linked work item: summary, status, assignee, description and comments. Note each one's key, how it is linked, and its last-updated time. Flag anything odd, such as a subtask marked "Not Required" or a link to an older, similar ticket.
 
 Then find what isn't linked: follow the steps of the `sdlc-research` skill (its `SKILL.md` is in the folder next to this one). It walks the pages around the linked ones, searches the same spaces and Jira, and saves `.intent/<ticket key>-sources.md`. Use what it finds before asking anything.
 
