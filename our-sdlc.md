@@ -371,18 +371,26 @@ A skill is a folder with a `SKILL.md` file. It teaches the agent one company rul
 
 **How we know it works:** review findings about that policy fall towards zero. If they don't, the skill isn't triggering, or it no longer matches the policy.
 
-**Our own flow skills (drafts, tried on DSM-964).** One skill per step, started by the engineer with `/<name> <ticket>`. Each is self-contained: it doesn't need this document. They live in `.claude/skills/` in this repo for now and will move to their own repo, installable for Claude Code, Cursor and Copilot.
+**Our own flow skills (drafts, tried on DSM-964 and DSM-903).** One skill per step, started by the engineer with `/<name> <ticket>`. Each is self-contained: it doesn't need this document. They live in `.claude/skills/` in this repo for now and will move to their own repo, installable for Claude Code, Cursor and Copilot.
 - `sdlc-setup`, once per repo: worknotes links and exclude lines, the `.verify/VERIFY.md` template, and an instruction file with the check commands and the exact Jira and Confluence commands (with the REST fallback for attachments and search).
 - `sdlc-onboard`: teaches a repo you didn't write. `full` gives a one-screen map and a tour of each flow at function level, with 2–3 teach-back questions per flow; `<ticket>` tours only the code that ticket touches. It saves `REPO-MAP.md` in worknotes with the commit it was read at, and intake and plan start from it. Run it yourself; it isn't part of setup.
 - `sdlc-research`: finds the related docs and tickets once (the pages around the linked ones, a search of the same spaces, exact keys across the site) and saves them to a sources file next to the intent. Intake runs it; later steps read the file and only check page versions. Run it yourself before there's a ticket, or for a new lead.
 - `sdlc-intake`, `sdlc-plan`, `sdlc-build`: steps 1 to 3. Before any question for someone else, every time: look for the answer in specs, sources, code and mocks; check the case really happens; check the answer would change the code. Otherwise drop it.
 - `sdlc-review`: the AI review, the engineer's review and the draft PR (step 4).
 - `sdlc-walkthrough`: one file at a time in data-flow order, for your own review, before showing a PR, or for a coworker's PR. On a second pass, `/sdlc-walkthrough HEAD` walks only the new changes.
-- `sdlc-summary`: a short ticket comment on what changed.
+- `sdlc-summary`: a short ticket comment on what changed. It is the only skill that posts on the ticket at the end; review and walkthrough keep their status in the Build log.
 - `sdlc-pr`: opens the draft PR, or updates an open one: short, one sentence per change, real blockers only, no AI attribution.
 - Later: verify, follow-through, release, a router ("ask our SDLC") and a bug diagnosis skill.
 
 What the first run taught us went into the skills: scope first, look before you ask, keep the intent current without asking, short posts in the engineer's voice, and exact steps for anything the engineer must run.
+
+What the second run taught us:
+- **Read everything linked.** Intake reads the epic even when it sits above the parent story, and opens every link in descriptions and comments, not only linked pages.
+- **Right branch first.** Plan shows the checked-out branch and asks if it's the one you'll build on, because it reads the code that is checked out.
+- **Fix small things here.** A small, low-risk problem that was already there, in or next to the code the ticket changes, is fixed in the ticket. Only big, shared or other-team problems get a new ticket.
+- **Prove a finding.** For a claim about what reaches the caller or the logs, follow the call to where that output is built. Each fix gets a test that fails without the fix. (A review claimed an error reached the caller; it didn't, and the walkthrough caught it.)
+- **One clean diff.** Build never stages anything, and its report ends with the next steps in order: review, commit and push, then deploy and verify.
+- **Fewer prompts.** Plan says whether to build in the same session or a new one, and summary posts on the ticket you name.
 
 ## Build hooks (hard stops)
 
