@@ -19,6 +19,9 @@ The engineer is new to this code. Your job is to make them understand what it do
 - **One flow at a time.** Stop after each and end with: "Say *next*, ask about this flow, or name a flow to jump to." Treat "next", "ok" or "go on" as moving on.
 - **Plain, short English.** Explain each project term once, the first time, and add it to `GLOSSARY.md` if it's missing.
 - **Docs can be wrong.** When the docs and the code disagree, the code wins; say so, and list it at the end.
+- **Short flows.** Aim for one screen per flow; give more only when the engineer asks.
+- **Bugs you find** (in any code you read): say so in one line with `file:line`, and list them at the end. Don't fix them during the tour.
+- **Never create branches or worktrees.** Fixes, when the engineer asks for them, go on the current branch as their own commit, unless the engineer says otherwise.
 
 ## 0. Choose the scope
 
@@ -55,7 +58,7 @@ For each flow:
 3. **Where the data changes shape:** input, what's looked up or called, what goes out.
 4. **Errors:** what can fail and what the caller gets back.
 5. **Its tests:** what they cover and what they run against, in one or two lines.
-6. **Teach-back:** 2 or 3 short questions the engineer answers from what they just saw (for example, "where would a new field in this response go?" or "what does the caller get if the downstream call fails?"). Correct wrong answers with the `file:line` that shows the right one. Don't move on until the engineer says so.
+6. **Teach-back:** 2 or 3 short questions the engineer answers from what they just saw (for example, "where would a new field in this response go?" or "what does the caller get if the downstream call fails?"). Correct wrong answers with the `file:line` that shows the right one. If the engineer says *next* without answering, give the answers in one line each at the top of the next flow, then go on.
 
 **Order for `full`:** the most typical flow first, end to end. Then each other flow, explaining only what differs from the first. Then shared code, infrastructure, and CI.
 
@@ -65,7 +68,9 @@ For each flow:
 
 - **Where things go:** a short list for the common changes in this repo (a new endpoint, a new field, a new backend, a new setting), each with the files to touch.
 - **Traps:** things that surprise a newcomer (generated code, odd data formats, config that differs per environment, tests that need special setup).
-- **Docs that are wrong or missing,** from step 1. Offer to draft fixes as a separate change; don't make them here.
+- **Docs that are wrong or missing,** from step 1.
+- **Bugs found,** with `file:line`, split into: in the ticket's code (offer to fix on the current branch) and outside it (draft a ticket, or note it if one exists).
+- Offer to fix the docs on the current branch as their own commit. Change nothing until the engineer says so.
 - **Questions the engineer asked** that the code couldn't answer, and who might know.
 
 ## 5. Save
