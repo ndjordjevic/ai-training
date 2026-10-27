@@ -27,7 +27,7 @@ If `.intent/<ticket key>-*.md` exists, this is a resume (for example, the ticket
 
 ## 1. Read the ticket
 
-Read it with the Jira and Confluence tools the instruction file names: the description, all comments, attachments and any linked Confluence page. Note the ticket's last-updated time and the page version. If one tool can't do something (for example, download an attachment or reach Confluence), use the other way the instruction file gives, such as the REST API, before asking the engineer.
+Read it with the Jira and Confluence tools the instruction file names: the description, all comments, attachments and any linked Confluence page. Also open every link in the description and comments, whatever it points to: a Confluence page, another ticket, a repo, an API spec or any other URL. If one can't be reached, list it for the engineer. Note the ticket's last-updated time and the page version. If one tool can't do something (for example, download an attachment or reach Confluence), use the other way the instruction file gives, such as the REST API, before asking the engineer.
 
 Then read every subtask, the parent (and the epic above it, if the parent isn't the epic), and every linked work item: summary, status, assignee, description and comments. Note each one's key, how it is linked, and its last-updated time. Flag anything odd, such as a subtask marked "Not Required" or a link to an older, similar ticket.
 
