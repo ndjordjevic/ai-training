@@ -28,6 +28,12 @@ Two sentences.
 - Errors: <what fails, what the caller gets>.
 - Differs from <first flow> by: <one line>.
 
+## Files and packages
+### <path>
+- Where it sits: <layer, what it's for>. Used by: <callers>. Uses: <what>.
+- Main parts: <function or type>: <one line>.
+- Traps: <one line, or none>.
+
 ## Where things go
 - New endpoint: <files>.
 - New field: <files>.

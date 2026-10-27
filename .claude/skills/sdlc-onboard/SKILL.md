@@ -1,8 +1,8 @@
 ---
 name: sdlc-onboard
-description: Teach the engineer an existing repo they didn't write - a map of the repo, then a guided tour of the code one flow at a time, at function level, with short teach-back questions. Either the whole repo, or only the code a ticket touches. Saves a repo map that later steps reuse.
+description: Teach the engineer an existing repo they didn't write - a map of the repo, then a guided tour of the code one flow at a time, at function level, with short teach-back questions. The whole repo, only the code a ticket touches, or one file or package. Saves a repo map that later steps reuse.
 disable-model-invocation: true
-argument-hint: "full | <ticket key>"
+argument-hint: "full | <ticket key> | <file path> | <folder or package>"
 ---
 
 # Onboard: learn the existing code
@@ -27,6 +27,8 @@ The engineer is new to this code. Your job is to make them understand what it do
 
 - **`full`:** the whole repo. Map first, then one full flow, then the rest by kind (step 3).
 - **`<ticket key>`:** only the code the ticket touches. Read the intent and plan if they exist (`.intent/<ticket key>-*.md`, `.plans/<ticket key>-*.md`), otherwise the ticket itself. Find the area: the entry points, layers and files it would touch, and the closest existing feature to copy. Show that list and let the engineer change it.
+- **A file path:** that file only. Skip the full map (step 2); show where it sits instead (step 3b).
+- **A folder or package** (a path, or a name you can find in the repo): that package only, the same way. If the name matches more than one place, show the matches and ask.
 - Nothing given: ask which one.
 
 If `REPO-MAP.md` exists in the worknotes folder for this repo, read it first. Re-read only what changed since the commit it names (`git log --stat <commit>..HEAD`), and update it.
@@ -64,6 +66,25 @@ For each flow:
 
 **Order for a ticket:** the closest existing flow first (the one the ticket will copy or change), then the shared code it uses, then the infrastructure it touches.
 
+## 3b. A file or package
+
+Instead of the map, start with **where it sits**, in 3 to 5 lines: its layer, what it's for, who uses it (search the code for its callers or imports, and name them), and what it uses.
+
+**A file:**
+1. Its main function or type first (the one callers use), then the rest in the order they're called. For each: what it does, who calls it, what it calls, in 1 or 2 sentences. Group small helpers in one line.
+2. Its data: the types it defines or changes, and where the data comes from and goes.
+3. Errors: what can fail and what the caller gets.
+4. Its tests: what they cover, what they run against, and what they don't cover.
+5. Teach-back, as in step 3.
+
+**A package:**
+1. **Its files,** one line each, in the order a caller meets them.
+2. **What it offers:** the functions and types other code uses, one line each, with who uses them.
+3. Then each file the way a file is explained above, one file at a time, ending with "Say *next*, ask about this file, or name a file to jump to."
+4. Teach-back at the end of the package, not after every file.
+
+Steps 1 and 4 cover only the docs and lessons for this file or package.
+
 ## 4. Wrap-up
 
 - **Where things go:** a short list for the common changes in this repo (a new endpoint, a new field, a new backend, a new setting), each with the files to touch.
@@ -75,9 +96,9 @@ For each flow:
 
 ## 5. Save
 
-Write or update `REPO-MAP.md` in the worknotes folder for this repo, using `repo-map-template.md` next to this file. Add the flows walked; don't drop what an earlier run saved. Record the commit it was read at. Commit and push the worknotes repo.
+Write or update `REPO-MAP.md` in the worknotes folder for this repo, using `repo-map-template.md` next to this file. Add the flows, files or packages walked; don't drop what an earlier run saved. A file or package goes under "Files and packages", in a few lines. Record the commit it was read at. Commit and push the worknotes repo.
 
 ## Done when
 
-- The engineer has walked every flow in scope and answered its teach-back questions.
+- The engineer has walked every flow, file or package in scope, and its teach-back questions are answered.
 - `REPO-MAP.md` is saved with the commit it was read at, and the worknotes repo is pushed.
