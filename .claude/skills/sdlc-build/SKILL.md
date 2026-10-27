@@ -19,7 +19,7 @@ The plan says what to build and where. The build writes the code, checks it, and
 - **Don't stop for review.** Work through every task to the end. The engineer reviews all the diffs once, at the end.
 - **Small choices don't wait.** If it's small and easy to undo, decide, carry on, and add one line to the plan's Build log: what and why. Stop only for something the plan doesn't cover, that is hard to undo, or that would change what existing users see.
 - **Plan wrong?** (A file isn't where it says, or the change belongs elsewhere.) Update the plan first, add a Build log line, then go on.
-- **Problems outside the ticket:** tell the engineer and draft a new ticket. Don't fix them here.
+- **Problems outside the ticket:** don't fix them without a yes. If one is small, low-risk and in or next to the code this ticket changes (for example, a handler we change sends an internal error to the caller), list it in the report as an offer to fix in this ticket. If it's big, risky, in shared code other parts use, or another team's work: tell the engineer and draft a new ticket.
 - **Comments you add are one line at most.** If it needs more, a name or the code should say it.
 - **Plain, short English** in every report.
 

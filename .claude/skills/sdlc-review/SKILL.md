@@ -16,12 +16,12 @@ Coworkers still review the PR. This review comes first, so they get cleaner code
 - **Model:** run on the strongest model you have. If you aren't on it, tell the engineer to switch before going on.
 - **Change only what the engineer agrees to.** Fixes stay unstaged, apart from the staged build, so the engineer sees them separately. Stage only when they say so.
 - **Git:** never commit, push or switch branches. The engineer commits. Never open or update a PR without the engineer approving the text.
-- **Every finding has a failing case:** an input or state, and the wrong result it gives. Without one, drop it or mark it "unsure".
+- **Every finding has a failing case:** an input or state, and the wrong result it gives. Without one, drop it or mark it "unsure". For a claim about what reaches the caller, the logs or another system, follow the call to where that output is built, or run a throwaway test, before you report it.
 - **Read from the diff, not from memory.** Quote `file:line`.
 - **Plain, short English.** Start every report with 3 to 5 lines: what was done, what's left, what the engineer must decide. Details after. Fix the project's terms once (from `GLOSSARY.md`) and keep them.
 - **Posts and messages for others** (Jira comments, chat messages): 2 to 4 short sentences, plain English, no lists unless the engineer asks. One request per post is fine; don't bundle background. Write as the engineer ("I found", not "we"), and leave out your own recommendation unless the engineer asks for it.
 - **Look before you ask.** Before any question for someone else, check the specs, Confluence pages, code, mocks and test environments. Only ask what none of them answers.
-- **Problems outside the ticket:** tell the engineer and draft a new ticket. Don't fix them here.
+- **Problems outside the ticket:** if one is small, low-risk and in or next to the code this ticket changes (for example, a handler we change sends an internal error to the caller), put it under "Fix now", marked "was already there". If it's big, risky, in shared code other parts use, or another team's work: tell the engineer and draft a new ticket.
 
 ## 0. Read and refresh
 
@@ -51,14 +51,14 @@ Then **check every finding yourself** against the code: confirmed, unsure, or wr
 1. **Fix now:** confirmed and small enough for this ticket.
 2. **Needs an answer:** the right code depends on someone else (the ticket creator, a design page owner). First look for the answer yourself (see Rules); if the sources settle it, it moves to "Fix now". **Check every question before you show it, every time** (also when you redraft one or add one later): (1) look for the answer in the specs, the sources file, the code, mocks and sample data; (2) check the case really happens (the spec's definitions, sample data, logs); (3) check the answer would change the code or the outcome. Drop any question that fails one. In a tool with subagents, also give the questions to a fresh read-only one and keep only what it can't answer. Under the draft, say in one line per question where you looked. Then read the ticket's comments and the plan's "Questions posted": never ask again what is already asked; say "already asked on <date>" instead. Draft only the new questions: one or two short lines each, one thing each, no background. Say if one blocks the merge. Post only after the engineer approves the text.
 3. **Plan or verify text is wrong** (the code is right): fix the plan or checks file, add a Build log line, and say what you changed. Don't ask first.
-4. **Outside the ticket:** a draft ticket each.
+4. **Outside the ticket:** only the big, risky or other-team ones (see Rules), a draft ticket each.
 5. **Dropped:** one line each, with the reason.
 
 For a big change or a one-way door, suggest a second review by a different model, such as `/code-review ultra` in Claude Code (billed, started by the engineer) or a review on GitHub. Different models miss different things.
 
 ## 2. Fix what the engineer agrees with
 
-The engineer picks which findings to fix. A fix that adds new behaviour on a live path (for example, dropping data) gets a verify check, and is marked high risk for the walkthrough. If they say "fix by best guess", decide each one and give a reason for every one you don't fix. Run the checks the fix touches, then the full build, test and lint once, and paste the output.
+The engineer picks which findings to fix. A fix that adds new behaviour on a live path (for example, dropping data) gets a verify check, and is marked high risk for the walkthrough. If they say "fix by best guess", decide each one and give a reason for every one you don't fix. Each fix gets a test that fails without the fix: undo the fix once and see it fail. Run the checks the fix touches, then the full build, test and lint once, and paste the output.
 
 A check that compares against git's index (for example "generated code matches") can fail while fixes are unstaged. Prove the real property another way; don't stage just to make it pass.
 

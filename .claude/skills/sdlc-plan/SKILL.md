@@ -19,7 +19,7 @@ This is the first time the code is read in depth. The intent says what is wanted
 - **Plain, short English.** Lead with the answer. Cite where each fact came from (page and version, file, ticket).
 - **Keep the intent current.** When you learn something that changes it, update it without asking and tell the engineer what changed.
 - **AWS and other environments:** read-only. Before the first command, check the instruction file and `.verify/VERIFY.md` for how to get in. If they don't say, ask the engineer which computer they're on and which account and role, then use the local CLI or give them read-only commands to run and paste back. Before the engineer gets credentials, ask for them in a scratch file outside any repo, with its path in the chat, never pasted; delete the file when done. Only look if the answer can change the design. Hide secrets in what comes back. Record the answer in `VERIFY.md`.
-- **Problems outside the ticket** (for example, a secret written to the logs): tell the engineer now, and draft a new ticket. Don't fix them here.
+- **Problems outside the ticket:** if one is small, low-risk and in or next to the code this ticket changes (for example, a handler we change sends an internal error to the caller), offer to fix it in this ticket as its own task. If it's big, risky, in shared code other parts use, or another team's work: tell the engineer and draft a new ticket.
 - **Git: read only.** Use only commands that change nothing (`log`, `branch -a`, `show`). No `fetch`, `pull`, `checkout` or branches; ask the engineer if you need fresher refs.
 
 ## 0. Read and refresh
