@@ -94,4 +94,4 @@ Save the plan as `.plans/<ticket key>-<short-name>.md`, starting with "Intent: <
 - The verify checks file exists, and its needs are listed for the engineer.
 - The worknotes repo is pushed.
 
-**Next:** `/sdlc-build <ticket key>` in a new session, or carry on in this one if it still has room, because it already knows the code.
+**Next:** `/sdlc-build <ticket key>`. Say which session to run it in, with one reason: this one if it still has room (for example, less than half its context used), because it already knows the code; a new one if this one is long or full of research. Build works from the plan file either way.
