@@ -35,7 +35,7 @@ Then find what isn't linked: follow the steps of the `sdlc-research` skill (its 
 
 ## 2. Already built?
 
-A short check of the code that answers only two things:
+A short check of the code that answers only two things. If `REPO-MAP.md` exists in the worknotes folder for this repo, start from it (its entry points, flows and "Where things go"):
 1. Does the requested behaviour already exist? Search by meaning, not only by the ticket's words.
 2. Are the ticket's claims about the code true ("the API already returns X")?
 
