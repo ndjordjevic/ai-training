@@ -45,7 +45,7 @@ PR: <link, if there is one>
 - Use the ticket's words for things (from the glossary and the intent).
 - "Tests" says what they run against (for example, a fake server). Don't call them integration or end-to-end tests unless they are.
 - "Still open" lists only real blockers and their owner, from the plan and the status block.
-- If the work spans a story and its subtasks, ask which ticket gets the comment.
+- Post on the ticket key the engineer passed. If the work also covers its subtasks, name their keys in the text instead of asking where to post.
 
 ## 4. Post
 
