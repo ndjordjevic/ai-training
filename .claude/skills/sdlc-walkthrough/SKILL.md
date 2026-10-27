@@ -1,8 +1,8 @@
 ---
 name: sdlc-walkthrough
-description: Walk an engineer through a diff one file at a time, in data-flow order, explaining new, modified, deleted and moved files in plain English. Use for your own review before committing, before showing a PR to a coworker, or when reviewing someone else's PR.
+description: Walk an engineer through a diff one file at a time, in data-flow order, explaining new, modified, deleted and moved files in plain English. Use for your own review before committing, before showing a PR to a coworker, or when reviewing someone else's PR. Pass HEAD to walk only uncommitted changes.
 disable-model-invocation: true
-argument-hint: "[base branch or PR number]"
+argument-hint: "[base branch | commit | HEAD | PR number]"
 ---
 
 # Walkthrough: one file at a time, in data-flow order

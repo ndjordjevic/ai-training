@@ -1,6 +1,6 @@
 ---
 name: sdlc-intake
-description: Turn a Jira ticket into an intent (why and what is wanted, in business terms) by grilling the engineer, and draft questions for the ticket creator only if the general picture is still unclear. Use at the start of every feature or story.
+description: Turn a Jira ticket into an intent (why and what is wanted, in business terms) - read the ticket and everything linked, find related docs, grill the engineer, and draft questions for the ticket creator only if the general picture is still unclear. Use at the start of every feature or story; run again to resume after answers.
 disable-model-invocation: true
 argument-hint: "<ticket key>"
 ---

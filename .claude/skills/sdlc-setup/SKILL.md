@@ -7,6 +7,8 @@ argument-hint: "[work repo path]"
 
 # Set up a repo for our SDLC
 
+Repo: $ARGUMENTS (empty means the current folder)
+
 Run once per repo, and again on each new computer (only the links are per computer).
 
 ## Rules

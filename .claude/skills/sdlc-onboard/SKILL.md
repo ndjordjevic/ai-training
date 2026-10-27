@@ -2,7 +2,7 @@
 name: sdlc-onboard
 description: Teach the engineer an existing repo they didn't write - a map of the repo, then a guided tour of the code one flow at a time, at function level, with short teach-back questions. The whole repo, only the code a ticket touches, or one file or package. Saves a repo map that later steps reuse.
 disable-model-invocation: true
-argument-hint: "full | <ticket key> | <file path> | <folder or package>"
+argument-hint: "[full | <ticket key> | <file path> | <folder or package>]"
 ---
 
 # Onboard: learn the existing code

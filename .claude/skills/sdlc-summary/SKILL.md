@@ -1,6 +1,6 @@
 ---
 name: sdlc-summary
-description: Sum up a ticket's code changes in one or two plain sentences per file or group of files, and draft a comment for the ticket. Use after the review, when the work is ready to share.
+description: Sum up a ticket's code changes in one or two plain sentences per file or group of files, and draft a comment for the ticket. Use after the review, best once the PR exists so the comment can link it.
 disable-model-invocation: true
 argument-hint: "<ticket key> [base branch]"
 ---

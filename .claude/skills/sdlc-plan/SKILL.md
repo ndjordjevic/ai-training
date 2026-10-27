@@ -1,6 +1,6 @@
 ---
 name: sdlc-plan
-description: Turn a ticket's intent into a plan - what we build and how in our code, split into tasks - plus the checks for the verify step. Decides first whether a big task needs a separate spec. For a bug, reproduces it first. Use after intake, in a new session.
+description: Turn a ticket's intent into a plan - what we build and how in our code, split into tasks - plus the checks for the verify step. Decides first whether a big task needs a separate spec. For a bug, reproduces it first. Use after intake, in a new session; run again to refresh an existing plan when tickets, docs or sources change.
 disable-model-invocation: true
 argument-hint: "<ticket key>"
 ---
