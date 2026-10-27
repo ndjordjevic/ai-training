@@ -14,7 +14,7 @@ The plan says what to build and where. The build writes the code, checks it, and
 ## Rules
 
 - **Model:** the main session runs on the strongest model you have. If you aren't on it, tell the engineer to switch before going on.
-- **Git:** the engineer owns the feature branch: never commit, push, switch it or create it. Only for parallel tasks may you make local task branches and worktrees (step 3); never push them, and remove them at the end.
+- **Git:** the engineer owns the feature branch: never commit, push, switch it or create it. Never stage anything on it either: delete files with plain `rm`, not `git rm`, so the result is one unstaged diff. Only for parallel tasks may you make local task branches and worktrees (step 3); never push them, and remove them at the end.
 - **Never deploy** or change anything in an environment. AWS and other environments: read only, as `.verify/VERIFY.md` says. Ask for credentials in a scratch file outside any repo, never pasted.
 - **Don't stop for review.** Work through every task to the end. The engineer reviews all the diffs once, at the end.
 - **Small choices don't wait.** If it's small and easy to undo, decide, carry on, and add one line to the plan's Build log: what and why. Stop only for something the plan doesn't cover, that is hard to undo, or that would change what existing users see.
@@ -78,7 +78,7 @@ Start each task as soon as its blockers are done, not in fixed rounds.
 
 1. **Clean up the diff:** remove comments that repeat the code, needless defensive checks, debug logs, and style that doesn't match the file. No change in behaviour.
 2. **Full checks:** run the full build, test and lint once, and paste the output. Then `git status`: only the files the build meant to change.
-3. **Parallel only:** bring the build branch onto the feature branch as uncommitted changes (`git merge --squash <ticket>-build`). Remove the worktrees. Keep the build and task branches until the engineer has committed after the review, then delete them.
+3. **Parallel only:** bring the build branch onto the feature branch as uncommitted changes (`git merge --squash <ticket>-build`, then `git reset` to unstage). Remove the worktrees. Keep the build and task branches until the engineer has committed after the review, then delete them.
 4. Update the plan's Build log, then commit and push the worknotes repo.
 
 ## 6. Report
@@ -86,15 +86,16 @@ Start each task as soon as its blockers are done, not in fixed rounds.
 - What each task built, in one or two lines.
 - **Review first:** the high-risk tasks and their files.
 - What was built on an assumption, and what was skipped because it waits on an answer.
-- The Build log lines added.
+- Only the Build log lines the engineer must act on or check; point to the plan for the rest.
 - The full check output, and any failure that was there before the build.
 - What the engineer must run that you couldn't (for example, a cloud plan or a check that needs a clean tree), and exactly how: the command, or the CI workflow and its inputs. Read the repo's CI files to find out; don't guess.
+- End with one numbered list of next steps, in order: AI review, the engineer's review, commit and push, then anything that needs the pushed branch (cloud plan, deploy, verify).
 
 ## Done when
 
 - Every task that isn't waiting on an answer is built.
 - The full build, test and lint pass, and the output is in the report.
-- The whole result is uncommitted on the feature branch, and no worktrees are left.
+- The whole result is uncommitted and unstaged on the feature branch, and no worktrees are left.
 - The plan's Build log is up to date and the worknotes repo is pushed.
 
 **Next:** `/sdlc-review <ticket key>` in a new session: the AI review of the uncommitted diff, then the engineer's own review (high-risk tasks first). Commit and push after that.
