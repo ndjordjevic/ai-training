@@ -72,6 +72,7 @@ Use `plan-template.md` next to this file. Each task has a goal, the files it tou
 - **Sketch first** for a new module: types and function signatures with empty bodies.
 - **How to split:** ask the engineer. Thin end-to-end slices when tasks run one after another; split by layer when tasks should run in parallel, because they touch different files.
 - **Each task** can be checked on its own and fits in one session. Too big means split it.
+- **Keep the PR small:** if the whole change looks like more than about 1,000 lines, suggest splitting the ticket into more than one PR. Big PRs get most of the review findings.
 - **Mark high-risk tasks** (for example, a change on a live path existing users depend on), with what extra checks they need. The build runs them on the strongest model.
 - Say which tasks can run in parallel and which in order.
 - Tasks are code only. Deploying and checking in an environment is the verify step, not a task.

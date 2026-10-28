@@ -17,6 +17,7 @@ Coworkers still review the PR. This review comes first, so they get cleaner code
 - **Change only what the engineer agrees to.** Fixes stay unstaged, apart from the staged build, so the engineer sees them separately. Stage only when they say so.
 - **Git:** never commit, push or switch branches. The engineer commits. Never open or update a PR without the engineer approving the text.
 - **Every finding has a failing case:** an input or state, and the wrong result it gives. Without one, drop it or mark it "unsure". For a claim about what reaches the caller, the logs or another system, follow the call to where that output is built, or run a throwaway test, before you report it.
+- **Fix the whole bug class:** for each confirmed finding, search the diff and the files it touches for the same mistake elsewhere, and list every place in one finding.
 - **Read from the diff, not from memory.** Quote `file:line`.
 - **Plain, short English.** Start every report with 3 to 5 lines: what was done, what's left, what the engineer must decide. Details after. Fix the project's terms once (from `GLOSSARY.md`) and keep them.
 - **Posts and messages for others** (Jira comments, chat messages): 2 to 4 short sentences, plain English, no lists unless the engineer asks. One request per post is fine; don't bundle background. Write as the engineer ("I found", not "we"), and leave out your own recommendation unless the engineer asks for it.
@@ -29,7 +30,7 @@ Coworkers still review the PR. This review comes first, so they get cleaner code
 2. Refresh against Jira: compare the last-updated times of the ticket, its subtasks and linked items, and the Confluence page versions, with the ones in the intent's Source and the sources file (`.intent/<ticket key>-sources.md`). Don't search again. If nothing changed, say "no change". If something did, update the intent, list the changes, and say what the code may now be missing.
 3. **Find the base:** the branch this one was made from (stacked branches don't start from main). Take it from the plan, or ask. The review covers `git diff <base>` plus uncommitted changes, nothing else.
 4. **Same session as the build?** If this session wrote the code, say so and ask once: go on here, or start a new session. The reviewers still start fresh, but your own checking of their findings doesn't.
-5. **A second review** of the same ticket: bugs cover only what changed since the last review (say from which commit); security and plan vs code still cover the whole branch.
+5. **A second review** of the same ticket: bugs cover only what changed since the last review (say from which commit); security and plan vs code still cover the whole branch. Never raise again what an earlier review fixed or dropped with a reason (the Build log has them). On a third review, stop first: tell the engineer that more rounds rarely help, and suggest rethinking the approach with them instead.
 6. If the build is uncommitted and unstaged, ask the engineer to stage it (or stage it when they say so), so later fixes show apart from it.
 
 ## 1. AI review: three fresh reviewers

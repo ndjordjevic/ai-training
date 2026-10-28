@@ -48,6 +48,9 @@ Testing
 Before merge
 - <each open item and who it waits on, or "Nothing">
 
+Risk
+<Low, medium or high, and one reason.>
+
 Rollback
 <One sentence: easy to roll back or not, and what it could affect.>
 ```
@@ -56,6 +59,7 @@ Rollback
 - "Testing" says what the tests run against (for example, a fake server). Don't call them integration or end-to-end tests unless they are.
 - Changes to code that belongs to another ticket or branch (for example, fixing its CI) get their own line, naming that ticket, so its owner knows.
 - "Before merge" holds real blockers only: open questions whose answer can change the code, missing test data, another PR that must merge first. A question asked only to confirm stays on the ticket, not here.
+- **Risk** is set by the change, not by who wrote it. Low: docs, tests, additive changes behind a flag. Medium: an ordinary change. High: a live path existing users depend on, security, money, shared code or CI.
 - **One sentence per Changes line.** If the whole text doesn't fit on one screen, shorten it (also text kept from an earlier version) and say what you cut.
 - If this PR is stacked on another branch, say so in one line under the link ("Stacked on <branch>; merge that first").
 

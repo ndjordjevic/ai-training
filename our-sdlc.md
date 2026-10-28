@@ -380,7 +380,7 @@ A skill is a folder with a `SKILL.md` file. It teaches the agent one company rul
 - `sdlc-walkthrough`: one file at a time in data-flow order, for your own review, before showing a PR, or for a coworker's PR. On a second pass, `/sdlc-walkthrough HEAD` walks only the new changes.
 - `sdlc-summary`: a short ticket comment on what changed. It is the only skill that posts on the ticket at the end; review and walkthrough keep their status in the Build log.
 - `sdlc-pr`: opens the draft PR, or updates an open one: short, one sentence per change, real blockers only, no AI attribution.
-- Later: verify, follow-through, release, a router ("ask our SDLC") and a bug diagnosis skill.
+- Later: verify, follow-through, release, a router ("ask our SDLC"), a bug diagnosis skill, and a scheduled review of existing code to find old bugs.
 
 What the first run taught us went into the skills: scope first, look before you ask, keep the intent current without asking, short posts in the engineer's voice, and exact steps for anything the engineer must run.
 
@@ -431,6 +431,12 @@ Our PRs are reviewed by coworkers. The AI review is an optional extra before the
 2. Check whether Copilot code review on GitHub is turned on for our organisation.
 3. Later: a `CODING_STANDARDS.md` at the repo root, read only by the reviewer, so `AGENTS.md` stays short. It says what counts as **Important** (breaks behaviour, leaks data, breaks a policy), what is only a **nit** (style, naming), and what to skip (generated files, anything CI already checks). It starts small and grows when the same review finding shows up twice. Both the self-review and an automated review in CI can use it.
 4. When the same mistake shows up twice in review, by the AI or a coworker, run a retro: a mistake a tool could catch becomes a check, and a judgement call goes into `CODING_STANDARDS.md`.
+5. **Measure the reviewer's noise.** Sort each AI finding by what the author did with it: fixed, wrong, intentional, or didn't matter. If "wrong" grows, tune the review skill or `CODING_STANDARDS.md`.
+6. **Risk sets the human review, not the author.** Each PR says its risk: low (docs, tests, additive changes behind a flag), medium (one approval), high (two approvals: live paths users depend on, security, money, shared code, CI). An agent's approval never counts as a person's, and whoever prompted the change owns it.
+7. **An approval covers one commit.** Turn on "dismiss stale approvals" in branch protection, so a new commit needs a fresh approval.
+8. **Fewer rounds.** The review fixes every place with the same bug at once, never repeats a finding already answered, and after three rounds asks to rethink the approach instead.
+
+Ideas 5 to 8 come from Anthropic's post on how they review code with AI.
 
 **How we know it works:** coworkers find fewer basic problems, and review rounds per PR go down.
 
@@ -491,6 +497,9 @@ Proposed order (not from the course, for discussion). Each phase adds one thing,
 For the Copilot admin setup (managed settings, permissions, sandboxing), see Part 1 of the training, Tab 4 (Administration).
 
 ## Open questions
+
+**Review**
+- Can a low-risk PR (docs, tests) ever merge with no human approval in our regulated setup, or does every PR keep one?
 
 **Access and tools**
 - Is the Atlassian MCP server allowed at work, and can it read attached images and linked Confluence pages?
