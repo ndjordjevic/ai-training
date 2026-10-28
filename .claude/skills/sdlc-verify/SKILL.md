@@ -17,7 +17,7 @@ Tests prove the code against fakes. This step checks what really runs in a lower
 - **Read only, apart from a deploy the engineer asks for.** Never change config, data, routing or other teams' systems, even when your role allows it. Say what needs changing and who owns it.
 - **Deploy only through the repo's pipeline, and only when the engineer asks.** Plan first, read the plan, then apply (step 3).
 - **Say what you stop or cancel.** A cancelled run shows as a failure to others. Tell the engineer at once, with the reason.
-- **Credentials:** short-lived and read-only where possible, in a scratch file outside any repo. Ask the engineer to copy the export lines and run `! pbpaste > <path>`, so they never show in the chat. Source the file in each command; never print or copy its values. Delete it when done. If they get pasted anyway, don't copy them anywhere and let them expire.
+- **Credentials:** short-lived and read-only where possible, in a scratch file outside any repo. Ask the engineer to copy the export lines and then type `! pbpaste | tr -d '\r' > <path>` themselves (copying the command from the chat replaces the exports in the clipboard; `tr` strips Windows line endings, which break the CLI). Check the file has three `export AWS_` lines (`grep -c '^export AWS_' <path>`) without printing it. Source the file in each command; never print or copy its values. Delete it when done. If they get pasted anyway, don't copy them anywhere and let them expire.
 - **Don't touch another session's checkout.** If the repo has a different branch checked out, do any git work in a separate worktree, and remove it when done.
 - **Commands on shared machines** (a bastion, a jump host) only on the engineer's go-ahead, even read-only ones.
 - **Plain, short English.** Start every report with 3 to 5 lines: what passed, what failed, what's waiting and on whom.
@@ -45,7 +45,7 @@ Which computer, which environment, which account and role (from `VERIFY.md`; ask
 
 ## 4. Test data
 
-Every check depends on data: mocks, stubs, test customers. Before running checks, send the exact calls this code makes to the mock or test system, read only, and note what comes back. Mark each check "ready" or "waiting on: <data>, <owner>". If you can't add the data yourself, draft what is needed (the request to match and the response) for whoever owns it.
+Every check depends on data: mocks, stubs, test customers. Before running checks, send the exact calls this code makes to the mock or test system, read only, and note what comes back. Before asking anyone for a test id, look in the logs of earlier successful calls. Mark each check "ready" or "waiting on: <data>, <owner>". If you can't add the data yourself, draft what is needed (the request to match and the response) for whoever owns it.
 
 ## 5. Run the checks
 
@@ -58,7 +58,8 @@ Every check depends on data: mocks, stubs, test customers. Before running checks
 
 - **Results** in the checks file: date, environment, commit, and per check: passed, failed, or not run with the reason.
 - **What wasn't tested,** and what each part waits on and who owns it. Include what isn't this repo's but blocks the full flow (routing, upstream config, test data).
-- **`VERIFY.md`:** propose what you learned (a better way to call the service, a gotcha, what a role can't do). The engineer decides what to keep.
+- **The checks file:** if a check or its command is wrong, fix it directly and add a Build log line.
+- **`VERIFY.md`:** propose what you learned (a better way to call the service, a gotcha, what a role can't do). The engineer decides what to keep. Mark something "confirmed" only if you ran it in this session, and write the exact command that worked, never one from a summary or an earlier chat.
 - Add a line to the plan's Build log. Commit and push the worknotes repo.
 
 ## 7. Report
