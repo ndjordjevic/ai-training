@@ -81,8 +81,8 @@ Use `plan-template.md` next to this file. Each task has a goal, the files it tou
 ## 7. Checks for the verify step
 
 1. If `.verify/VERIFY.md` is missing or still the empty template, fill in what you can read from the repo (how to run it, endpoints, logs), ask the engineer for what only they know (environments, accounts and roles, the login on each computer), and mark the rest "to confirm".
-2. Write `.verify/<ticket key>-<short-name>.md` with a "Checks" part: for each check, what to do, what to expect, which environment can test it, and what it needs (test data, an id, credentials, a person's answer). Leave a "Results" heading empty.
-3. List the needs in the chat, so the engineer can chase them while the code is built.
+2. Write `.verify/<ticket key>-<short-name>.md` with a "Checks" part: for each check, what to do, what to expect, which environment can test it, and what it needs (test data, an id, credentials, a person's answer). Call the service at its own entry point (the gateway or front door), not further up the flow; the full flow is QA's. Leave a "Results" heading empty.
+3. List the needs in the chat, each with who can provide it, so the engineer can ask for them while the code is built. Add them to the plan's Open points as "waiting on: <need>, <owner>", so later steps keep showing them until they arrive.
 
 ## 8. Check the plan
 

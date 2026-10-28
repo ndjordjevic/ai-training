@@ -86,4 +86,4 @@ After the push, tell the engineer to run `/sdlc-pr <ticket key> <base>` here (in
 - The status block is in the Build log and the worknotes repo is pushed.
 - The engineer knows the next step: `/sdlc-pr`.
 
-**Next:** deploy to a lower environment and run the verify checks, in a new session.
+**Next:** `/sdlc-verify <ticket key>` in a new session: deploy to a lower environment and run the verify checks.

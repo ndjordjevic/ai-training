@@ -84,4 +84,4 @@ When the engineer says the blockers are closed, re-check the "Before merge" list
 - The draft PR is open with the approved text, against the right base.
 - The link is in the Build log.
 
-**Next:** post the ticket comment with the PR link (`/sdlc-summary <ticket key>`).
+**Next:** post the ticket comment with the PR link (`/sdlc-summary <ticket key>`), then `/sdlc-verify <ticket key>` in a new session.
