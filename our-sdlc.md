@@ -167,6 +167,7 @@ The spec, or the plan's "What we build" part, has: decisions, rules, what we wil
    - **A ticket ask with no pattern in the repo** (for example, "integration tests" where the repo has none): the plan says how it reads it and adds it to Open points for the engineer to confirm.
    - **Each task** can be checked on its own, fits in one session, and has a "Blocked by" line naming tasks or a person's answer ("Blocked by: A", "Blocked by: product owner's ids"), or "Blocked by: nothing". Too big for one session means split it.
 5. Repeat until someone who never saw the chat could build from the plan alone.
+5a. **Check the plan before saving.** First, against the intent: every place the plan decides something differently is listed, quoting both, and the engineer decides. Then up to three fresh read-only subagents read only the plan, the intent and the repo: one retells the plan in its own words (a wrong retelling is a finding), one lists every choice left to the builder and every file or function the plan wrongly says exists, and one looks for existing code that already does it. This tests "could build from the plan alone" instead of hoping. (From Google's Elephant-Goldfish Model: the session that knows everything writes, fresh ones with no chat history check.)
 6. **Write the checks for the verify step,** in `.verify/<ticket-key>-<short-name>.md`, and link it from the plan. If the repo's `.verify/VERIFY.md` is still the empty template, fill it in first (see PR step 7). The planner knows what the change does and what can be seen from outside. Each check says what to do and what to expect, which environment can test it, and what it needs: test data, an id, credentials, or a person's answer. Chase the needs while the code is built, not after the deploy. The plan's "done when" list stays the short, business-level view.
 7. Save the plan as `.plans/<ticket-key>-<short-name>.md`, with a Sources list (pages and versions, tickets, attachments, specs, mocks) and a Status that names any task waiting on an answer, for example "ready to build (Task 2 waits on <person>'s answer)". Then commit and push the worknotes repo.
 
@@ -436,7 +437,9 @@ Our PRs are reviewed by coworkers. The AI review is an optional extra before the
 7. **An approval covers one commit.** Turn on "dismiss stale approvals" in branch protection, so a new commit needs a fresh approval.
 8. **Fewer rounds.** The review fixes every place with the same bug at once, never repeats a finding already answered, and after three rounds asks to rethink the approach instead.
 
-Ideas 5 to 8 come from Anthropic's post on how they review code with AI.
+9. **Dropping a finding needs proof.** "Wrong" needs a `file:line` or a doc a reader can check; "it was meant that way" isn't proof. If the proof is outside the repo (a team habit, a meeting), the engineer decides. A reviewer that fails or returns nothing is "not run", never "no findings". A fixed finding that comes back in the same place means the fix failed.
+
+Ideas 5 to 8 come from Anthropic's post on how they review code with AI, and idea 9 from Google's Elephant-Goldfish Model.
 
 **How we know it works:** coworkers find fewer basic problems, and review rounds per PR go down.
 

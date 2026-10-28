@@ -84,7 +84,17 @@ Use `plan-template.md` next to this file. Each task has a goal, the files it tou
 2. Write `.verify/<ticket key>-<short-name>.md` with a "Checks" part: for each check, what to do, what to expect, which environment can test it, and what it needs (test data, an id, credentials, a person's answer). Leave a "Results" heading empty.
 3. List the needs in the chat, so the engineer can chase them while the code is built.
 
-## 8. Save
+## 8. Check the plan
+
+1. **Against the intent:** re-read the intent and list every place the plan decides something differently, quoting both, one line each. The engineer decides each one; don't change either to match on your own, since the plan read code the intent didn't. List a decision the intent didn't make only if it changes an interface, the data or a dependency.
+2. **Fresh readers** (in a tool with subagents): give the plan, the intent and the repo to read-only subagents with no chat history, in parallel, one round:
+   - **Retell:** in its own words, what the plan builds and how today's code works, 2 to 5 sentences each. Show it to the engineer; a wrong retelling is a finding.
+   - **Builder:** every choice the plan leaves to whoever builds it (an error case, a name, where code goes), and every file or function the plan says exists now but doesn't. A wrong claim about today's code is the worst finding. New files must be marked new, changed or deleted.
+   - **Simpler:** existing code that already does it, and parts built for a need the ticket doesn't have.
+   A reader that fails or returns nothing: retry once, then say "not run". Never count it as no findings.
+3. Fix what the engineer agrees with, and run a fresh reader once more only if the fixes were big.
+
+## 9. Save
 
 Save the plan as `.plans/<ticket key>-<short-name>.md`, starting with "Intent: <path>" (or "Spec: <path>"). Set "Status: ready to build" when no task is blocked by a design question. If some tasks wait on an answer, say which: "ready to build (Task 2 waits on <person>'s answer)". Commit and push the worknotes repo.
 

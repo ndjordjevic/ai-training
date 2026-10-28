@@ -46,7 +46,7 @@ Run these leads. In a tool with subagents, run them in parallel, read only, on a
 
 Stop a search line when its hits stop being about this work.
 
-Each subagent reports, per hit: title, link, id, version or last-updated time, one line on why it matters, and the exact rules or values it holds, quoted. Plus what it searched with no useful hits.
+Each subagent reports, per hit: title, link, id, version or last-updated time, one line on why it matters, and the exact rules or values it holds, quoted. Plus what it searched with no useful hits. A subagent that fails or returns nothing: retry once, then list its lead as "not searched". Never count it as no hits.
 
 ## 3. Check
 
