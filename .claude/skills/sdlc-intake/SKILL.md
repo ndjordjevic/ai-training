@@ -80,7 +80,7 @@ The same questions go into the intent's Open questions. Show the draft to the en
 
 ## 6. Save
 
-Commit and push the worknotes repo.
+Commit and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## Done when
 

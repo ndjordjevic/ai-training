@@ -3,6 +3,9 @@ name: sdlc-research
 description: Find the docs and tickets related to a piece of work - the pages around the linked ones, a search of the same spaces, exact-key searches across the site - and save them to one sources file that later steps reuse. Intake runs these steps itself; run it on its own before there's a ticket, or to add a new lead mid-ticket.
 disable-model-invocation: true
 argument-hint: "<ticket key, or terms to search> [extra lead: page link, term or question]"
+allowed-tools:
+  - Bash(${CLAUDE_SKILL_DIR}/scripts/attachments.sh *)
+  - Bash(python3 -I ${CLAUDE_SKILL_DIR}/scripts/office2text.py *)
 ---
 
 # Research: find the related docs once, save them
@@ -19,7 +22,7 @@ Design pages, mapping pages and older tickets are often not linked to the ticket
 - **Titles first.** Read search results as titles and excerpts. Open a full page only when it looks relevant: about 5 to 15 pages per ticket.
 - **Never guess.** Quote rules and values exactly, with the page and version. If two pages disagree, say which is newer.
 - **Keep the intent current.** If a source shows the intent is wrong or out of date, fix it without asking and list what you changed. Never change the plan or code; say what may need to change.
-- **Read every attachment.** From the ticket, its parent and epic, subtasks and linked tickets, and the pages you cite. Download each one through the REST API to a scratch folder outside any repo (one folder per ticket), then read it: PDFs and images directly; Excel and Word files by unzipping them and reading the XML, if no library for them is installed; text, CSV and JSON as they are. Images in descriptions and comments are attachments too. If one can't be read, list it as "not read" with the reason. If two files have the same content (`cmp`), read one and say so. Never commit the files.
+- **Read every attachment.** From the ticket, its parent and epic, subtasks and linked tickets, and the pages you cite. Download them with `scripts/attachments.sh <site> <credentials file> <scratch folder> <ticket key> [page id ...]` (next to this file; the site and credentials file are in the instruction file). It gets the ticket's, its parent's and epic's, subtasks' and linked tickets' files, and the pages' you give, into a scratch folder outside any repo, and marks files with the same content. Then read each: PDFs and images directly; Excel, Word and PowerPoint files with `python3 -I scripts/office2text.py <file>`; text, CSV and JSON as they are. Images in descriptions and comments are attachments too. If one can't be read, list it as "not read" with the reason. If two files have the same content, read one and say so. Never commit the files.
 - **Plain, short English** in the file and the report.
 
 ## 0. Resume or start
@@ -58,7 +61,7 @@ Check each hit yourself: open the page or ticket and confirm it is about this wo
 
 ## 4. Save
 
-Write `.intent/<ticket key>-sources.md` (or `.intent/<short-name>-sources.md` without a ticket), using `sources-template.md` next to this file. Add new entries to an existing file; don't rewrite it. Commit and push the worknotes repo.
+Write `.intent/<ticket key>-sources.md` (or `.intent/<short-name>-sources.md` without a ticket), using `sources-template.md` next to this file. Add new entries to an existing file; don't rewrite it. Commit and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## 5. Report
 

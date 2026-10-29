@@ -3,6 +3,8 @@ name: sdlc-verify
 description: Check a ticket's branch in a lower environment - access, what is deployed, a deploy when the engineer asks (plan first), the test data, then each check in the ticket's checks file at the service's own entry point - and write the results. Use after the PR is pushed, in a new session; run again after a redeploy or when test data arrives.
 disable-model-invocation: true
 argument-hint: "<ticket key> [environment]"
+allowed-tools:
+  - Bash(${CLAUDE_SKILL_DIR}/scripts/creds-check.sh *)
 ---
 
 # Verify: does it work where it runs
@@ -17,7 +19,7 @@ Tests prove the code against fakes. This step checks what really runs in a lower
 - **Read only, apart from a deploy and test data the engineer asks for.** Never change config, routing or other teams' systems, even when your role allows it. Say what needs changing and who owns it. Test data (mocks, stubs) only when the engineer asks and its owner agrees (step 4).
 - **Deploy only through the repo's pipeline, and only when the engineer asks.** Plan first, read the plan, then apply (step 3).
 - **Say what you stop or cancel.** A cancelled run shows as a failure to others. Tell the engineer at once, with the reason.
-- **Credentials:** short-lived and read-only where possible, in a scratch file outside any repo. Ask the engineer to copy the export lines and then type `! (umask 077; pbpaste | tr -d '\r' > <path>)` themselves (copying the command from the chat replaces the exports in the clipboard; `umask` makes the file readable only by them; `tr` strips Windows line endings, which break the CLI). Run one read-only call right after: if fresh credentials come back expired, the clipboard held the old ones or the portal reused the session, so ask for a new sign-in. Check the file has three `export AWS_` lines (`grep -c '^export AWS_' <path>`) without printing it; if a permission check blocks that, ask the engineer to run it with `!`, which shows only the count. Source the file in each command; never print or copy its values. For lower environments, keep the file and reuse it until the credentials expire; ask again only when a command fails on expiry. For production, delete it when done. If they get pasted anyway, don't copy them anywhere and let them expire.
+- **Credentials:** short-lived and read-only where possible, in a scratch file outside any repo. Ask the engineer to copy the export lines and then type `! (umask 077; pbpaste | tr -d '\r' > <path>)` themselves (copying the command from the chat replaces the exports in the clipboard; `umask` makes the file readable only by them; `tr` strips Windows line endings, which break the CLI). Right after, run `scripts/creds-check.sh <path>` (next to this file): it counts the `export AWS_` lines, checks only the engineer can read the file, and makes one identity call, printing only the account and role. If fresh credentials come back expired, the clipboard held the old ones or the portal reused the session, so ask for a new sign-in. If a permission check blocks the script, ask the engineer to run it with `!`. Source the file in each command; never print or copy its values. For lower environments, keep the file and reuse it until the credentials expire; ask again only when a command fails on expiry. For production, delete it when done. If they get pasted anyway, don't copy them anywhere and let them expire.
 - **Don't touch another session's checkout.** If the repo has a different branch checked out, do any git work in a separate worktree, and remove it when done.
 - **Web consoles** (a mock service, a dashboard): the engineer signs in in the browser tab; never type a password. A password pasted in the chat: don't use it, and tell the engineer the owner should change it.
 - **Commands on shared machines** (a bastion, a jump host) only on the engineer's go-ahead, even read-only ones.
@@ -75,7 +77,7 @@ When a call isn't matched, read the mock's non-match report, and try the call in
 - **What wasn't tested,** and what each part waits on and who owns it. Include what isn't this repo's but blocks the full flow (routing, upstream config, test data).
 - **The checks file:** if a check or its command is wrong, fix it directly and add a Build log line. Add cases you found during the run (for example, one call succeeds and the next fails) as new checks, with their results.
 - **`VERIFY.md`:** add what you learned (a better way to call the service, a gotcha, what a role can't do, new test data) and list each addition in the report, so the engineer can take any out. Before changing or deleting what is already there, ask. Mark something "confirmed" only if you ran it in this session, and write the exact command that worked, never one from a summary or an earlier chat.
-- Add a line to the plan's Build log. Commit and push the worknotes repo.
+- Add a line to the plan's Build log. Commit and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## 7. Report
 

@@ -96,7 +96,7 @@ Steps 1 and 4 cover only the docs and lessons for this file or package.
 
 ## 5. Save
 
-Write or update `REPO-MAP.md` in the worknotes folder for this repo, using `repo-map-template.md` next to this file. Add the flows, files or packages walked; don't drop what an earlier run saved. A file or package goes under "Files and packages", in a few lines. Record the commit it was read at. Commit and push the worknotes repo.
+Write or update `REPO-MAP.md` in the worknotes folder for this repo, using `repo-map-template.md` next to this file. Add the flows, files or packages walked; don't drop what an earlier run saved. A file or package goes under "Files and packages", in a few lines. Record the commit it was read at. Commit and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## Done when
 

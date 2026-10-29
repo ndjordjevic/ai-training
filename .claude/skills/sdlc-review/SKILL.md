@@ -71,7 +71,7 @@ The engineer decides what's left open. Change only what they ask for. If a fix c
 
 ## 4. Status, then commit
 
-Write a short status block: what was tested, what is blocked and on whom, and what must happen before production. For each step the engineer must run, say exactly how (the command, or the CI workflow and its inputs, read from the repo's CI files). Add it to the plan's Build log and commit and push the worknotes repo. Don't offer to post it on the ticket: the one ticket comment comes from `/sdlc-summary` once the PR exists.
+Write a short status block: what was tested, what is blocked and on whom, and what must happen before production. For each step the engineer must run, say exactly how (the command, or the CI workflow and its inputs, read from the repo's CI files). Add it to the plan's Build log and commit and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`). Don't offer to post it on the ticket: the one ticket comment comes from `/sdlc-summary` once the PR exists.
 
 Then the engineer commits the build and the fixes they keep, and pushes.
 
