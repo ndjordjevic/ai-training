@@ -17,7 +17,7 @@ Tests prove the code against fakes. This step checks what really runs in a lower
 - **Read only, apart from a deploy and test data the engineer asks for.** Never change config, routing or other teams' systems, even when your role allows it. Say what needs changing and who owns it. Test data (mocks, stubs) only when the engineer asks and its owner agrees (step 4).
 - **Deploy only through the repo's pipeline, and only when the engineer asks.** Plan first, read the plan, then apply (step 3).
 - **Say what you stop or cancel.** A cancelled run shows as a failure to others. Tell the engineer at once, with the reason.
-- **Credentials:** short-lived and read-only where possible, in a scratch file outside any repo. Ask the engineer to copy the export lines and then type `! pbpaste | tr -d '\r' > <path>` themselves (copying the command from the chat replaces the exports in the clipboard; `tr` strips Windows line endings, which break the CLI). Check the file has three `export AWS_` lines (`grep -c '^export AWS_' <path>`) without printing it; if a permission check blocks that, ask the engineer to run it with `!`, which shows only the count. Source the file in each command; never print or copy its values. Delete it when done. If they get pasted anyway, don't copy them anywhere and let them expire.
+- **Credentials:** short-lived and read-only where possible, in a scratch file outside any repo. Ask the engineer to copy the export lines and then type `! pbpaste | tr -d '\r' > <path>` themselves (copying the command from the chat replaces the exports in the clipboard; `tr` strips Windows line endings, which break the CLI). Check the file has three `export AWS_` lines (`grep -c '^export AWS_' <path>`) without printing it; if a permission check blocks that, ask the engineer to run it with `!`, which shows only the count. Source the file in each command; never print or copy its values. For lower environments, keep the file and reuse it until the credentials expire; ask again only when a command fails on expiry. For production, delete it when done. If they get pasted anyway, don't copy them anywhere and let them expire.
 - **Don't touch another session's checkout.** If the repo has a different branch checked out, do any git work in a separate worktree, and remove it when done.
 - **Web consoles** (a mock service, a dashboard): the engineer signs in in the browser tab; never type a password. A password pasted in the chat: don't use it, and tell the engineer the owner should change it.
 - **Commands on shared machines** (a bastion, a jump host) only on the engineer's go-ahead, even read-only ones.
@@ -40,9 +40,10 @@ Which computer, which environment, which account and role (from `VERIFY.md`; ask
 
 ## 3. Deploy (only when the engineer asks)
 
+0. The environment holds one branch at a time. To keep another ticket's work there, deploy a branch that contains it, usually this branch after bringing in the base. Deploying the base drops any ticket not merged into it yet. Say which tickets each choice keeps and drops.
 1. If the base moved, ask whether to bring it in first. Merge it, run the checks the merge touches, and push (this updates the PR).
 2. Tell the engineer whose deploy this replaces and what it removes (another ticket's work in the same environment), and draft a short heads-up for the team.
-3. Run the pipeline as a plan only. Read the plan: every add, change and destroy should be explained by this branch, or by removing the last deploy's work. List anything else apart: it may be drift in the environment (something changed outside the code). Show it, and check it again after the apply.
+3. Run the pipeline as a plan only (a plan-only run is fine to answer the engineer's question too; say you started it). Read the plan: every add, change and destroy should be explained by this branch, or by removing the last deploy's work. List anything else apart: it may be drift in the environment (something changed outside the code). Show it, and check it again after the apply.
 4. **Before the apply,** save the answers the "unchanged" checks compare against (for example, the same call on a path this branch shouldn't change), so they compare with a real before.
 5. Apply. Then check the resources from step 2 again.
 6. If the deploy removed another ticket's work, add a line to that ticket's checks file and Build log: "not deployed in <environment> since <time>, replaced by <ticket>". Do it even if another session works on that ticket: it's one line, and that session needs it.
@@ -72,7 +73,7 @@ When a call isn't matched, read the mock's non-match report, and try the call in
 
 ## 7. Report
 
-The 3 to 5 lines, then failures first, each with the check, what you saw and the likely cause. If a failure is in the code, say to fix it in the build session, then redeploy and run this again. Draft messages for owners of what's blocking (2 to 4 short sentences, written as the engineer); post nothing without approval.
+The 3 to 5 lines, then failures first, each with the check, what you saw and the likely cause. If a failure is in the code, say to fix it in the build session, then redeploy and run this again. Draft messages for owners of what's blocking (2 to 4 short sentences, or a few short bullets if the engineer asks, written as the engineer); post nothing without approval. Leave out ids and details the reader doesn't know, such as test ids you made up; say what they are for instead.
 
 ## Done when
 
