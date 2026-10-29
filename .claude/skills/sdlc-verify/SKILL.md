@@ -21,7 +21,7 @@ Tests prove the code against fakes. This step checks what really runs in a lower
 - **Don't touch another session's checkout.** If the repo has a different branch checked out, do any git work in a separate worktree, and remove it when done.
 - **Web consoles** (a mock service, a dashboard): the engineer signs in in the browser tab; never type a password. A password pasted in the chat: don't use it, and tell the engineer the owner should change it.
 - **Commands on shared machines** (a bastion, a jump host) only on the engineer's go-ahead, even read-only ones.
-- **Problems outside the ticket** (found while checking): draft a short ticket for each, with what you saw and how to repeat it. Don't fix them here.
+- **Problems outside the ticket** (found while checking): find the root cause first. If the fix is small, low-risk and in this repo, offer to fix it on this branch, marked "was already there" in the PR. If it's big, risky, in shared code other repos use, or another team's: draft a short ticket, with what you saw and how to repeat it.
 - **Plain, short English.** Start every report with 3 to 5 lines: what passed, what failed, what's waiting and on whom.
 
 ## 0. Read
@@ -79,10 +79,10 @@ When a call isn't matched, read the mock's non-match report, and try the call in
 
 ## 7. Report
 
-The 3 to 5 lines, then failures first, each with the check, what you saw and the likely cause. If a failure is in the code, say to fix it in the build session, then redeploy and run this again. Draft messages for owners of what's blocking (2 to 4 short sentences, or a few short bullets if the engineer asks, written as the engineer); post nothing without approval. Leave out ids and details the reader doesn't know, such as test ids you made up; say what they are for instead.
+The 3 to 5 lines, then failures first, each with the check, what you saw and the likely cause. If a failure is in the code: a small fix can be made here when the engineer says so (run the repo's checks, add a check for it to the checks file, commit and push only when they say so, then plan, apply and go on from step 5). A bigger one goes back to the build session. After any redeploy, run every check again on the new commit, not only the ones the fix touches. When the checks pass, offer to update the PR's testing and change lines (`/sdlc-pr`). Draft messages for owners of what's blocking (2 to 4 short sentences, or a few short bullets if the engineer asks, written as the engineer); post nothing without approval. Leave out ids and details the reader doesn't know, such as test ids you made up; say what they are for instead.
 
 ## Done when
 
-- Every check has a result, or "not run" with what it waits on. The full flow through other teams' services is QA's: it isn't a check, and the checks file doesn't list it.
+- Every check has a result on the commit that is deployed now, or "not run" with what it waits on. The full flow through other teams' services is QA's: it isn't a check, and the checks file doesn't list it.
 - What wasn't tested is listed, with owners.
 - The results are in the checks file and the worknotes repo is pushed.
