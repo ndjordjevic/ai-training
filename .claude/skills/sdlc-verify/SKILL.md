@@ -17,7 +17,7 @@ Tests prove the code against fakes. This step checks what really runs in a lower
 - **Read only, apart from a deploy and test data the engineer asks for.** Never change config, routing or other teams' systems, even when your role allows it. Say what needs changing and who owns it. Test data (mocks, stubs) only when the engineer asks and its owner agrees (step 4).
 - **Deploy only through the repo's pipeline, and only when the engineer asks.** Plan first, read the plan, then apply (step 3).
 - **Say what you stop or cancel.** A cancelled run shows as a failure to others. Tell the engineer at once, with the reason.
-- **Credentials:** short-lived and read-only where possible, in a scratch file outside any repo. Ask the engineer to copy the export lines and then type `! pbpaste | tr -d '\r' > <path>` themselves (copying the command from the chat replaces the exports in the clipboard; `tr` strips Windows line endings, which break the CLI). Check the file has three `export AWS_` lines (`grep -c '^export AWS_' <path>`) without printing it; if a permission check blocks that, ask the engineer to run it with `!`, which shows only the count. Source the file in each command; never print or copy its values. For lower environments, keep the file and reuse it until the credentials expire; ask again only when a command fails on expiry. For production, delete it when done. If they get pasted anyway, don't copy them anywhere and let them expire.
+- **Credentials:** short-lived and read-only where possible, in a scratch file outside any repo. Ask the engineer to copy the export lines and then type `! (umask 077; pbpaste | tr -d '\r' > <path>)` themselves (copying the command from the chat replaces the exports in the clipboard; `umask` makes the file readable only by them; `tr` strips Windows line endings, which break the CLI). Run one read-only call right after: if fresh credentials come back expired, the clipboard held the old ones or the portal reused the session, so ask for a new sign-in. Check the file has three `export AWS_` lines (`grep -c '^export AWS_' <path>`) without printing it; if a permission check blocks that, ask the engineer to run it with `!`, which shows only the count. Source the file in each command; never print or copy its values. For lower environments, keep the file and reuse it until the credentials expire; ask again only when a command fails on expiry. For production, delete it when done. If they get pasted anyway, don't copy them anywhere and let them expire.
 - **Don't touch another session's checkout.** If the repo has a different branch checked out, do any git work in a separate worktree, and remove it when done.
 - **Web consoles** (a mock service, a dashboard): the engineer signs in in the browser tab; never type a password. A password pasted in the chat: don't use it, and tell the engineer the owner should change it.
 - **Commands on shared machines** (a bastion, a jump host) only on the engineer's go-ahead, even read-only ones.
@@ -30,11 +30,17 @@ The repo's `.verify/VERIFY.md`, the ticket's checks file `.verify/<ticket key>-*
 
 ## 1. Access
 
-Which computer, which environment, which account and role (from `VERIFY.md`; ask only what it doesn't say). Run one read-only command that shows the account, and confirm it is the environment you meant. When credentials expire, ask for new ones the same way.
+Do this first: every later step needs it. Which computer, which environment, which account and role (from `VERIFY.md`; ask only what it doesn't say). If there's no working credentials file, ask for one now (see Rules), and meanwhile do only what needs no access (reading files, the pipeline's runs). Run one read-only command that shows the account, and confirm it is the environment you meant. When credentials expire, ask for new ones the same way.
 
 ## 2. What is deployed
 
-- Is this branch deployed there? Check the pipeline's runs for this branch and the resources themselves (the function, the route, the config).
+Two checks, both needed:
+1. **The pipeline:** find the commit the last successful deploy ran, from any branch, and check whether it contains this branch's head (`git merge-base --is-ancestor <head> <deployed commit>`). If the PR is merged, check its merge commit instead (from the PR), since a squash merge leaves the branch's own commits out. The code may have arrived through another branch or a merge.
+2. **The environment itself:** the pipeline's record isn't proof. In the cloud, check each resource this ticket adds or changes: it exists, it was last updated after that deploy finished (not during it), and routes and config point where the ticket says. A mismatch means someone deployed since, or the deploy didn't finish: stop and show it.
+
+If the deployed commit holds other tickets' code too, see what of it touches this ticket's path (a shared validator, config) and check that part still works.
+
+Never redeploy code that is already there.
 - Who deployed last, from which branch and commit. A shared environment may hold someone else's work.
 - Has the base branch moved since this branch left it? Say what the new commits touch.
 
@@ -54,7 +60,7 @@ Every check depends on data: mocks, stubs, test customers. Before running checks
 
 When a call isn't matched, read the mock's non-match report, and try the call in the shape the stub expects: that shows whether the code or the stub is wrong.
 
-**Changing test data** (only when the engineer asks and the data's owner agrees): add new stubs, one new id per case, so nobody else's tests change. Change an existing stub only to make it match the spec. Call each stub straight after, with the exact request the code sends. Write what you added or changed in the checks file and in `VERIFY.md`'s test data list.
+**Changing test data** (only when the engineer asks and the data's owner agrees): add new stubs, one new id per case, so nobody else's tests change. Change an existing stub only to make it match the spec. Call each stub straight after, with the exact request the code sends. Write what you added or changed in the checks file and in `VERIFY.md`'s test data list, and save the stubs as an import file next to the checks file, so they can be put back.
 
 ## 5. Run the checks
 
@@ -77,6 +83,6 @@ The 3 to 5 lines, then failures first, each with the check, what you saw and the
 
 ## Done when
 
-- Every check has a result, or "not run" with what it waits on. The full flow through other teams' services is QA's and isn't needed here.
+- Every check has a result, or "not run" with what it waits on. The full flow through other teams' services is QA's: it isn't a check, and the checks file doesn't list it.
 - What wasn't tested is listed, with owners.
 - The results are in the checks file and the worknotes repo is pushed.
