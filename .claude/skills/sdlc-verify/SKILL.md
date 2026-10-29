@@ -76,6 +76,6 @@ The 3 to 5 lines, then failures first, each with the check, what you saw and the
 
 ## Done when
 
-- Every check has a result, or "not run" with what it waits on.
+- Every check has a result, or "not run" with what it waits on. The full flow through other teams' services is QA's and isn't needed here.
 - What wasn't tested is listed, with owners.
 - The results are in the checks file and the worknotes repo is pushed.
