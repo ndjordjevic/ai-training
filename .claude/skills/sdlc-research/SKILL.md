@@ -19,6 +19,7 @@ Design pages, mapping pages and older tickets are often not linked to the ticket
 - **Titles first.** Read search results as titles and excerpts. Open a full page only when it looks relevant: about 5 to 15 pages per ticket.
 - **Never guess.** Quote rules and values exactly, with the page and version. If two pages disagree, say which is newer.
 - **Keep the intent current.** If a source shows the intent is wrong or out of date, fix it without asking and list what you changed. Never change the plan or code; say what may need to change.
+- **Read every attachment.** From the ticket, its parent and epic, subtasks and linked tickets, and the pages you cite. Download each one through the REST API to a scratch folder outside any repo (one folder per ticket), then read it: PDFs and images directly; Excel and Word files by unzipping them and reading the XML, if no library for them is installed; text, CSV and JSON as they are. Images in descriptions and comments are attachments too. If one can't be read, list it as "not read" with the reason. If two files have the same content (`cmp`), read one and say so. Never commit the files.
 - **Plain, short English** in the file and the report.
 
 ## 0. Resume or start
@@ -30,6 +31,7 @@ If `.intent/<ticket key>-sources.md` exists, read it first. Check each listed pa
 From the ticket, its parent and epic (the epic may be the parent's parent), subtasks and linked items (read them if intake hasn't):
 - **Pages:** every linked page, including links in descriptions and comments, with its id and space.
 - **Keys:** the ticket, epic, subtask and linked keys, plus ticket keys found in descriptions and comments.
+- **Attachments:** every file on these tickets, with its id, name, type and size.
 - **Other links:** any other URL in descriptions and comments (repo, API spec, document). Read it if it can be reached; if not, list it in the sources file.
 - **Terms:** the epic name, the feature's main nouns, system and API names, field names. Note other words for the same thing (from `GLOSSARY.md`, if it exists).
 
@@ -45,6 +47,8 @@ Run these leads. In a tool with subagents, run them in parallel, read only, on a
 4. **Jira:** the epic's other tickets, and tickets that explain a term, setting or acronym the ticket uses but doesn't explain. Search by the terms, for example JQL `text ~ "<term>" ORDER BY updated DESC`.
 
 Stop a search line when its hits stop being about this work.
+
+Attachments: read each one yourself (see Rules), and quote the rules, values and test cases it holds.
 
 Each subagent reports, per hit: title, link, id, version or last-updated time, one line on why it matters, and the exact rules or values it holds, quoted. Plus what it searched with no useful hits. A subagent that fails or returns nothing: retry once, then list its lead as "not searched". Never count it as no hits.
 
