@@ -74,7 +74,7 @@ When a call isn't matched, read the mock's non-match report, and try the call in
 - **Results** in the checks file: date, environment, commit, and per check: passed, failed, or not run with the reason.
 - **What wasn't tested,** and what each part waits on and who owns it. Include what isn't this repo's but blocks the full flow (routing, upstream config, test data).
 - **The checks file:** if a check or its command is wrong, fix it directly and add a Build log line. Add cases you found during the run (for example, one call succeeds and the next fails) as new checks, with their results.
-- **`VERIFY.md`:** propose what you learned (a better way to call the service, a gotcha, what a role can't do). The engineer decides what to keep. Mark something "confirmed" only if you ran it in this session, and write the exact command that worked, never one from a summary or an earlier chat.
+- **`VERIFY.md`:** add what you learned (a better way to call the service, a gotcha, what a role can't do, new test data) and list each addition in the report, so the engineer can take any out. Before changing or deleting what is already there, ask. Mark something "confirmed" only if you ran it in this session, and write the exact command that worked, never one from a summary or an earlier chat.
 - Add a line to the plan's Build log. Commit and push the worknotes repo.
 
 ## 7. Report
