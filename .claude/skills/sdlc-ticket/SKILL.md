@@ -81,18 +81,20 @@ Read the ticket first (summary, links, the branches that look related), so you c
 
 Then create the worktree from the main checkout: `scripts/worktree.sh <base> <branch> <folder>`. It makes the branch and the folder and copies the worknotes links into it. Then run the setup the repo needs there, as the instruction file says (for example `terraform init`). Write the base, the branch and the folder at the top of the intent, so every step and every later session finds them.
 
+The folder is outside the one this session started in, so edits there may ask for permission each time. Ask the engineer to run `/add-dir <folder>` now (in Claude Code), and wait until they have.
+
 From here on, every subagent works only in that folder.
 
 ## 2. Intake
 
-A subagent (strongest model) runs the intake skill's steps, with these changes:
+A subagent (strongest model) runs `sdlc-intake`, with these changes:
 - **Scope:** the subtasks assigned to the engineer in Jira. If none are assigned, the whole ticket.
 - **No grilling.** Answer each question yourself from the evidence. What you can't answer becomes an assumption in the intent's Open questions, with the role who should answer it.
 - **Already built, or the ticket contradicts itself** in a way that changes the outcome: stop the flow and report.
 
 ## 3. Plan
 
-A subagent (strongest model) runs the plan skill's steps, with these changes:
+A subagent (strongest model) runs `sdlc-plan`, with these changes:
 - The branch question is answered: build on the worktree's branch.
 - Design questions become assumptions (Rules), not questions. The plan is saved as "ready to build", with the tasks that rest on an assumption marked.
 - **Too big for this flow?** If the plan's three questions show it spans several services, needs a security review, or takes more than a few days: stop after the plan and report. That ticket needs the step-by-step flow.
@@ -101,7 +103,7 @@ A subagent (strongest model) runs the plan skill's steps, with these changes:
 
 ## 4. Build
 
-A subagent (strongest model) runs the build skill's steps, with these changes:
+A subagent (strongest model) runs `sdlc-build`, with these changes:
 - No order question: one after another, except tasks the plan marks parallel.
 - Each task runs in its own subagent on a cheaper model; high-risk tasks on the strongest.
 - Problems outside the ticket: fix the small ones in this ticket, marked "was already there"; list the big ones in the end report.
@@ -109,7 +111,7 @@ A subagent (strongest model) runs the build skill's steps, with these changes:
 
 ## 5. Review
 
-A subagent (strongest model) runs the review skill's steps 0 to 2, with these changes:
+A subagent (strongest model) runs `sdlc-review`, steps 0 to 2, with these changes:
 - The build is staged first, so the fixes show apart from it.
 - "Fix by best guess": fix every confirmed finding small enough for this ticket, each with a test. Give a reason for every one not fixed.
 - "Needs an answer" findings become assumptions and go to the end report.
@@ -120,11 +122,11 @@ Then, if allowed, commit the build and the fixes on the ticket branch (the ticke
 
 ## 6. Draft PR
 
-If allowed, open the PR as a draft, as the PR skill says, without waiting for approval of the text. Add one line under the link: "Draft: open questions and the engineer's review are still to come." If not allowed, put the drafted title and description in the end report.
+If allowed, open the PR as a draft, as `sdlc-pr` says, without waiting for approval of the text. Add one line under the link: "Draft: open questions and the engineer's review are still to come." If not allowed, put the drafted title and description in the end report.
 
 ## 7. Verify
 
-A subagent (strongest model) runs the verify skill's steps, with these changes:
+A subagent (strongest model) runs `sdlc-verify`, with these changes:
 - Deploy only if allowed at the start. Otherwise check what is deployed and run only the checks it covers.
 - The base moved since the branch left it: don't merge it in; deploy the branch as it is and say so in the end report.
 - The deploy would replace another ticket's work and the engineer didn't allow that: don't deploy; draft the heads-up for the end report.
