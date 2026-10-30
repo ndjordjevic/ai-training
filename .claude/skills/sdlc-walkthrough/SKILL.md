@@ -57,7 +57,7 @@ Spend the most time on high-risk files: anything on a live path users depend on,
 - **What's missing:** what should have changed but didn't: generated code, docs that list things, CI, config, tests, the order things must be deployed in. A diff can't show what's absent, so look for it.
 - **Trade-offs:** each choice the build kept, with its Build log line, if there is one.
 - **Follow-ups:** turn the engineer's questions into a list. Naming questions often mean a rename; "why not X?" often exposes a choice made silently.
-- **Status:** what was tested, what is blocked and on whom, what must happen before production. Keep it in the plan's Build log; don't offer to post it on the ticket. The one ticket comment comes from `/sdlc-summary` once the PR exists.
+- **Status:** what was tested, what is blocked and on whom, what must happen before production. Keep it in the plan's Build log and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`); don't offer to post it on the ticket. The one ticket comment comes from `/sdlc-summary` once the PR exists.
 
 ## Done when
 

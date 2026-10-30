@@ -51,7 +51,7 @@ Check: `git status` in the work repo shows none of the linked items.
 Draft it from the code, then cut it to what a new teammate needs on day one. Keep it under about 40 lines:
 - **Commands:** build, test, lint, and what success looks like. If it takes several commands, say so; don't invent a wrapper.
 - **Rule:** "Run build, test and lint before reporting a task complete, and paste the output. If a test fails, fix the code, not the test."
-- **Git:** "The engineer creates branches, commits and pushes. The agent never does."
+- **Git:** "The engineer creates branches, commits and pushes. The agent does only what the engineer allows in the session."
 - **AWS and GitHub account:** what step 1 found or was told, one line each.
 - **Jira and Confluence:** the site, and the exact commands to read a ticket with its subtasks and links, read a page, search both, and download an attachment. Then the REST fallback (where the token lives, how to call it), and how to write to Confluence. A few lines, with commands.
 - **Pointers:** `GLOSSARY.md`, `.verify/VERIFY.md`, `.notes/`, and any coding standards file.
@@ -70,4 +70,4 @@ With a team file, don't edit it. Show the engineer the lines you'd add, and put 
 - The check commands ran once, with the results reported.
 - The worknotes repo is pushed.
 
-**Next:** if the repo is new to you, spend one read-only session getting to know it first: what it does, how a request flows, and what surprised you, saved in `.notes/`. Then `/sdlc-intake <ticket key>`.
+**Next:** if the repo is new to you, get to know it first with `/sdlc-onboard full`. Then `/sdlc-intake <ticket key>`.

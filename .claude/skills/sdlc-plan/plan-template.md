@@ -1,6 +1,7 @@
 # <TICKET KEY>: <title>
 
 Intent: .intent/<ticket key>-<short-name>.md
+Branch: <branch>, from <base>
 Status: <draft, waiting on answers | ready to build>
 
 ## Sources
