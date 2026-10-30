@@ -39,9 +39,11 @@ These rules win over the step skills' rules where they disagree. Give them to ev
 
 ## Models
 
-- This session and the intake, plan, review and verify subagents: the strongest model (Opus).
-- Build tasks: a cheaper model (Sonnet). Tasks the plan marks high risk run on the strongest model.
-- Research searches: a cheaper model.
+The strongest model (Opus) costs several times more than a cheaper one (Sonnet), and on a subscription it uses up the usage window fast. Use it where a wrong call is expensive; use the cheaper one where the work is following a plan or running commands.
+
+- **Strongest model:** this session (it holds the gates and checks each report), and the intake, plan and review subagents, with review's reviewers.
+- **Cheaper model:** the build subagent and its tasks, the verify subagent, the plan's fresh readers, and research searches.
+- **Back to the strongest** for build tasks the plan marks high risk, and in verify for a failure whose cause isn't clear from the logs: the verify subagent reports it, and you find the cause on the strongest model.
 - Set the model on every subagent call (in Claude Code, the Agent tool's `model`: `opus` or `sonnet`). No custom agent files are needed.
 - Wait for each step's subagent to finish before the next step starts.
 
@@ -103,11 +105,11 @@ A subagent (strongest model) runs `sdlc-plan`, with these changes:
 - Design questions become assumptions (Rules), not questions. The plan is saved as "ready to build", with the tasks that rest on an assumption marked.
 - **Too big for this flow?** If the plan's three questions show it spans several services, needs a security review, or takes more than a few days: stop after the plan and report. That ticket needs the step-by-step flow.
 - How to split: thin slices one after another, unless tasks touch different files and can run in parallel.
-- The fresh readers still run. Fix what they find yourself; nobody is asked.
+- The fresh readers still run, on the cheaper model. Fix what they find yourself; nobody is asked.
 
 ## 4. Build
 
-A subagent (strongest model) runs `sdlc-build`, with these changes:
+A subagent (cheaper model) runs `sdlc-build`, with these changes:
 - No order question: one after another, except tasks the plan marks parallel.
 - Each task runs in its own subagent on a cheaper model; high-risk tasks on the strongest.
 - Problems outside the ticket: fix the small ones in this ticket, marked "was already there"; list the big ones in the end report.
@@ -130,7 +132,7 @@ If allowed, open the PR as a draft, as `sdlc-pr` says, without waiting for appro
 
 ## 7. Verify
 
-A subagent (strongest model) runs `sdlc-verify`, with these changes:
+A subagent (cheaper model) runs `sdlc-verify`, with these changes:
 - Deploy only if allowed at the start. Otherwise check what is deployed and run only the checks it covers.
 - The base moved since the branch left it: don't merge it in; deploy the branch as it is and say so in the end report.
 - The deploy would replace another ticket's work and the engineer didn't allow that: don't deploy; draft the heads-up for the end report.
