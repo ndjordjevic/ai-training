@@ -32,7 +32,7 @@ The repo's `.verify/VERIFY.md`, the ticket's checks file `.verify/<ticket key>-*
 
 ## 1. Access
 
-Do this first: every later step needs it. Which computer, which environment, which account and role (from `VERIFY.md`; ask only what it doesn't say). If there's no working credentials file, ask for one now (see Rules), and meanwhile do only what needs no access (reading files, the pipeline's runs). Run one read-only command that shows the account, and confirm it is the environment you meant. When credentials expire, ask for new ones the same way.
+Do this first: every later step needs it. Which computer, which environment, which account and role (from `VERIFY.md`; ask only what it doesn't say). If there's no working credentials file, ask for one now (see Rules), and meanwhile do only what needs no access (reading files, the pipeline's runs). Run one read-only command that shows the account, and confirm it is the environment you meant. Then one real read this ticket needs (for example, list the gateway's APIs): sign-in passes even where a network rule denies everything else. If the read is denied, ask about the network (VPN or similar) before asking for new credentials. When credentials expire, ask for new ones the same way.
 
 ## 2. What is deployed
 
