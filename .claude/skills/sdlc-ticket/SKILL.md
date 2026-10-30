@@ -42,9 +42,10 @@ These rules win over the step skills' rules where they disagree. Give them to ev
 The strongest model (Opus) costs several times more than a cheaper one (Sonnet), and on a subscription it uses up the usage window fast. Use it where a wrong call is expensive; use the cheaper one where the work is following a plan or running commands.
 
 - **Strongest model:** this session (it holds the gates and checks each report), and the intake, plan and review subagents, with review's reviewers.
-- **Cheaper model:** the build subagent and its tasks, the verify subagent, the plan's fresh readers, and research searches.
+- **Cheaper model (Sonnet):** the build subagent and its tasks, the verify subagent, and the plan's fresh readers.
+- **Cheapest model (Haiku):** research searches only. They report hits that the intake or plan agent then opens and checks, so a weak hit gets dropped.
 - **Back to the strongest** for build tasks the plan marks high risk, and in verify for a failure whose cause isn't clear from the logs: the verify subagent reports it, and you find the cause on the strongest model.
-- Set the model on every subagent call (in Claude Code, the Agent tool's `model`: `opus` or `sonnet`). No custom agent files are needed.
+- Set the model on every subagent call (in Claude Code, the Agent tool's `model`: `opus`, `sonnet` or `haiku`). No custom agent files are needed.
 - Wait for each step's subagent to finish before the next step starts.
 
 ## How each step runs

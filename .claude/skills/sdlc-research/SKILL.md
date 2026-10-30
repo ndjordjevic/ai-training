@@ -40,7 +40,7 @@ From the ticket, its parent and epic (the epic may be the parent's parent), subt
 
 ## 2. Search
 
-Run these leads. In a tool with subagents, run them in parallel, read only, on a cheaper model: one subagent per lead line, each given the leads, the access commands from the instruction file and the report format below. Do it in this session when the searches are few (for example, one or two linked pages and a handful of terms), and say which you chose.
+Run these leads. In a tool with subagents, run them in parallel, read only, on the cheapest model (in Claude Code, `haiku`), since step 3 checks every hit: one subagent per lead line, each given the leads, the access commands from the instruction file and the report format below. Do it in this session when the searches are few (for example, one or two linked pages and a handful of terms), and say which you chose.
 
 1. **Around each linked page:** its parents, its siblings (the parent's children) and its children. Check its version history if it looks cut down. Older pages often hold rules the newer ones dropped.
    - Confluence Cloud REST, for example: `/wiki/rest/api/content/<id>?expand=ancestors,version`, `/wiki/api/v2/pages/<id>/children`.
