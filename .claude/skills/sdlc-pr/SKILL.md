@@ -13,7 +13,7 @@ Reviewers read the description first. It says what changed, why, how it was test
 
 ## Rules
 
-- **Draft by default.** Open it as a draft unless the engineer says otherwise. Mark it ready only when the engineer asks.
+- **Draft by default, assigned to the engineer.** Open it as a draft unless the engineer says otherwise. Mark it ready only when the engineer asks.
 - **Never create or change the PR** without the engineer approving the exact title and description.
 - **No AI attribution:** no "Co-Authored-By" lines, no "Generated with" footers, no mention of the agent.
 - **Short and plain:** written as the engineer ("I added", not "we"). No filler, no repeated headings, no long lists. The whole description fits on one screen.
@@ -68,7 +68,7 @@ Rollback
 Show the title and description. After the engineer approves:
 
 ```
-gh pr create --draft --base <base> --title "<title>" --body-file <scratch file>
+gh pr create --draft --assignee @me --base <base> --title "<title>" --body-file <scratch file>
 ```
 
 To update an open PR, read its current text first (`gh pr view <number>`), keep what the engineer wrote by hand, show the new text, and after approval run `gh pr edit <number> --title "<title>" --body-file <scratch file>`.

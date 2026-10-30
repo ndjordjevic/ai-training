@@ -26,12 +26,12 @@ These rules win over the step skills' rules where they disagree. Give them to ev
 
 - **Don't ask; investigate.** Where a step skill says "ask the engineer" or "ask someone", look for the answer instead, in this order: the sources file, Jira (the ticket, its parent, subtasks, linked and nearby tickets, attachments), Confluence, the code, other repos on GitHub (read only), the environments (read only, as `.verify/VERIFY.md` says), mocks and logs.
 - **No answer? Assume and go on.** Pick the most likely answer and write it in the plan's Open points: "Assumed: <answer>, because <evidence>. If wrong: <what changes, which tasks>. Ask: <role>." Where two options are close, pick the one that is cheaper to change later.
-- **No messages during the flow.** No Jira comments, no chat messages, no "tell your coworker". Drafts for other people go to the end report.
+- **No messages during the flow.** No Jira comments, no chat messages, no "tell your coworker". Drafts for other people go to the end report. If the engineer asks for a post during the flow, show the exact text first and post only after they approve it.
 - **No plan mode, and no "stop and wait" for answers.** The plan is written in full, on assumptions, and saved.
 - **Git:** work only in the ticket's worktree (step 1). Run every `git` and `gh` command there (`cd` into it, or `git -C <folder>`), also in this session, which may have started in the main checkout. Commit and push only the ticket branch, and only if the engineer allowed it at the start. Never touch other branches, the main checkout, or other tickets' worktrees.
 - **Waiting for a yes:** where a step skill waits for the engineer's approval (to post, deploy, fix something big, run a command on a shared machine), the start answers decide. If they don't cover it, don't do it; list it in the end report.
 - **Deploy** only to the environment the engineer allowed at the start, through the repo's pipeline, plan first, as the verify skill says.
-- **Never change shared test data** (mocks, stubs, test customers) or anything another team owns. Draft what's needed for the end report.
+- **Never change shared test data** (mocks, stubs, test customers) or anything another team owns. Draft what's needed for the end report. The one exception: if the engineer allowed it at the start, add new mock stubs, as the verify skill's "Changing test data" says (new ids only, each called straight after, saved as an import file).
 - **Worknotes:** push with `sdlc-setup/scripts/worknotes-push.sh "<message>"` (it commits only this repo's folder and pulls first; another session may have pushed).
 - **Scripts** for the steps that are always the same are in the `scripts` folders of this skill and of `sdlc-research`, `sdlc-verify` and `sdlc-setup`. Use them, by their full path, instead of writing the commands again. Give subagents the paths.
 - **Mark each step done** with one Build log line in the plan: "flow: build done", "flow: review done", "flow: verify done". The status script reads them.
@@ -79,6 +79,7 @@ Find out first, so you can propose an answer to each of 1 to 3: read the ticket 
 3. **What I may do on my own,** each yes or no:
    - commit and push the ticket branch (recommend yes: verify needs the pushed branch);
    - open a draft PR (recommend yes);
+   - add new stubs to the test mock, new ids only, never changing existing ones (recommend yes if the checks need data the mock doesn't have yet; name the mock, and the ticket that owns it if there is one; the engineer signs in to its web console);
    - deploy to the lower environment (name it): recommend yes only if the last deploy there is old, or is this ticket's base; otherwise no, and say whose work it would replace.
 4. **Credentials** (no answer to propose; the engineer does this): for the environments the flow reads or deploys to, they save them now, the way the verify skill's Credentials rule says: you pick the path (a scratch file outside any repo), the engineer copies the export lines and types `! (umask 077; pbpaste | tr -d '\r' > <path>)` themselves. Then run `sdlc-verify/scripts/creds-check.sh <path>`. Where `VERIFY.md` says otherwise, the verify skill wins. Say they may expire before verify; then you'll ask once more.
 
@@ -134,7 +135,7 @@ A subagent (strongest model) runs `sdlc-verify`, with these changes:
 - The base moved since the branch left it: don't merge it in; deploy the branch as it is and say so in the end report.
 - The deploy would replace another ticket's work and the engineer didn't allow that: don't deploy; draft the heads-up for the end report.
 - Expired credentials: the only stop in the middle. Ask once for new ones, the same way as at the start.
-- Test data that's missing: mark the check "waiting on: <data>, <owner>", draft the request, go on.
+- Test data that's missing: if stubs were allowed at the start, add them (Rules). Otherwise mark the check "waiting on: <data>, <owner>", draft the request, go on.
 - A failing check caused by this ticket's code: fix it if small, rerun the checks, commit and push if allowed, redeploy if allowed, and run every check again. A bigger one goes in the end report.
 - End with "flow: verify done".
 
