@@ -3,6 +3,8 @@ name: sdlc-build
 description: Build a ticket from its plan - work through every task to the end, checks included, and leave one uncommitted diff on the feature branch for the engineer to review. Use after the plan, in a new session or the plan's session.
 disable-model-invocation: true
 argument-hint: "<ticket key>"
+allowed-tools:
+  - Bash(${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh *)
 ---
 
 # Build: from plan to one diff

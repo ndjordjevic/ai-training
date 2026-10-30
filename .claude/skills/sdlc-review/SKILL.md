@@ -3,6 +3,8 @@ name: sdlc-review
 description: Review a ticket's build before coworkers see it - fresh AI reviewers for bugs, security and plan-vs-code, fixes the engineer agrees to, then hands off to the walkthrough and the PR. Use after the build, in a new session; run again after later changes.
 disable-model-invocation: true
 argument-hint: "<ticket key>"
+allowed-tools:
+  - Bash(${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh *)
 ---
 
 # Review: AI review, the engineer's review, then the draft PR

@@ -3,6 +3,8 @@ name: sdlc-setup
 description: Set up a work repo for our SDLC, once per repo and per computer. Links the private worknotes folder, hides it from git, and writes the instruction file. Use before the first ticket in a repo.
 disable-model-invocation: true
 argument-hint: "[work repo path]"
+allowed-tools:
+  - Bash(${CLAUDE_SKILL_DIR}/scripts/worknotes-push.sh *)
 ---
 
 # Set up a repo for our SDLC

@@ -3,6 +3,8 @@ name: sdlc-summary
 description: Sum up a ticket's code changes in one or two plain sentences per file or group of files, and draft a comment for the ticket. Use after the review, best once the PR exists so the comment can link it.
 disable-model-invocation: true
 argument-hint: "<ticket key> [base branch]"
+allowed-tools:
+  - Bash(${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh *)
 ---
 
 # Summary: the changes, for the ticket

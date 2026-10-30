@@ -6,6 +6,7 @@ argument-hint: "<ticket key, or terms to search> [extra lead: page link, term or
 allowed-tools:
   - Bash(${CLAUDE_SKILL_DIR}/scripts/attachments.sh *)
   - Bash(python3 -I ${CLAUDE_SKILL_DIR}/scripts/office2text.py *)
+  - Bash(${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh *)
 ---
 
 # Research: find the related docs once, save them
@@ -22,7 +23,7 @@ Design pages, mapping pages and older tickets are often not linked to the ticket
 - **Titles first.** Read search results as titles and excerpts. Open a full page only when it looks relevant: about 5 to 15 pages per ticket.
 - **Never guess.** Quote rules and values exactly, with the page and version. If two pages disagree, say which is newer.
 - **Keep the intent current.** If a source shows the intent is wrong or out of date, fix it without asking and list what you changed. Never change the plan or code; say what may need to change.
-- **Read every attachment.** From the ticket, its parent and epic, subtasks and linked tickets, and the pages you cite. Download them with `scripts/attachments.sh <site> <credentials file> <scratch folder> <ticket key> [page id ...]` (next to this file; the site and credentials file are in the instruction file). It gets the ticket's, its parent's and epic's, subtasks' and linked tickets' files, and the pages' you give, into a scratch folder outside any repo, and marks files with the same content. Then read each: PDFs and images directly; Excel, Word and PowerPoint files with `python3 -I scripts/office2text.py <file>`; text, CSV and JSON as they are. Images in descriptions and comments are attachments too. If one can't be read, list it as "not read" with the reason. If two files have the same content, read one and say so. Never commit the files.
+- **Read every attachment.** From the ticket, its parent and epic, subtasks and linked tickets, and the pages you cite. Download them with `${CLAUDE_SKILL_DIR}/scripts/attachments.sh <site> <credentials file> <scratch folder> <ticket key> [page id ...]` (next to this file; the site and credentials file are in the instruction file). It gets the ticket's, its parent's and epic's, subtasks' and linked tickets' files, and the pages' you give, into a scratch folder outside any repo, and marks files with the same content. Then read each: PDFs and images directly; Excel, Word and PowerPoint files with `python3 -I ${CLAUDE_SKILL_DIR}/scripts/office2text.py <file>`; text, CSV and JSON as they are. Images in descriptions and comments are attachments too. If one can't be read, list it as "not read" with the reason. If two files have the same content, read one and say so. Never commit the files.
 - **Plain, short English** in the file and the report.
 
 ## 0. Resume or start

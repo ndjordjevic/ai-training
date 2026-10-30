@@ -3,6 +3,8 @@ name: sdlc-pr
 description: Open a ticket's pull request as a draft, with a short plain-English title and description and no AI attribution, after the engineer has reviewed and pushed. Updates an open PR's description, and marks it ready later, when the engineer says so.
 disable-model-invocation: true
 argument-hint: "<ticket key> [base branch]"
+allowed-tools:
+  - Bash(${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh *)
 ---
 
 # PR: open it as a draft
