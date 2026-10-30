@@ -72,12 +72,15 @@ Check each report against the files it names before the next step starts. A repo
 
 ## 1. Start: one round of questions
 
-Read the ticket first (summary, links, the branches that look related), so you can propose answers. Then ask everything in one go, each with your recommended answer:
+Find out first, so you can propose an answer to each of 1 to 3: read the ticket (summary, links), the branches that look related (`git branch -a`, recent merges), the team's branch names, and the pipeline's last deploy to each lower environment (which branch and ticket, and when). Then ask everything in one go. For 1 to 3, give your answer and one line of evidence, so the engineer only confirms or corrects:
 
-1. **Base branch:** the branch to start from, with one line of reasoning (the ticket it depends on, the release branch it ships in).
+1. **Base branch:** the branch to start from (the ticket it depends on, the release branch it ships in).
 2. **Branch and worktree:** the branch name (the team's pattern, for example `feature/<ticket key>`) and the folder (next to the main checkout, for example `../<repo>-<ticket key>`).
-3. **What I may do on my own:** commit and push the ticket branch; open a draft PR; deploy to the lower environment (name it), and whether that's fine when it replaces another ticket's deploy there. Each one is yes or no.
-4. **Credentials** for the environments the flow reads or deploys to: the engineer saves them now, as `.verify/VERIFY.md` and the verify skill say (scratch file, never pasted). Say they may expire before verify; then you'll ask once more.
+3. **What I may do on my own,** each yes or no:
+   - commit and push the ticket branch (recommend yes: verify needs the pushed branch);
+   - open a draft PR (recommend yes);
+   - deploy to the lower environment (name it): recommend yes only if the last deploy there is old, or is this ticket's base; otherwise no, and say whose work it would replace.
+4. **Credentials** (no answer to propose; the engineer does this): for the environments the flow reads or deploys to, they save them now, as `.verify/VERIFY.md` and the verify skill say (scratch file, never pasted). Say they may expire before verify; then you'll ask once more.
 
 Then create the worktree from the main checkout: `scripts/worktree.sh <base> <branch> <folder>`. It makes the branch and the folder and copies the worknotes links into it. Then run the setup the repo needs there, as the instruction file says (for example `terraform init`). Write the base, the branch and the folder at the top of the intent, so every step and every later session finds them.
 
