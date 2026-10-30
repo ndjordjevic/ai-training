@@ -16,53 +16,35 @@ allowed-tools:
 
 Ticket: $ARGUMENTS
 
-This skill runs the steps of the other `sdlc-*` skills in order, in one session: intake, plan, build, review, PR and verify. Their `SKILL.md` files are in the folders next to this one. It asks the engineer once, at the start. After that it investigates instead of asking, writes down what it assumes, and brings every open question to the end.
+This skill runs the steps of the other `sdlc-*` skills in order, in one session: intake, plan, build, review, PR and verify. It asks the engineer once, at the start. After that it investigates instead of asking, writes down what it assumes, and brings every open question to the end.
 
 The engineer's own walkthrough of the code comes after this flow, in a new session.
 
-## Rules for every step
-
-These rules win over the step skills' rules where they disagree. Give them to every subagent.
-
-- **Don't ask; investigate.** Where a step skill says "ask the engineer" or "ask someone", look for the answer instead, in this order: the sources file, Jira (the ticket, its parent, subtasks, linked and nearby tickets, attachments), Confluence, the code, other repos on GitHub (read only), the environments (read only, as `.verify/VERIFY.md` says), mocks and logs.
-- **No answer? Assume and go on.** Pick the most likely answer and write it in the plan's Open points: "Assumed: <answer>, because <evidence>. If wrong: <what changes, which tasks>. Ask: <role>." Where two options are close, pick the one that is cheaper to change later.
-- **No messages during the flow.** No Jira comments, no chat messages, no "tell your coworker". Drafts for other people go to the end report. If the engineer asks for a post during the flow, show the exact text first and post only after they approve it.
-- **No plan mode, and no "stop and wait" for answers.** The plan is written in full, on assumptions, and saved.
-- **Git:** work only in the ticket's worktree (step 1). Run every `git` and `gh` command there (`cd` into it, or `git -C <folder>`), also in this session, which may have started in the main checkout. Commit and push only the ticket branch, and only if the engineer allowed it at the start. Never touch other branches, the main checkout, or other tickets' worktrees.
-- **Waiting for a yes:** where a step skill waits for the engineer's approval (to post, deploy, fix something big, run a command on a shared machine), the start answers decide. If they don't cover it, don't do it; list it in the end report.
-- **Deploy** only to the environment the engineer allowed at the start, through the repo's pipeline, plan first, as the verify skill says.
-- **Never change shared test data** (mocks, stubs, test customers) or anything another team owns. Draft what's needed for the end report. The one exception: if the engineer allowed it at the start, add new mock stubs, as the verify skill's "Changing test data" says (new ids only, each called straight after, saved as an import file).
-- **Worknotes:** push with `${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"` (it commits only this repo's folder and pulls first; another session may have pushed).
-- **Scripts** for the steps that are always the same are in the `scripts` folders of this skill and of `sdlc-research`, `sdlc-verify` and `sdlc-setup`. Use them, by their full path, instead of writing the commands again. Give subagents the paths.
-- **Mark each step done** with one Build log line in the plan: "flow: build done", "flow: review done", "flow: verify done". The status script reads them.
-- **Plain, short English** in every file and report.
+**First, read the flow rules:** `${CLAUDE_SKILL_DIR}/flow-rules.md`. They bind this session and every subagent.
 
 ## Models
 
 The strongest model (Opus) costs several times more than a cheaper one (Sonnet), and on a subscription it uses up the usage window fast. Use it where a wrong call is expensive; use the cheaper one where the work is following a plan or running commands.
 
 - **Strongest model:** this session (it holds the gates and checks each report), and the intake, plan and review subagents, with review's reviewers.
-- **Cheaper model (Sonnet):** the build subagent and its tasks, the verify subagent, and the plan's fresh readers.
+- **Cheaper model (Sonnet):** the build subagent and its tasks, the verify subagents, the plan's fresh readers, and the final question check.
 - **Cheapest model (Haiku):** research searches only. They report hits that the intake or plan agent then opens and checks, so a weak hit gets dropped.
 - **Back to the strongest** for build tasks the plan marks high risk, and in verify for a failure whose cause isn't clear from the logs: the verify subagent reports it, and you find the cause on the strongest model.
 - Set the model on every subagent call (in Claude Code, the Agent tool's `model`: `opus`, `sonnet` or `haiku`). No custom agent files are needed.
-- Wait for each step's subagent to finish before the next step starts.
 
 ## How each step runs
 
 The step skills can't be invoked from here; their files are read instead. `<skills folder>` is the folder that holds this skill's folder. Each step's subagent gets this prompt, filled in:
 
 ```
-Ticket: <ticket key>. Work only in <worktree folder>.
-Read <skills folder>/sdlc-<step>/SKILL.md and follow it for this ticket.
-Read the "Rules for every step" in <skills folder>/sdlc-ticket/SKILL.md: where they disagree with the step skill, they win.
+Ticket: <ticket key>. Work only in <worktree folder>. Skills folder: <skills folder>.
+Read <skills folder>/sdlc-ticket/flow-rules.md, then <skills folder>/sdlc-<step>/SKILL.md, and follow the step skill for this ticket. Where they disagree, the flow rules win.
 Changes for this step: <the bullets under this step below>.
 Scripts: <the full paths of the scripts this step uses>.
 Credentials file: <path, if this step needs it>.
-Report back: what you did, the files you wrote, every assumption you made, and anything that stopped you.
 ```
 
-Check each report against the files it names before the next step starts. A report alone isn't proof.
+Run the steps one after another, except the verify prep (step 4). Before the next step, spot-check the report: the files it names exist and hold what it says (search for the headings and key lines; don't re-read whole files). A report alone isn't proof.
 
 ## 0. Check
 
@@ -84,7 +66,7 @@ Find out first, so you can propose an answer to each of 1 to 3: read the ticket 
    - open a draft PR (recommend yes);
    - add new stubs to the test mock, new ids only, never changing existing ones (recommend yes if the checks need data the mock doesn't have yet; name the mock, and the ticket that owns it if there is one; the engineer signs in to its web console);
    - deploy to the lower environment (name it): recommend yes only if the last deploy there is old, or is this ticket's base; otherwise no, and say whose work it would replace.
-4. **Credentials** (no answer to propose; the engineer does this): for the environments the flow reads or deploys to, they save them now, the way the verify skill's Credentials rule says: you pick the path (a scratch file outside any repo), the engineer copies the export lines and types `! (umask 077; pbpaste | tr -d '\r' > <path>)` themselves. Then run `${CLAUDE_SKILL_DIR}/../sdlc-verify/scripts/creds-check.sh <path>`, and one real read the flow needs (for example, list the gateway's APIs): sign-in passes even where a network rule denies everything else. If the read is denied, ask about the network (VPN or similar) before asking for new credentials. Where `VERIFY.md` says otherwise, the verify skill wins. Say they may expire before verify; then you'll ask once more.
+4. **Credentials** (no answer to propose; the engineer does this): for the environments the flow reads or deploys to. You pick the path (a scratch file outside any repo); the engineer copies the export lines and types `! (umask 077; pbpaste | tr -d '\r' > <path>)` themselves. Then run `${CLAUDE_SKILL_DIR}/../sdlc-verify/scripts/creds-check.sh <path>`, and one real read the flow needs (for example, list the gateway's APIs): sign-in passes even where a network rule denies everything else. If the read is denied, ask about the network (VPN or similar) before asking for new credentials. Where `VERIFY.md` says otherwise, the verify skill wins. Say they may expire before verify; then you'll ask once more.
 
 Then create the worktree from the main checkout: `${CLAUDE_SKILL_DIR}/scripts/worktree.sh <base> <branch> <folder>`. It makes the branch and the folder and copies the worknotes links into it. Then run the setup the repo needs there, as the instruction file says (for example `terraform init`). Write the base, the branch and the folder at the top of the intent, so every step and every later session finds them.
 
@@ -103,18 +85,20 @@ A subagent (strongest model) runs `sdlc-intake`, with these changes:
 
 A subagent (strongest model) runs `sdlc-plan`, with these changes:
 - The branch question is answered: build on the worktree's branch.
-- Design questions become assumptions (Rules), not questions. The plan is saved as "ready to build", with the tasks that rest on an assumption marked.
+- Design questions become assumptions, not questions. The plan is saved as "ready to build", with the tasks that rest on an assumption marked.
 - **Too big for this flow?** If the plan's three questions show it spans several services, needs a security review, or takes more than a few days: stop after the plan and report. That ticket needs the step-by-step flow.
 - How to split: thin slices one after another, unless tasks touch different files and can run in parallel.
-- The fresh readers still run, on the cheaper model. Fix what they find yourself; nobody is asked.
+- The fresh readers run on the cheaper model: Builder and Simpler only (nobody reads a retelling during the flow). Fix what they find yourself.
 
-## 4. Build
+## 4. Build, with the verify prep alongside
 
 A subagent (cheaper model) runs `sdlc-build`, with these changes:
 - No order question: one after another, except tasks the plan marks parallel.
 - Each task runs in its own subagent on a cheaper model; high-risk tasks on the strongest.
 - Problems outside the ticket: fix the small ones in this ticket, marked "was already there"; list the big ones in the end report.
 - End with a Build log line "flow: build done".
+
+At the same time, a second subagent (cheaper model) does the **verify prep:** `sdlc-verify` steps 0, 1, 2 and 4, read only. No deploy, no stubs, no file changes; the calls for the test data come from the plan and the checks file. It reports access, what is deployed, and each check as "ready" or "waiting on: <data>, <owner>". Give that report to the verify subagent in step 7.
 
 ## 5. Review
 
@@ -134,46 +118,30 @@ If allowed, open the PR as a draft, as `sdlc-pr` says, without waiting for appro
 ## 7. Verify
 
 A subagent (cheaper model) runs `sdlc-verify`, with these changes:
+- Start from the verify prep's report. Redo steps 1, 2 and 4 only for what it couldn't do, or what changed since (a deploy, new test data).
 - Deploy only if allowed at the start. Otherwise check what is deployed and run only the checks it covers.
 - The base moved since the branch left it: don't merge it in; deploy the branch as it is and say so in the end report.
 - The deploy would replace another ticket's work and the engineer didn't allow that: don't deploy; draft the heads-up for the end report.
 - Expired credentials: the only stop in the middle. Ask once for new ones, the same way as at the start.
-- Test data that's missing: if stubs were allowed at the start, add them (Rules). Otherwise mark the check "waiting on: <data>, <owner>", draft the request, go on.
+- Test data that's missing: if stubs were allowed at the start, add them (flow rules). Otherwise mark the check "waiting on: <data>, <owner>", draft the request, go on.
 - A failing check caused by this ticket's code: fix it if small, rerun the checks, commit and push if allowed, redeploy if allowed, and run every check again. A bigger one goes in the end report.
 - End with "flow: verify done".
 
 ## 8. End report
 
-Start with 3 to 5 lines: what was built, what passed, what's open.
+First, the question check: give all the questions from the plan's Open points and the reports to one fresh read-only subagent (cheaper model), with the sources file. Drop each one it can answer from the sources, and say so.
 
-Then:
-1. **Questions:** one draft ticket comment, using the `sdlc-intake` skill's `questions-template.md`: the people the instruction file lists tagged at the top, no grouping by role, each item with what I did and the question. Under the draft, one line per item: what changes if the answer is different (tasks, files). Post nothing; the engineer approves the text first.
-2. **Review findings left open,** with reasons.
-3. **Verify:** each check and its result, what wasn't tested, and what it waits on.
-4. **Outside the ticket:** the big problems found, a draft ticket each.
-5. **Next steps for the engineer,** in order:
-   - Walk the code in a new session in the worktree: `/sdlc-walkthrough <base>`.
-   - Send the questions; when answers arrive, rerun the plan in the worktree (`/sdlc-plan <ticket key>`) to see what changes.
-   - Post the ticket comment (`/sdlc-summary <ticket key>`).
-   - Mark the PR ready when the walkthrough is done and the blockers are closed (`/sdlc-pr <ticket key>`).
-   - After the merge, from the main checkout: `git worktree remove <folder>`, then `git branch -d <branch>`.
+Write the full report in the plan's Build log: review findings left open with reasons, each check and its result, what wasn't tested and what it waits on, big problems outside the ticket with a draft ticket each, what changes if each question's answer is different, and the next steps (walkthrough, send the questions, rerun the plan when answers arrive, `/sdlc-summary`, `/sdlc-pr` to mark it ready, and after the merge `git worktree remove <folder>` then `git branch -d <branch>`). Push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
-Add the report to the plan's Build log, then commit and push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
+Show the engineer only this, short:
+- **Blocks the merge** (only if something does: a failing check, a big open finding): one line each, at the top.
+- **Changes:** one line per file or group of files.
+- **Questions for the team:** one draft ticket comment, using the `sdlc-intake` skill's `questions-template.md`, with the assumption each item was built on. Post nothing; the engineer approves the text first.
+- **Verify:** one line, for example "12 of 12 checks passed in <environment>", or what failed or wasn't tested.
+- **Next:** `/sdlc-walkthrough <base>` in a new session in the worktree. The rest is in the plan's Build log.
 
 ## Done when
 
 - Every step ran, or the flow stopped with a reason (already built, too big, no access).
-- Every assumption is in the plan's Open points, and every question is in the end report.
+- Every assumption is in the plan's Open points, every question is in the end report, and the full report is in the Build log.
 - The worknotes repo is pushed, and the engineer has the end report.
-
-## The steps in short
-
-1. **Check** that the repo is set up, and whether this ticket is already part-done.
-2. **Ask once:** the base branch, the branch and folder, what the agent may do alone, and the credentials. Then make the worktree.
-3. **Intake:** read the ticket and everything around it, and write the intent. No questions, only assumptions.
-4. **Plan:** read the code and write the plan and the checks, on assumptions where needed. Stop if the ticket is too big.
-5. **Build:** each task in its own subagent, with tests, until the full checks pass.
-6. **Review:** fresh reviewers find problems, and the agent fixes the small ones. Commit and push.
-7. **Draft PR**, if allowed.
-8. **Verify** in the lower environment: deploy if allowed, then run every check.
-9. **End report:** what was done, the questions for each person with the assumptions used, and the engineer's next steps, starting with the walkthrough.

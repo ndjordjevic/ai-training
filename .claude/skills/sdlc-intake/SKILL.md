@@ -73,9 +73,7 @@ Write it from the ticket and the answers, using `intent-template.md` next to thi
 
 Only if the general picture is still unclear: for example, the ticket contradicts itself, or it's unclear what the outcome is. Questions about how or details go to "Parked for the plan"; the plan asks them. Most tickets need no questions here. If there are none, say so and skip this step.
 
-**Check every question before you show it, every time** (also when you redraft one or add one later): (1) look for the answer in the specs, the sources file, the code, mocks and sample data; (2) check the case really happens (the spec's definitions, sample data, logs); (3) check the answer would change what is wanted. Drop any question that fails one. In a tool with subagents, also give the questions to a fresh read-only one and keep only what it can't answer. Under the draft, say in one line per question where you looked.
-
-Write them as one comment, using `questions-template.md` next to this file. The same questions go into the intent's Open questions. Show the draft to the engineer, and post it only after they approve the text.
+Check them and write them as one comment, as `questions-template.md` next to this file says. The same questions go into the intent's Open questions. Show the draft to the engineer, and post it only after they approve the text.
 
 ## 6. Save
 

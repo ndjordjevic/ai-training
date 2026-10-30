@@ -1,5 +1,16 @@
 # Questions comment: one comment on the ticket
 
+## Check each question first
+
+Every time, also when you redraft one or add one later:
+1. Look for the answer in the specs, the sources file, the code, mocks and sample data.
+2. Check the case really happens (the spec's definitions, sample data, logs).
+3. Check the answer would change what is wanted, the code or the outcome.
+
+Drop any question that fails one. In a tool with subagents, also give the questions to a fresh read-only one and keep only what it can't answer. Under the draft, say in one line per question where you looked.
+
+## Write them
+
 Tag the people the instruction file lists for ticket questions, once, at the top. Don't group by role: whoever a question is for answers it. Plain, simple English, written as the engineer ("I", not "we").
 
 ```
