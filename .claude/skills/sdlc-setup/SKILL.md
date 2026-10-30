@@ -28,7 +28,8 @@ Check these yourself, and don't ask about them unless a check fails:
 Then ask in one list, each with your suggested answer:
 1. The work repo path (default: the current folder).
 2. How the agent reaches AWS for this repo: local AWS CLI (which login), or commands the engineer runs on another machine. Does it depend on the computer?
-3. Anything a check above couldn't settle.
+3. The people to tag on ticket questions, and their roles (team lead, BA, PO, QA, anyone else always tagged). Ask only if the instruction file doesn't list them.
+4. Anything a check above couldn't settle.
 
 ## 2. Create the worknotes folder
 
@@ -53,6 +54,7 @@ Draft it from the code, then cut it to what a new teammate needs on day one. Kee
 - **Rule:** "Run build, test and lint before reporting a task complete, and paste the output. If a test fails, fix the code, not the test."
 - **Git:** "The engineer creates branches, commits and pushes. The agent does only what the engineer allows in the session."
 - **AWS and GitHub account:** what step 1 found or was told, one line each.
+- **People:** who to tag on ticket questions, with their roles (private, so in the private file).
 - **Jira and Confluence:** the site, and the exact commands to read a ticket with its subtasks and links, read a page, search both, and download an attachment. Then the REST fallback (where the token lives, how to call it), and how to write to Confluence. A few lines, with commands.
 - **Pointers:** `GLOSSARY.md`, `.verify/VERIFY.md`, `.notes/`, and any coding standards file.
 

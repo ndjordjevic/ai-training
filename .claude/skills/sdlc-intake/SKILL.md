@@ -73,10 +73,7 @@ Only if the general picture is still unclear: for example, the ticket contradict
 
 **Check every question before you show it, every time** (also when you redraft one or add one later): (1) look for the answer in the specs, the sources file, the code, mocks and sample data; (2) check the case really happens (the spec's definitions, sample data, logs); (3) check the answer would change what is wanted. Drop any question that fails one. In a tool with subagents, also give the questions to a fresh read-only one and keep only what it can't answer. Under the draft, say in one line per question where you looked.
 
-- Plain, simple English. One short question per line, numbered, most important first.
-- No default answers, no summary, no background. Written as the engineer ("I", not "we").
-
-The same questions go into the intent's Open questions. Show the draft to the engineer, and post it as a Jira comment only after they approve the text.
+Write them as one comment, using `questions-template.md` next to this file. The same questions go into the intent's Open questions. Show the draft to the engineer, and post it only after they approve the text.
 
 ## 6. Save
 

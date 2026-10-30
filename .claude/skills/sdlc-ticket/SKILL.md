@@ -147,7 +147,7 @@ A subagent (cheaper model) runs `sdlc-verify`, with these changes:
 Start with 3 to 5 lines: what was built, what passed, what's open.
 
 Then:
-1. **Questions, grouped by who should answer** (team lead, BA, QA, PO, customer). For each one: the question, the assumption used, and what changes if the answer is different (tasks, files). Under each group, a short draft message written as the engineer, plain and short. Post nothing.
+1. **Questions:** one draft ticket comment, using the `sdlc-intake` skill's `questions-template.md`: the people the instruction file lists tagged at the top, no grouping by role, each item with what I did and the question. Under the draft, one line per item: what changes if the answer is different (tasks, files). Post nothing; the engineer approves the text first.
 2. **Review findings left open,** with reasons.
 3. **Verify:** each check and its result, what wasn't tested, and what it waits on.
 4. **Outside the ticket:** the big problems found, a draft ticket each.
