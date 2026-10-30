@@ -77,7 +77,7 @@ Write them as one comment, using `questions-template.md` next to this file. The 
 
 ## 6. Save
 
-Commit and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`).
+Commit and push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## Done when
 

@@ -49,7 +49,7 @@ PR: <link, if there is one>
 
 ## 4. Post
 
-Show the draft. Post it as a Jira comment only after the engineer approves the text, then add a Build log line with the comment id and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`).
+Show the draft. Post it as a Jira comment only after the engineer approves the text, then add a Build log line with the comment id and push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## Done when
 

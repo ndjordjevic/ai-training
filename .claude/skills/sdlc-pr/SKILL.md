@@ -73,7 +73,7 @@ gh pr create --draft --assignee @me --base <base> --title "<title>" --body-file 
 
 To update an open PR, read its current text first (`gh pr view <number>`), keep what the engineer wrote by hand, show the new text, and after approval run `gh pr edit <number> --title "<title>" --body-file <scratch file>`.
 
-Write the body to a scratch file outside the repo, and delete it after. Give the engineer the PR link, add a Build log line, and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`).
+Write the body to a scratch file outside the repo, and delete it after. Give the engineer the PR link, add a Build log line, and push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## 3. Ready for review (later)
 

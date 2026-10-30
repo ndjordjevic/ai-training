@@ -32,7 +32,7 @@ These rules win over the step skills' rules where they disagree. Give them to ev
 - **Waiting for a yes:** where a step skill waits for the engineer's approval (to post, deploy, fix something big, run a command on a shared machine), the start answers decide. If they don't cover it, don't do it; list it in the end report.
 - **Deploy** only to the environment the engineer allowed at the start, through the repo's pipeline, plan first, as the verify skill says.
 - **Never change shared test data** (mocks, stubs, test customers) or anything another team owns. Draft what's needed for the end report. The one exception: if the engineer allowed it at the start, add new mock stubs, as the verify skill's "Changing test data" says (new ids only, each called straight after, saved as an import file).
-- **Worknotes:** push with `sdlc-setup/scripts/worknotes-push.sh "<message>"` (it commits only this repo's folder and pulls first; another session may have pushed).
+- **Worknotes:** push with `${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"` (it commits only this repo's folder and pulls first; another session may have pushed).
 - **Scripts** for the steps that are always the same are in the `scripts` folders of this skill and of `sdlc-research`, `sdlc-verify` and `sdlc-setup`. Use them, by their full path, instead of writing the commands again. Give subagents the paths.
 - **Mark each step done** with one Build log line in the plan: "flow: build done", "flow: review done", "flow: verify done". The status script reads them.
 - **Plain, short English** in every file and report.
@@ -158,7 +158,7 @@ Then:
    - Mark the PR ready when the walkthrough is done and the blockers are closed (`/sdlc-pr <ticket key>`).
    - After the merge, from the main checkout: `git worktree remove <folder>`, then `git branch -d <branch>`.
 
-Add the report to the plan's Build log, then commit and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`).
+Add the report to the plan's Build log, then commit and push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## Done when
 

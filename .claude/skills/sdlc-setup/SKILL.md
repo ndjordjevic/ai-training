@@ -63,7 +63,7 @@ With a team file, don't edit it. Show the engineer the lines you'd add, and put 
 ## 5. Check and save
 
 1. Run the build, test and lint commands once. Report the results. Don't fix failures; note them in `.notes/`.
-2. Commit and push the worknotes repo only, with `scripts/worknotes-push.sh "<message>"` (next to this file; the other skills use it too).
+2. Commit and push the worknotes repo only, with `${CLAUDE_SKILL_DIR}/scripts/worknotes-push.sh "<message>"` (next to this file; the other skills use it too).
 
 ## Done when
 

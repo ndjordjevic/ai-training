@@ -96,7 +96,7 @@ Use `plan-template.md` next to this file. Each task has a goal, the files it tou
 
 ## 9. Save
 
-Save the plan as `.plans/<ticket key>-<short-name>.md`, starting with "Intent: <path>" (or "Spec: <path>"). Set "Status: ready to build" when no task is blocked by a design question. If some tasks wait on an answer, say which: "ready to build (Task 2 waits on <person>'s answer)". Commit and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`).
+Save the plan as `.plans/<ticket key>-<short-name>.md`, starting with "Intent: <path>" (or "Spec: <path>"). Set "Status: ready to build" when no task is blocked by a design question. If some tasks wait on an answer, say which: "ready to build (Task 2 waits on <person>'s answer)". Commit and push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## Done when
 

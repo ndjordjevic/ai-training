@@ -79,7 +79,7 @@ Start each task as soon as its blockers are done, not in fixed rounds.
 1. **Clean up the diff:** remove comments that repeat the code, needless defensive checks, debug logs, and style that doesn't match the file. No change in behaviour.
 2. **Full checks:** run the full build, test and lint once, and paste the output. Then `git status`: only the files the build meant to change.
 3. **Parallel only:** bring the build branch onto the feature branch as uncommitted changes (`git merge --squash <ticket>-build`, then `git reset` to unstage). Remove the worktrees. Keep the build and task branches until the engineer has committed after the review, then delete them.
-4. Update the plan's Build log, then commit and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`).
+4. Update the plan's Build log, then commit and push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## 6. Report
 

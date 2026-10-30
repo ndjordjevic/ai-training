@@ -61,7 +61,7 @@ Check each hit yourself: open the page or ticket and confirm it is about this wo
 
 ## 4. Save
 
-Write `.intent/<ticket key>-sources.md` (or `.intent/<short-name>-sources.md` without a ticket), using `sources-template.md` next to this file. Add new entries to an existing file; don't rewrite it. Commit and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`).
+Write `.intent/<ticket key>-sources.md` (or `.intent/<short-name>-sources.md` without a ticket), using `sources-template.md` next to this file. Add new entries to an existing file; don't rewrite it. Commit and push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## 5. Report
 

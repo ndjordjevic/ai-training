@@ -18,6 +18,8 @@ The engineer is the reviewer. Your job is to make the diff easy to understand, s
 - **Plain, short English.** 2 or 3 sentences per file, more only for a risky or surprising part.
 - **Change nothing** unless the engineer asks. Fixes they ask for stay unstaged, apart from what's already staged.
 - **Posts for others** (a ticket comment, a chat message): 2 to 4 short sentences, written as the engineer ("I found", not "we"), with no recommendation unless the engineer asks. Post only after they approve the text.
+- **No bare labels.** Never cite a plan label (D5, A4, Task 3) alone; say in a few words what it means.
+- **Environment facts** (what is deployed where): take them from the latest Results in the checks file, or check live. Never from the plan alone.
 - **"Did you check X?"** means run a real check (a search, a test, `git` command) and show the result, not answer from memory.
 
 ## 0. Set up
@@ -57,7 +59,7 @@ Spend the most time on high-risk files: anything on a live path users depend on,
 - **What's missing:** what should have changed but didn't: generated code, docs that list things, CI, config, tests, the order things must be deployed in. A diff can't show what's absent, so look for it.
 - **Trade-offs:** each choice the build kept, with its Build log line, if there is one.
 - **Follow-ups:** turn the engineer's questions into a list. Naming questions often mean a rename; "why not X?" often exposes a choice made silently.
-- **Status:** what was tested, what is blocked and on whom, what must happen before production. Keep it in the plan's Build log and push the worknotes repo (`sdlc-setup/scripts/worknotes-push.sh "<message>"`); don't offer to post it on the ticket. The one ticket comment comes from `/sdlc-summary` once the PR exists.
+- **Status:** what was tested, what is blocked and on whom, what must happen before production. Keep it in the plan's Build log and push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`); don't offer to post it on the ticket. The one ticket comment comes from `/sdlc-summary` once the PR exists.
 
 ## Done when
 
