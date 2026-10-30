@@ -80,7 +80,7 @@ Find out first, so you can propose an answer to each of 1 to 3: read the ticket 
    - commit and push the ticket branch (recommend yes: verify needs the pushed branch);
    - open a draft PR (recommend yes);
    - deploy to the lower environment (name it): recommend yes only if the last deploy there is old, or is this ticket's base; otherwise no, and say whose work it would replace.
-4. **Credentials** (no answer to propose; the engineer does this): for the environments the flow reads or deploys to, they save them now, as `.verify/VERIFY.md` and the verify skill say (scratch file, never pasted). Say they may expire before verify; then you'll ask once more.
+4. **Credentials** (no answer to propose; the engineer does this): for the environments the flow reads or deploys to, they save them now, the way the verify skill's Credentials rule says: you pick the path (a scratch file outside any repo), the engineer copies the export lines and types `! (umask 077; pbpaste | tr -d '\r' > <path>)` themselves. Then run `sdlc-verify/scripts/creds-check.sh <path>`. Where `VERIFY.md` says otherwise, the verify skill wins. Say they may expire before verify; then you'll ask once more.
 
 Then create the worktree from the main checkout: `scripts/worktree.sh <base> <branch> <folder>`. It makes the branch and the folder and copies the worknotes links into it. Then run the setup the repo needs there, as the instruction file says (for example `terraform init`). Write the base, the branch and the folder at the top of the intent, so every step and every later session finds them.
 
