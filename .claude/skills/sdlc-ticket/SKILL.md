@@ -26,8 +26,8 @@ The engineer's own walkthrough of the code comes after this flow, in a new sessi
 
 The strongest model (Opus) costs several times more than a cheaper one (Sonnet), and on a subscription it uses up the usage window fast. Use it where a wrong call is expensive; use the cheaper one where the work is following a plan or running commands.
 
-- **Strongest model:** this session (it holds the gates and checks each report), and the intake, plan and review subagents, with review's reviewers.
-- **Cheaper model (Sonnet):** the build subagent and its tasks, the verify subagents, the plan's fresh readers, and the final question check.
+- **Strongest model:** this session (it holds the gates and checks each report), and the intake, plan and review subagents, with review's bugs and security reviewers.
+- **Cheaper model (Sonnet):** the build subagent and its tasks, the verify subagents, the plan's fresh readers, review's plan-vs-code reviewer, the final question check, and any work after the end report.
 - **Cheapest model (Haiku):** research searches only. They report hits that the intake or plan agent then opens and checks, so a weak hit gets dropped.
 - **Back to the strongest** for build tasks the plan marks high risk, and in verify for a failure whose cause isn't clear from the logs: the verify subagent reports it, and you find the cause on the strongest model.
 - Set the model on every subagent call (in Claude Code, the Agent tool's `model`: `opus`, `sonnet` or `haiku`). No custom agent files are needed.
@@ -67,6 +67,7 @@ Find out first, so you can propose an answer to each of 1 to 3: read the ticket 
    - add new stubs to the test mock, new ids only, never changing existing ones (recommend yes if the checks need data the mock doesn't have yet; name the mock, and the ticket that owns it if there is one; the engineer signs in to its web console);
    - deploy to the lower environment (name it): recommend yes only if the last deploy there is old, or is this ticket's base; otherwise no, and say whose work it would replace.
 4. **Credentials** (no answer to propose; the engineer does this): for the environments the flow reads or deploys to. You pick the path (a scratch file outside any repo). For lower environments the engineer pastes the export lines into the chat; write them to the file at once as the verify skill says, and never repeat them. For production, the engineer uses the `pbpaste` command from the verify skill instead. Then run `${CLAUDE_SKILL_DIR}/../sdlc-verify/scripts/creds-check.sh <path>`, and one real read the flow needs (for example, list the gateway's APIs): sign-in passes even where a network rule denies everything else. If the read is denied, ask about the network (VPN or similar) before asking for new credentials. Where `VERIFY.md` says otherwise, the verify skill wins. Say they may expire before verify; then you'll ask once more.
+5. **Stub tool** (only if adding stubs was allowed): check now that you can reach the mock's web console, as `.verify/VERIFY.md` says (for example, the browser tool is connected and the engineer is signed in to the mock). If not, ask the engineer to fix it now, not at verify.
 
 Then create the worktree from the main checkout: `${CLAUDE_SKILL_DIR}/scripts/worktree.sh <base> <branch> <folder>`. It makes the branch and the folder and copies the worknotes links into it. Then run the setup the repo needs there, as the instruction file says (for example `terraform init`). Write the base, the branch and the folder at the top of the intent, so every step and every later session finds them.
 
@@ -139,6 +140,10 @@ Show the engineer only this, short:
 - **Questions for the team:** one draft ticket comment, using the `sdlc-intake` skill's `questions-template.md`, with the assumption each item was built on. Post nothing; the engineer approves the text first.
 - **Verify:** one line, for example "12 of 12 checks passed in <environment>", or what failed or wasn't tested.
 - **Next:** `/sdlc-walkthrough <base>` in a new session in the worktree. The rest is in the plan's Build log.
+
+## After the end report
+
+The engineer may ask for more: add stubs, rerun checks, edit the PR, update a note. Don't do it in this session; its long context makes every call expensive. Give it to a fresh subagent (cheaper model) with the flow-rules prompt above, the step skill it belongs to (usually `sdlc-verify`), and what to do. Then spot-check its report as usual. Only a one-line answer or a single command stays here.
 
 ## Done when
 
