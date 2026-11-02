@@ -396,6 +396,7 @@ A skill is a folder with a `SKILL.md` file. It teaches the agent one company rul
 - `sdlc-intake`, `sdlc-plan`, `sdlc-build`: steps 1 to 3. Before any question for someone else, every time: look for the answer in specs, sources, code and mocks; check the case really happens; check the answer would change the code. Otherwise drop it.
 - `sdlc-review`: the AI review, the engineer's review and the draft PR (step 4).
 - `sdlc-walkthrough`: one file at a time in data-flow order, for your own review, before showing a PR, or for a coworker's PR. On a second pass, `/sdlc-walkthrough HEAD` walks only the new changes.
+- `sdlc-qa`: a short note for QA when the PR is ready: the cases the engineer tested (where, and the result) and the mock stubs added for the ticket, so QA can check them again in the full flow. It asks QA to make sure the PR's branch is deployed in that environment before testing. Taken only from the checks file's latest Results and the saved stubs.
 - `sdlc-summary`: a short ticket comment on what changed. It is the only skill that posts on the ticket at the end; review and walkthrough keep their status in the Build log.
 - `sdlc-pr`: opens the draft PR, or updates an open one: short, one sentence per change, real blockers only, no AI attribution.
 - `sdlc-verify`: step 7. Checks access and what's deployed, deploys when asked (plan first), tries the test data, runs each check at the service's entry point, and writes the results and what wasn't tested.
