@@ -130,7 +130,7 @@ A subagent (cheaper model) runs `sdlc-verify`, with these changes:
 
 ## 8. End report
 
-First, the question check: give all the questions from the plan's Open points and the reports to one fresh read-only subagent (cheaper model), with the sources file. Drop each one it can answer from the sources, and say so.
+First, the question check: give all the questions from the plan's Open points and the reports to one fresh read-only subagent (cheaper model), with the sources file and the six checks in `questions-template.md`. Drop each one that fails a check, and say which check.
 
 Write the full report in the plan's Build log: review findings left open with reasons, each check and its result, what wasn't tested and what it waits on, big problems outside the ticket with a draft ticket each, what changes if each question's answer is different, and the next steps (walkthrough, send the questions, rerun the plan when answers arrive, `/sdlc-summary`, `/sdlc-pr` to mark it ready, and after the merge `git worktree remove <folder>` then `git branch -d <branch>`). Push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
