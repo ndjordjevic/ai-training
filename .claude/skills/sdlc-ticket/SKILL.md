@@ -137,7 +137,7 @@ Write the full report in the plan's Build log: review findings left open with re
 Show the engineer only this, short:
 - **Blocks the merge** (only if something does: a failing check, a big open finding): one line each, at the top.
 - **Changes:** one line per file or group of files.
-- **Questions for the team:** one draft ticket comment, using the `sdlc-intake` skill's `questions-template.md`, with the assumption each item was built on. Post nothing; the engineer approves the text first.
+- **Questions for the team:** one draft ticket comment, using the `sdlc-intake` skill's `questions-template.md`, with the assumption each item was built on (no intro line, just the tags and the questions). If one of our own subtasks is now covered, say in the report that it can move to Done; don't ask. Post nothing; the engineer approves the text first.
 - **Verify:** one line, for example "12 of 12 checks passed in <environment>", or what failed or wasn't tested.
 - **Next:** `/sdlc-walkthrough <base>` in a new session in the worktree. The rest is in the plan's Build log.
 
