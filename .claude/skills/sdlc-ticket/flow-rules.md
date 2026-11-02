@@ -18,6 +18,9 @@ For every step of the `sdlc-ticket` flow: the main session and every subagent. W
 - **Deploy** only to the environment the engineer allowed at the start, through the repo's pipeline, plan first, as the verify skill says.
 - **Never change shared test data** (mocks, stubs, test customers) or anything another team owns. Draft what's needed for the end report. The one exception: if the engineer allowed it at the start, add new mock stubs, as the verify skill's "Changing test data" says (new ids only, each called straight after, saved as an import file).
 
+- **Network switches:** if `.verify/VERIFY.md` says some tools need a VPN or proxy on and others need it off, ask the engineer to switch only right before the steps that need it, and group those steps so they switch as few times as possible.
+- **A subagent dies on a network or proxy error** (for example a 403 from a proxy): resume it once the engineer has fixed the network, instead of starting it again.
+
 ## Speed and cost
 
 - **No refresh against Jira after intake:** it ran minutes ago. Skip the refresh part of the plan, build, review and verify skills, unless the engineer says the ticket changed.
