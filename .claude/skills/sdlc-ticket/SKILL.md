@@ -14,7 +14,9 @@ allowed-tools:
 
 # Ticket: the whole flow, on its own
 
-Ticket: $ARGUMENTS
+Input: $ARGUMENTS
+
+The first word is the ticket key. Any text after it is the engineer's note (for example, which subtask to focus on): follow it for the scope.
 
 This skill runs the steps of the other `sdlc-*` skills in order, in one session: intake, plan, build, review, PR and verify. It asks the engineer once, at the start. After that it investigates instead of asking, writes down what it assumes, and brings every open question to the end.
 
@@ -49,11 +51,8 @@ Run the steps one after another, except the verify prep (step 4). Before the nex
 ## 0. Check
 
 1. The repo is set up: the instruction file, `.verify/VERIFY.md` and the worknotes links exist. If not, stop and say to run `/sdlc-setup` first.
-2. Resume? The status of this ticket, from `scripts/status.sh`:
-
-   !`${CLAUDE_SKILL_DIR}/scripts/status.sh $ARGUMENTS`
-
-   Go on from the first step not done. Run the script again in the ticket's worktree if it was started from another folder.
+2. Resume? Run `${CLAUDE_SKILL_DIR}/scripts/status.sh <ticket key>` (the key only, not the note) and go on from the first step not done. Run the script again in the ticket's worktree if it was started from another folder.
+3. Network: read what `.verify/VERIFY.md` says about the network (VPN, proxy) now. If it gives scripts that switch it, you switch it yourself from here on; never ask the engineer to.
 
 ## 1. Start: one round of questions
 
@@ -66,7 +65,7 @@ Find out first, so you can propose an answer to each of 1 to 3: read the ticket 
    - open a draft PR (recommend yes);
    - add new stubs to the test mock, new ids only, never changing existing ones (recommend yes if the checks need data the mock doesn't have yet; name the mock, and the ticket that owns it if there is one; the engineer signs in to its web console);
    - deploy to the lower environment (name it): recommend yes only if the last deploy there is old, or is this ticket's base; otherwise no, and say whose work it would replace.
-4. **Credentials** (no answer to propose; the engineer does this): for the environments the flow reads or deploys to. You pick the path (a scratch file outside any repo). For lower environments the engineer pastes the export lines into the chat; write them to the file at once as the verify skill says, and never repeat them. For production, the engineer uses the `pbpaste` command from the verify skill instead. Then run `${CLAUDE_SKILL_DIR}/../sdlc-verify/scripts/creds-check.sh <path>`, and one real read the flow needs (for example, list the gateway's APIs): sign-in passes even where a network rule denies everything else. If the read is denied, ask about the network (VPN or similar) before asking for new credentials. Where `VERIFY.md` says otherwise, the verify skill wins. Say they may expire before verify; then you'll ask once more.
+4. **Credentials** (no answer to propose; the engineer does this): for the environments the flow reads or deploys to. You pick the path (a scratch file outside any repo). For lower environments the engineer pastes the export lines into the chat; write them to the file at once as the verify skill says, and never repeat them. For production, the engineer uses the `pbpaste` command from the verify skill instead. Then run `${CLAUDE_SKILL_DIR}/../sdlc-verify/scripts/creds-check.sh <path>`, and one real read the flow needs (for example, list the gateway's APIs): sign-in passes even where a network rule denies everything else. If the read is denied, check the network (switch it with `VERIFY.md`'s scripts if it has them, else ask) before asking for new credentials. Where `VERIFY.md` says otherwise, the verify skill wins. Say they may expire before verify; then you'll ask once more.
 5. **Stub tool** (only if adding stubs was allowed): check now that you can reach the mock's web console, as `.verify/VERIFY.md` says (for example, the browser tool is connected and the engineer is signed in to the mock). If not, ask the engineer to fix it now, not at verify.
 
 Then create the worktree from the main checkout: `${CLAUDE_SKILL_DIR}/scripts/worktree.sh <base> <branch> <folder>`. It makes the branch and the folder and copies the worknotes links into it. Then run the setup the repo needs there, as the instruction file says (for example `terraform init`). Write the base, the branch and the folder at the top of the intent, so every step and every later session finds them.
@@ -138,6 +137,7 @@ Show the engineer only this, short:
 - **Blocks the merge** (only if something does: a failing check, a big open finding): one line each, at the top.
 - **Changes:** one line per file or group of files.
 - **Questions for the team:** one draft ticket comment, using the `sdlc-intake` skill's `questions-template.md`, with the assumption each item was built on (no intro line, just the tags and the questions). If one of our own subtasks is now covered, say in the report that it can move to Done; don't ask. Post nothing; the engineer approves the text first.
+- **Notes to send** (only if needed): the heads-up if the deploy replaced someone's work, and a retest note for QA that says how QA reaches each test case from where they test (a new test id may not be reachable from their tool).
 - **Verify:** one line, for example "12 of 12 checks passed in <environment>", or what failed or wasn't tested.
 - **Next:** `/sdlc-walkthrough <base>` in a new session in the worktree. The rest is in the plan's Build log.
 
