@@ -21,14 +21,14 @@ Several sessions work in one repo at once, one ticket each. This shows where eac
 
 ## Steps
 
-1. Find the deploy workflow file in `.verify/VERIFY.md` (for example `wf-deploy.yml`). If it says nothing, leave it out: the board then shows no "deployed" column.
+1. Find the deploy workflow file in `.verify/VERIFY.md` (for example `wf-deploy.yml`). If it says nothing, leave it out: "deployed" then shows "n/a".
 2. Run `${CLAUDE_SKILL_DIR}/scripts/board.sh <workflow file>` from the main checkout. It prints the last successful deploy, then one block per ticket worktree:
    - its PR and target branch;
    - whether the last successful deploy contains the branch head;
    - uncommitted and unpushed changes;
    - the first flow step not done, from `sdlc-ticket/scripts/status.sh`;
    - the plan's "waiting on" lines;
-   - then the files that more than one open branch changes.
+   - then the files that more than one open branch changes, against each PR's base (a ticket with no PR: the base its intent records, else `origin/HEAD`).
 3. If a ticket key was given, read that ticket's intent and plan Build log and add its latest line.
 
 ## Report
