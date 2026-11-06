@@ -40,7 +40,7 @@ Never change the main checkout itself: only read it.
 
 - **The bug:** the subtask (or the parent's newest comments): summary, description, every comment and every attachment (`${CLAUDE_SKILL_DIR}/../sdlc-research/scripts/attachments.sh`). Write down what QA did, what they saw, what they expected, when (time, environment), and any ids (customer, trace, request).
 - **The parent:** its intent, plan and checks files (`.intent/`, `.plans/`, `.verify/` for the parent key), the PR and whether it's merged. These say what was assumed. A wrong assumption is often the cause.
-- **Test data QA changed:** if QA edited shared test data (a mock stub), note it. Other tests may now fail because of it.
+- **Test data QA changed:** if QA edited shared test data (a mock stub), note it for the engineer. Other tests may now fail because of it.
 
 Keep the notes in the subtask's intent file (`.intent/<subtask key>-*.md`), or in the parent's if there's no subtask, under "QA feedback".
 
@@ -79,8 +79,8 @@ Deploy as the verify skill says (whose deploy it replaces, the before-saves). Th
 - **Reply to QA**, a draft for the engineer, as a ticket comment. Tag QA at the top as real mentions, and cc the people the instruction file lists for ticket questions. Plain and short: no commits, few numbers and ticket ids.
   - What was wrong, in words QA knows (for example, where our service sits in the flow they call).
   - What changed and what they'll see now.
-  - How to retest. If a new test id can't be reached from QA's tool, say what to use instead.
-  - Any shared test data they changed that should be put back.
+  - How to retest: ask QA to make sure the branch is the one deployed in the environment first (you may deploy something else there in between), and to check the mocks. Don't write "it's deployed, run it again". If a new test id can't be reached from QA's tool, say what to use instead.
+  - Don't ask QA to put back test data they changed: they check the mocks before testing anyway. Tell the engineer instead, if it matters.
 - Post it only after the engineer approves the text. Log it in the intent.
 
 ## 8. Keep what was learned

@@ -32,7 +32,7 @@ The checks file `.verify/<ticket key>-*.md` (its latest Results), the stub impor
 ```
 @<QA person> <ticket key>: ready for QA. PR: <link>
 
-Before you start, please make sure branch <PR branch> is deployed in <environment>.
+Before you start, please make sure branch <PR branch> is the one deployed in <environment> (I may deploy something else there in between), and check the mocks.
 I tested it there by calling <the entry point, for example the gateway>.
 
 Cases I tested
