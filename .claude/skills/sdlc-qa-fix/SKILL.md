@@ -2,7 +2,7 @@
 name: sdlc-qa-fix
 description: Fix what QA sent back on a ticket - read QA's feedback and attachments, find QA's own call in the logs, reproduce it where QA saw it, find the root cause (also in the services around ours), fix it on the open PR or a new branch, verify through the caller, and draft the reply to QA. Use when QA reopens a ticket or opens a bug subtask under it.
 disable-model-invocation: true
-argument-hint: "<parent ticket key> [<bug subtask key>]"
+argument-hint: "<parent ticket key> [<bug subtask key> ...]"
 allowed-tools:
   - Bash(${CLAUDE_SKILL_DIR}/../sdlc-ticket/scripts/worktree.sh *)
   - Bash(${CLAUDE_SKILL_DIR}/../sdlc-research/scripts/attachments.sh *)
@@ -15,7 +15,9 @@ allowed-tools:
 
 Input: $ARGUMENTS
 
-The first word is the parent ticket: the one whose work QA tested. The second, if given, is the bug subtask QA opened under it. Any text after that is the engineer's note. Without a subtask, QA's feedback is on the parent itself (a reopen or a comment).
+The first word is the parent ticket: the one whose work QA tested. The ticket keys after it, if any, are bug subtasks QA opened under it (one or more). Any text after the keys is the engineer's note. Without a subtask, QA's feedback is on the parent itself (a reopen or a comment).
+
+With more than one subtask, do steps 1 to 4 for each one first. Bugs often share a cause: say which ones do, and fix a shared cause once.
 
 The parent's intent, plan and checks files hold what was built and how it was tested. QA's feedback says where that fell short. Find out why before changing anything.
 
@@ -39,11 +41,11 @@ Never change the main checkout itself: only read it.
 
 ## 1. Read
 
-- **The bug:** the subtask (or the parent's newest comments): summary, description, every comment and every attachment (`${CLAUDE_SKILL_DIR}/../sdlc-research/scripts/attachments.sh`). Write down what QA did, what they saw, what they expected, when (time, environment), and any ids (customer, trace, request).
+- **The bug:** each subtask (or the parent's newest comments): summary, description, every comment and every attachment (`${CLAUDE_SKILL_DIR}/../sdlc-research/scripts/attachments.sh`). Write down what QA did, what they saw, what they expected, when (time, environment), and any ids (customer, trace, request).
 - **The parent:** its intent, plan and checks files (`.intent/`, `.plans/`, `.verify/` for the parent key), the PR and whether it's merged. These say what was assumed. A wrong assumption is often the cause.
 - **Test data QA changed:** if QA edited shared test data (a mock stub), note it for the engineer. Other tests may now fail because of it.
 
-Keep the notes in the subtask's intent file (`.intent/<subtask key>-*.md`), or in the parent's if there's no subtask, under "QA feedback".
+Keep the notes in each subtask's intent file (`.intent/<subtask key>-*.md`), or in the parent's if there's no subtask, under "QA feedback".
 
 ## 2. Find QA's call
 
@@ -63,22 +65,22 @@ Then tell the engineer in plain words: what's wrong, where, why the earlier chec
 
 - **PR not merged:** fix on its branch, in its worktree (ask before creating one if there isn't one).
 - **The cause is in another open PR** (for example, a later fix on the same code): fix it on that PR's branch, with this ticket's key in the commit.
-- **PR merged:** a new branch and worktree from the release branch it merged into (`${CLAUDE_SKILL_DIR}/../sdlc-ticket/scripts/worktree.sh <base> <branch> <folder>`), with the subtask key in the branch name if there's one. Ask for the name first.
+- **PR merged:** a new branch and worktree from the release branch it merged into (`${CLAUDE_SKILL_DIR}/../sdlc-ticket/scripts/worktree.sh <base> <branch> <folder>`), with a subtask key in the branch name if there's one (the first, if there are several). Ask for the name first. All the subtasks go on one branch and one PR, unless the engineer says otherwise.
 - To try an idea out first, ask before making an experiment branch. When it works, bring it onto the real branch and delete the experiment, locally and on the remote, with the engineer's OK.
 - Add a test that fails without the fix. Run the repo's build, tests and lint.
-- Commit with the ticket key (the subtask's, if there's one), and push if the engineer allows it.
+- Commit with the ticket key (the key of the subtask it fixes, if there's one; one commit per subtask when the causes differ), and push if the engineer allows it.
 
 ## 6. Verify
 
 Deploy as the verify skill says (whose deploy it replaces, the before-saves). Then run:
-- QA's case, where QA saw it (step 3's call): now the expected result.
+- Each QA case, where QA saw it (step 3's call): now the expected result.
 - The parent's earlier checks that this fix could change: still as before, or changed on purpose.
 - Before and after for each, in a short table, in the checks file.
 
 ## 7. PR and the reply to QA
 
 - **PR:** update the description the way the `sdlc-pr` skill says (or open a new one for a new branch). Keep it short.
-- **Reply to QA**, a draft for the engineer, as a ticket comment. Tag QA at the top as real mentions, and cc the people the instruction file lists for ticket questions. Short: two or three sentences, then one retest line. No commits, few numbers and ticket ids. Risks for other people (for example, a coming spec change) go to them, not in this reply.
+- **Reply to QA**, a draft for the engineer, as a ticket comment: one on each subtask, about that bug only. Tag QA at the top as real mentions, and cc the people the instruction file lists for ticket questions. Short: two or three sentences, then one retest line. No commits, few numbers and ticket ids. Risks for other people (for example, a coming spec change) go to them, not in this reply: a short draft comment for each, on their ticket, using the `sdlc-intake` skill's `questions-template.md`: the person it's for at the top, the people the instruction file lists for ticket questions in cc. Offer it in the end report.
   - What was wrong and what they'll see now, in words QA knows (for example, where our service sits in the flow they call).
   - How to retest: ask QA to make sure the branch is the one deployed in the environment first (you may deploy something else there in between), and to check the mocks. Don't write "it's deployed, run it again". If a new test id can't be reached from QA's tool, say what to use instead.
   - Don't ask QA to put back test data they changed: they check the mocks before testing anyway. Tell the engineer instead, if it matters.
@@ -90,7 +92,7 @@ Write what the next ticket should know into the repo's notes: the call chain, ho
 
 ## Done when
 
-- QA's case gives the expected result where QA saw it, and the before and after are written down.
-- The PR holds the fix and a short, current description.
-- The reply to QA is approved and posted, or given to the engineer.
+- Each QA case gives the expected result where QA saw it, and the before and after are written down.
+- The PR holds the fixes and a short, current description.
+- The replies to QA are approved and posted, or given to the engineer.
 - The notes hold what was learned.

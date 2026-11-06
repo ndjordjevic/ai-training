@@ -29,6 +29,6 @@ Question: <one question>
 
 - **No intro line:** no status, no PR link, no "please answer". Just the tags, then the questions.
 - **One question only:** no number; write it as the item without "1.".
-- **One thing per item.** Most important first.
+- **One thing per item, three or four lines at most.** Most important first. Cut what the reader already knows or doesn't need to answer.
 - **Real mentions:** look up each person's account id (Jira user search) and post the tags as mentions; a typed @name notifies nobody.
 - **Show the whole text** to the engineer and post only after they approve it. After posting, log it under the plan's "Questions posted".
