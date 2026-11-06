@@ -65,6 +65,9 @@ When a call isn't matched, read the mock's non-match report, and try the call in
 
 **Changing test data** (only when the engineer asks and the data's owner agrees): add new stubs, one new id per case, so nobody else's tests change. Change an existing stub only to make it match the spec. Call each stub straight after, with the exact request the code sends. Write what you added or changed in the checks file and in `VERIFY.md`'s test data list, and save the stubs as an import file next to the checks file, so they can be put back.
 
+- **Stubs before the deploy:** add a new case's stubs before deploying the fix, then call it on the old build through the caller. That is the real "before": it shows the bug where QA saw it. Then deploy and call it again.
+- **Pasting into a web console:** paste into the visible editor in the dialog (a page may hold hidden ones), read it back and compare before Import or Save. Wrong editor: reload without saving and check the stub is unchanged.
+
 ## 5. Run the checks
 
 - Call the service at its own entry point, the closest to real you can get from here. Prefer a call through the gateway or front door (for example, a test-invoke from the cloud CLI) over calling the function directly; say what the call skips (for example, the network path).

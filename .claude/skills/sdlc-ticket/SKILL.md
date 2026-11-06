@@ -48,6 +48,8 @@ Credentials file: <path, if this step needs it>.
 
 Run the steps one after another, except the verify prep (step 4). Before the next step, spot-check the report: the files it names exist and hold what it says (search for the headings and key lines; don't re-read whole files). A report alone isn't proof.
 
+**A gap goes back to the same subagent.** If the spot-check finds something missing or wrong, continue that subagent (in Claude Code, `SendMessage` to its id) with what is missing and where you looked. It still holds the step's context, so the fix is cheaper and better than fixing it here or starting a fresh one. Start a fresh one only if the first has died or its context is full. Spot-check again after.
+
 ## 0. Check
 
 1. The repo is set up: the instruction file, `.verify/VERIFY.md` and the worknotes links exist. If not, stop and say to run `/sdlc-setup` first.

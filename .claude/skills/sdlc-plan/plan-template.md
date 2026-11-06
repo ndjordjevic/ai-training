@@ -21,6 +21,10 @@ The options, the trade-offs, and why this one.
 ## What we will not do
 -
 
+## Must not change
+Files, behaviour and callers this ticket leaves alone (for example, another backend, a shared validator, an error code callers read). Review and verify check the diff against it.
+-
+
 ## What could break (who uses what we change)
 -
 

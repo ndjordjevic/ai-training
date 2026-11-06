@@ -17,7 +17,13 @@ Input: $ARGUMENTS
 
 The first word is the parent ticket: the one whose work QA tested. The ticket keys after it, if any, are bug subtasks QA opened under it (one or more). Any text after the keys is the engineer's note. Without a subtask, QA's feedback is on the parent itself (a reopen or a comment).
 
-With more than one subtask, do steps 1 to 4 for each one first. Bugs often share a cause: say which ones do, and fix a shared cause once.
+## More than one bug
+
+- **Open siblings not given:** in step 1, list the parent's open defect subtasks (`acli jira workitem view <parent> --fields subtasks --json`) and the open PRs and worktrees that already fix some of them. If others are open, not given and not fixed elsewhere, offer to take them in this run. Ask it in the same message as step 1's summary, not on its own.
+- **Steps 1 to 4 for each bug first.** Bugs often share a cause: say which ones do, and fix a shared cause once.
+- **Shared:** one worktree, one round of "before" saves, one stub import, one deploy (after the last fix), one after-run through the caller.
+- **Per bug:** its own intent file, its own rows in the before/after table, its own reply to QA, and its own commit, or one commit with all their keys for a shared cause.
+- **Tests:** rerun all of them after each fix: sibling fixes often touch the same function.
 
 The parent's intent, plan and checks files hold what was built and how it was tested. QA's feedback says where that fell short. Find out why before changing anything.
 
@@ -50,6 +56,7 @@ Keep the notes in each subtask's intent file (`.intent/<subtask key>-*.md`), or 
 ## 2. Find QA's call
 
 Find QA's own request in the logs, by the trace or request id from their evidence, or by time and test id. Follow it through each service, from the first one QA called down to ours (the repo's notes may already have the chain). Say what each service did with it. If you can't find it, say what you searched and carry on.
+- **No id:** search our logs just before the ticket was created for the value QA highlighted, and take the customer id from our log. A mock screenshot may show another stub, and QA may edit stubs between calls.
 
 ## 3. Reproduce where QA saw it
 

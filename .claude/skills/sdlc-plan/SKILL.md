@@ -67,6 +67,8 @@ Skip if there is a spec. Otherwise: decisions, what we will not do, and a **Test
 
 - Where does the change belong? What can we reuse? How is similar code written today?
 - **What could break:** list who calls or uses what we change, beyond the files in the diff.
+- **Must not change:** list the files, behaviour and callers next to the change that must stay as they are (for example, another backend's code, a shared validator, an error code a caller reads). Each one gets an "unchanged" check in the checks file.
+- **Fields a standard defines:** when the spec says a field follows a standard (RFC 3966, ISO 8601, ISO 4217, a regex), read the standard's grammar itself, not a summary. The rule we build matches it, and the tests and checks use values on both sides of its line (for example, `+61-2-9999-8888` passes, `+61 2 9999 8888` and `405 750 720` don't).
 - **Docs that name it:** search the repo docs (README, architecture docs, runbooks, endpoint tables) for lists of what we add or change, and put their updates into a task.
 
 ## 6. Tasks
