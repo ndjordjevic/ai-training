@@ -8,7 +8,7 @@ Ask the team only what you can't find or decide yourself: every question costs t
 3. Check the answer would change what is wanted, the code or the outcome.
 4. Check for a precedent: earlier tickets in the same epic, the flow this one copies, the existing backend, or a team answer on an earlier ticket already cover it. Then follow that.
 5. Check it's for the team: not the engineer's own call (their own work, their own subtasks, how they test). Never ask whether our own subtask or work is done: say it can move to Done.
-6. Check a wrong guess is costly: if the fix is small (a constant, one check) and nothing breaks for anyone meanwhile, keep it as an assumption, not a question.
+6. Check a wrong guess is costly: if the fix is small (a constant, one check) and nothing breaks for anyone meanwhile, keep it as an assumption, not a question. A guess about what the end user or QA sees (a status, an error code) is never cheap: a wrong one costs a QA round.
 
 Drop any question that fails one. Few questions is the goal: one that matters gets answered faster than five. In a tool with subagents, also give the questions and these six checks to a fresh read-only one, and keep only what passes all six: what depends on someone else's knowledge and changes the code or the outcome. Under the draft, say in one line per question where you looked.
 

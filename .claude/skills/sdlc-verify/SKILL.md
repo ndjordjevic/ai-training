@@ -24,7 +24,7 @@ Tests prove the code against fakes. This step checks what really runs in a lower
 - **Don't touch another session's checkout.** If the repo has a different branch checked out, do any git work in a separate worktree, and remove it when done.
 - **Web consoles** (a mock service, a dashboard): the engineer signs in in the browser tab; never type a password. A password pasted in the chat: don't use it, and tell the engineer the owner should change it.
 - **Commands on shared machines** (a bastion, a jump host) only on the engineer's go-ahead, even read-only ones.
-- **Problems outside the ticket** (found while checking): find the root cause first. If the fix is small, low-risk and in this repo, offer to fix it on this branch, marked "was already there" in the PR. If it's big, risky, in shared code other repos use, or another team's: draft a short ticket, with what you saw and how to repeat it.
+- **Problems outside the ticket** (found while checking): find the root cause first. If the fix is small, low-risk and in this repo, fix it on this branch, marked "was already there" in the PR. Don't leave it for a later ticket. If it's big, risky, in shared code other repos use, or another team's: draft a short ticket, with what you saw and how to repeat it.
 - **Plain, short English.** Start every report with 3 to 5 lines: what passed, what failed, what's waiting and on whom.
 
 ## 0. Read
@@ -52,7 +52,7 @@ Never redeploy code that is already there.
 0. The environment holds one branch at a time. To keep another ticket's work there, deploy a branch that contains it, usually this branch after bringing in the base. Deploying the base drops any ticket not merged into it yet. Say which tickets each choice keeps and drops.
 1. If the base moved, ask whether to bring it in first. Merge it, run the checks the merge touches, and push (this updates the PR).
 2. Tell the engineer whose deploy this replaces and what it removes (another ticket's work in the same environment), and draft a short heads-up for the team.
-3. Run the pipeline as a plan only (a plan-only run is fine to answer the engineer's question too; say you started it). Read the plan: every add, change and destroy should be explained by this branch, or by removing the last deploy's work. List anything else apart: it may be drift in the environment (something changed outside the code). Show it, and check it again after the apply.
+3. Lower environment: plan and apply in one run, if the pipeline can (it stops if the plan fails), unless `VERIFY.md` says otherwise. Upper environment: run a plan only first. Either way, read the plan: every add, change and destroy should be explained by this branch, or by removing the last deploy's work. List anything else apart: it may be drift in the environment (something changed outside the code). Show it, and check it again after the apply.
 4. **Before the apply,** save the answers the "unchanged" checks compare against (for example, the same call on a path this branch shouldn't change), so they compare with a real before.
 5. Apply. Then check the resources from step 2 again.
 6. If the deploy removed another ticket's work, add a line to that ticket's checks file and Build log: "not deployed in <environment> since <time>, replaced by <ticket>". Do it even if another session works on that ticket: it's one line, and that session needs it.
@@ -68,6 +68,7 @@ When a call isn't matched, read the mock's non-match report, and try the call in
 ## 5. Run the checks
 
 - Call the service at its own entry point, the closest to real you can get from here. Prefer a call through the gateway or front door (for example, a test-invoke from the cloud CLI) over calling the function directly; say what the call skips (for example, the network path).
+- **Also through the caller,** if the service that calls ours (often another team's) can be called in the test environment: run the main checks through it too. It shows what the end user really gets, for example how it reads our errors. Calling only our own entry point can't catch that. Write down how in the repo's notes.
 - For each check: what you ran, what you expected, what you saw, and the log lines that prove it (never paste secrets, tokens or personal data).
 - On an unexpected result, follow the request through the logs before saying why. Don't guess.
 - When someone reports an error from further up the flow, take its trace or request id and follow it through each service's logs, from the first to this one. Save the chain once in the repo's notes, so the next session doesn't trace it again.

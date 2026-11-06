@@ -21,7 +21,7 @@ This is the first time the code is read in depth. The intent says what is wanted
 - **Plain, short English.** Lead with the answer. Cite where each fact came from (page and version, file, ticket).
 - **Keep the intent current.** When you learn something that changes it, update it without asking and tell the engineer what changed.
 - **AWS and other environments:** read-only. Before the first command, check the instruction file and `.verify/VERIFY.md` for how to get in. If they don't say, ask the engineer which computer they're on and which account and role, then use the local CLI or give them read-only commands to run and paste back. Ask for credentials the way the `sdlc-verify` skill's Credentials rule says (a scratch file, never pasted). Only look if the answer can change the design. Hide secrets in what comes back. Record the answer in `VERIFY.md`.
-- **Problems outside the ticket:** if one is small, low-risk and in or next to the code this ticket changes (for example, a handler we change sends an internal error to the caller), offer to fix it in this ticket as its own task. If it's big, risky, in shared code other parts use, or another team's work: tell the engineer and draft a new ticket.
+- **Problems outside the ticket:** if one is small, low-risk and in or next to the code this ticket changes (for example, a handler we change sends an internal error to the caller), plan it in this ticket as its own task, marked "was already there". Don't leave it for a later ticket. If it's big, risky, in shared code other parts use, or another team's work: tell the engineer and draft a new ticket.
 - **Git: read only.** Use only commands that change nothing (`log`, `branch -a`, `show`). No `fetch`, `pull`, `checkout` or branches; ask the engineer if you need fresher refs.
 
 ## 0. Read and refresh
@@ -35,6 +35,8 @@ If a plan with "Status: draft" exists, go on from it (step 4 onwards).
 ## 1. For a bug: reproduce it first
 
 Show one command you have already run that fails on this exact bug: fast, and the same result every time. In order of preference: a failing test locally, then a read-only call or script against a test environment (access as in Rules). If neither works, confirm the symptom from the logs, write "not reproduced" in the plan, and carry on.
+
+If the report shows the expected result (for example, what another system answers in the same case), the fix must give that result, checked where the reporter saw it. A different result is a question for the team, not an assumption.
 
 Then list 3 to 5 possible causes, each with a check that would prove it wrong, and show them to the engineer before testing them.
 
