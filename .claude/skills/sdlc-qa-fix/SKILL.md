@@ -32,6 +32,7 @@ Never change the main checkout itself: only read it.
 - **Read the rules first:** `${CLAUDE_SKILL_DIR}/../sdlc-ticket/flow-rules.md` (git, network, credentials, writing), and the Rules in `${CLAUDE_SKILL_DIR}/../sdlc-verify/SKILL.md`. Both bind this session.
 - **QA's evidence first, then the code.** Every screenshot, log and comment QA gave, read in full.
 - **QA's expected result is the target.** If QA shows what they expect (for example, another system's answer in the same case), the fix gives that result, checked where QA saw it. A different result is a question for the team, not an assumption.
+- **Check the cases next to it.** When the fix draws a line (for example, missing vs empty vs blank), check what the reference system does on each side of it. Don't assume they're the same case.
 - **No guess as a cause.** Each cause is backed by a log line, a code line or a call you ran. Say what you checked and what you didn't.
 - **Small side problems** found on the way, in or next to this code: fix them in the same PR, marked "was already there". Big, risky or another team's: a draft ticket.
 - **Never post** to the ticket or anywhere else without the engineer approving the exact text.
@@ -61,6 +62,7 @@ Then tell the engineer in plain words: what's wrong, where, why the earlier chec
 ## 5. Fix
 
 - **PR not merged:** fix on its branch, in its worktree (ask before creating one if there isn't one).
+- **The cause is in another open PR** (for example, a later fix on the same code): fix it on that PR's branch, with this ticket's key in the commit.
 - **PR merged:** a new branch and worktree from the release branch it merged into (`${CLAUDE_SKILL_DIR}/../sdlc-ticket/scripts/worktree.sh <base> <branch> <folder>`), with the subtask key in the branch name if there's one. Ask for the name first.
 - To try an idea out first, ask before making an experiment branch. When it works, bring it onto the real branch and delete the experiment, locally and on the remote, with the engineer's OK.
 - Add a test that fails without the fix. Run the repo's build, tests and lint.
@@ -76,12 +78,11 @@ Deploy as the verify skill says (whose deploy it replaces, the before-saves). Th
 ## 7. PR and the reply to QA
 
 - **PR:** update the description the way the `sdlc-pr` skill says (or open a new one for a new branch). Keep it short.
-- **Reply to QA**, a draft for the engineer, as a ticket comment. Tag QA at the top as real mentions, and cc the people the instruction file lists for ticket questions. Plain and short: no commits, few numbers and ticket ids.
-  - What was wrong, in words QA knows (for example, where our service sits in the flow they call).
-  - What changed and what they'll see now.
+- **Reply to QA**, a draft for the engineer, as a ticket comment. Tag QA at the top as real mentions, and cc the people the instruction file lists for ticket questions. Short: two or three sentences, then one retest line. No commits, few numbers and ticket ids. Risks for other people (for example, a coming spec change) go to them, not in this reply.
+  - What was wrong and what they'll see now, in words QA knows (for example, where our service sits in the flow they call).
   - How to retest: ask QA to make sure the branch is the one deployed in the environment first (you may deploy something else there in between), and to check the mocks. Don't write "it's deployed, run it again". If a new test id can't be reached from QA's tool, say what to use instead.
   - Don't ask QA to put back test data they changed: they check the mocks before testing anyway. Tell the engineer instead, if it matters.
-- Post it only after the engineer approves the text. Log it in the intent.
+- Show the whole draft in the end report, not in an earlier message. Post it only after the engineer approves the text. Log it in the intent.
 
 ## 8. Keep what was learned
 
