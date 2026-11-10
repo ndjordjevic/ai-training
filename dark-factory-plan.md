@@ -45,6 +45,24 @@ Full research: [reports/Local Claude dark factory design.md](reports/Local%20Cla
 - A release skill with a human merge and a prod gate. Still no auto-merge.
 - **Done when:** security and compliance have agreed.
 
+## Dashboard options for later
+
+Phase 1 stays FastAPI + HTMX + SSE in the browser. These are options for later, if the dashboard grows or becomes a desktop app. Most come from my agentic AI wiki.
+
+| Option | What it is | Who uses it | Fit |
+|---|---|---|---|
+| [nanoui](https://github.com/justrach/nanoui) | Zig desktop apps (~0.7 MB). Native GPU UI or a system webview with a typed Zig↔TS bridge. The `nui` CLI tests and snapshots without a window, built for coding agents. MIT, 0.x | nanoterm, nanomon | Small native Mac app. Means learning Zig, and the API may still change |
+| React + Vite + Tailwind | Most common web dashboard stack | Factory Mission Control, Agent of Empires, Agent Control Plane, Paperclip | Safe default if HTMX gets too limited |
+| Tauri 2 + React | Rust desktop shell with a web UI, small binaries | Phasr (with SQLite) | Desktop app that reuses a web UI |
+| Electron | Desktop shell with Chromium, heavy but simple | Orca, Open Dot, Cabinet, Sculptor | Only if Tauri doesn't fit |
+| pywebview | Python desktop window over a web UI | Hermes Agent Desktop | Easiest desktop step from a Python + FastAPI factory |
+| Streamlit | Python script becomes a web app | Data dashboards | Quick prototype only. Reruns the whole script on each click, weak for live feeds |
+| Next.js | React framework with a server | Cabinet, builderz Mission Control | Only for a team or hosted version |
+
+Helpers for making it look good: design skills from the wiki such as Impeccable (`pbakaus-impeccable`), taste-skill (`leonxlnx-taste-skill`) and Hallmark (`Nutlope-hallmark`). Reticle (`reticlehq-reticle`) lets an agent check the running UI.
+
+Not a fit: Retool. It's hosted and enterprise, and the factory stays local.
+
 ## Lessons from ZazenCodes factory v2
 
 Source: [video](https://www.youtube.com/watch?v=RiaTyJ2POVo), 9 Nov 2026.
