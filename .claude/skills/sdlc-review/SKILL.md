@@ -45,7 +45,7 @@ Three reviews, each with a fresh context, read only. Each reports findings, not 
 2. **Security:** secrets, certificates, auth, input checks, what gets logged (personal data, tokens), permissions in infrastructure code.
    - In Claude Code: run the bundled `/security-review`. It compares with the default branch, so on a stacked branch keep only findings in files `git diff <base>` changed.
    - Elsewhere: a reviewer subagent.
-3. **Plan vs code**, always a reviewer subagent of our own (no built-in checks this): what the plan or intent asked for that is missing, what was built but not asked for, anything that breaks a constraint, and any change to what the plan's "Must not change" lists. Tests at the points the Testing section names. It is a checklist job, so run it on a cheaper model (Sonnet) where you can choose; the bugs and security reviewers stay on the strongest.
+3. **Plan vs code**, always a reviewer subagent of our own (no built-in checks this): what the plan or intent asked for that is missing, what was built but not asked for, anything that breaks a constraint, any change to what the plan's "Must not change" lists, and whether the code got the plan's "Least sure about" items right. Tests at the points the Testing section names. It is a checklist job, so run it on a cheaper model (Sonnet) where you can choose; the bugs and security reviewers stay on the strongest.
 
 Give each of our own reviewers the base, the paths to the plan and intent, and the rules above. Run them in parallel where you can. A reviewer that fails or returns nothing didn't review: retry once, then report it as "not run". Never count it as no findings.
 

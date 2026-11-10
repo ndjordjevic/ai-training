@@ -28,6 +28,7 @@ For every step of the `sdlc-ticket` flow: the main session and every subagent. W
 - **No refresh against Jira after intake:** it ran minutes ago. Skip the refresh part of the plan, build, review and verify skills, unless the engineer says the ticket changed.
 - **Read once.** Start from the intent, the sources file and the plan; don't search again for what they hold. Read only the parts of a file you need.
 - **Scripts:** use the ones you are given, by their full path, instead of writing the commands again.
+- **Two failed tries, then start fresh.** If the same fix or correction fails twice, stop. Say what was tried and why it failed, then start again with a better brief (a fresh subagent, or a new idea checked first), not a third patch on the same path.
 - **zsh traps** (the shell on the Mac): never name a variable `path` (it is `PATH`; a loop over `path` makes every later command "not found"), and don't start a word with `=` (`echo ====` fails; zsh expands `=word` to a command's path).
 - **Short report back:** at most about 300 words. What you did, the files you wrote, every assumption, and anything that stopped you. Details go in the files, not the report.
 

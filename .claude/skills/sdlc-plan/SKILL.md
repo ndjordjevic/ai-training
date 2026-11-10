@@ -38,7 +38,7 @@ Show one command you have already run that fails on this exact bug: fast, and th
 
 If the report shows the expected result (for example, what another system answers in the same case), the fix must give that result, checked where the reporter saw it. A different result is a question for the team, not an assumption.
 
-Then list 3 to 5 possible causes, each with a check that would prove it wrong, and show them to the engineer before testing them.
+Then list 3 to 5 possible causes, each with a check that would prove it wrong, and show them to the engineer before testing them. When one is left, argue against it (the best case that it's wrong) and run that check too.
 
 ## 2. Big task? Answer three questions, don't decide
 
@@ -67,6 +67,7 @@ Skip if there is a spec. Otherwise: decisions, what we will not do, and a **Test
 
 - Where does the change belong? What can we reuse? How is similar code written today?
 - **What could break:** list who calls or uses what we change, beyond the files in the diff.
+- **Least sure about:** ask yourself what in this plan you are unsure of (a guess about the data, a library's behaviour, how a caller reads our answer). List it in the plan, with why, so review and verify check it first.
 - **Must not change:** list the files, behaviour and callers next to the change that must stay as they are (for example, another backend's code, a shared validator, an error code a caller reads). Each one gets an "unchanged" check in the checks file.
 - **Fields a standard defines:** when the spec says a field follows a standard (RFC 3966, ISO 8601, ISO 4217, a regex), read the standard's grammar itself, not a summary. The rule we build matches it, and the tests and checks use values on both sides of its line (for example, `+61-2-9999-8888` passes, `+61 2 9999 8888` and `405 750 720` don't).
 - **Docs that name it:** search the repo docs (README, architecture docs, runbooks, endpoint tables) for lists of what we add or change, and put their updates into a task.

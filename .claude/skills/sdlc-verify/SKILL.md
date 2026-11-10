@@ -70,6 +70,7 @@ When a call isn't matched, read the mock's non-match report, and try the call in
 
 ## 5. Run the checks
 
+- Run the checks for the plan's "Least sure about" items first.
 - Call the service at its own entry point, the closest to real you can get from here. Prefer a call through the gateway or front door (for example, a test-invoke from the cloud CLI) over calling the function directly; say what the call skips (for example, the network path).
 - **Also through the caller,** if the service that calls ours (often another team's) can be called in the test environment: run the main checks through it too. It shows what the end user really gets, for example how it reads our errors. Calling only our own entry point can't catch that. Write down how in the repo's notes.
 - For each check: what you ran, what you expected, what you saw, and the log lines that prove it (never paste secrets, tokens or personal data).

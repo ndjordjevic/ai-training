@@ -318,6 +318,8 @@ Today our PRs are reviewed by coworkers, and that stays. We add an **optional AI
       - **Worth doing,** ranked. Each item says what it is today, what to change, the risk and the best timing.
       - **Checked, not worth it now,** each with a one-line reason, so a later session doesn't repeat the sweep.
 
+**Two failed tries, then start fresh.** If the same fix fails twice in a session, stop and start again with a better brief, not a third patch. Before reporting a root cause, the agent argues against it and checks that. The plan lists what it is least sure about, and review and verify check those first. (From Addy Osmani, "Your coding agents made you a manager", Nov 2026.)
+
 **Retro, when something went wrong.** If the build or review hit problems, the agent looks back over the session and suggests changes to our setup, not the code. A mistake a tool could catch becomes a check. Prefer, in this order: a type or code structure that makes the mistake impossible, then a lint rule or hook whose message says the fix, then a test. A judgement call goes into `CODING_STANDARDS.md`. Show that a new check fails on the real past mistake. The engineer picks what to apply.
 
 ## 5. Release: merge, deploy, check (session 5)
@@ -337,6 +339,8 @@ A new session, after coworkers approve the PR. It reads the intent, spec and pla
 
 When a metric in production goes out of its normal range, the agent diagnoses it (read-only), following the bug process, and writes its finding. The finding becomes a new Jira ticket, linked to the old one, and the flow starts again at step 1.
 
+**Count the misses, not only the output.** Next to speed (PR cycle time, tickets done), count what came back: QA rounds per ticket, reverts, and fixes after merge. More agent output with more QA rounds is not a win. DSM-903 went back to QA three times; that's the number to bring down.
+
 ---
 
 # Part 2: One-time setup
@@ -353,6 +357,7 @@ One file at the root of each repo that tells the agent how the project works. Th
 4. Keep it short. Every line is loaded in every session and costs tokens each turn. Details go in other files, behind a pointer that says when to read them.
 5. Commit it at the repo root. Code owners review changes to it like any code.
 6. When the agent makes the same mistake twice, run a retro (step 4). A mistake a tool could catch becomes a check. Only what the agent can't look up itself goes into this file.
+7. On a new model, re-check the rules: try a few tickets without each old correction, and delete the ones the model no longer needs. Short files and skills are followed better.
 
 **Writing rules** for this file and for every skill: say what to do, not what not to do, because a ban puts the idea in the agent's head. Delete lines that don't change what the agent does. Don't copy facts the agent can look up (scripts, config). Give each step a clear "done when".
 

@@ -66,6 +66,8 @@ Show one call you ran that gives the same wrong result QA saw. Run it as close t
 
 List 3 to 5 possible causes, each with a check that would prove it wrong, and run them. Look outside our code too: how the caller reads our answer, the test data, what's deployed. Read the other services' code when the cause may be there (clone it read-only into a scratch folder).
 
+Before you report, argue against the cause you picked: the best case that it's wrong, and the check that would show it. Run that check.
+
 Then tell the engineer in plain words: what's wrong, where, why the earlier checks missed it, and the fix you propose. Wait for a yes before changing code.
 
 ## 5. Fix

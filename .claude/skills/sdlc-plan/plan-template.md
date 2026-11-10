@@ -53,6 +53,10 @@ In parallel: <tasks>. Then in order: <tasks>.
 ## Open points: assumed for now, confirm later
 1.
 
+## Least sure about
+The parts of this plan most likely to be wrong, and why. Review and verify check these first.
+-
+
 ## Questions posted
 - <ticket, comment date, to whom>: the questions, and which design point each answer changes.
 
