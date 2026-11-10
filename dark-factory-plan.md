@@ -19,6 +19,9 @@ Full research: [reports/Local Claude dark factory design.md](reports/Local%20Cla
 - One SQLite file with 4 tables: tickets, runs, decisions, events.
 - A FastAPI + HTMX dashboard: a "needs you" inbox, a board and a run page, with live updates. Resume continues a stopped run.
 - The factory writes nothing to Jira. I copy drafted comments and post them myself.
+- Only a script writes run state. A small `factory` CLI (`job create`, `advance`, `feedback`, …) is the only writer to SQLite. Claude calls it and never edits the state itself.
+- A cheap scripted gate (lint, type check, tests, build) runs before the review step. If it fails, the work goes back to the builder without spending tokens on reviewers.
+- Every round keeps its files: round output, `decision.md` (why it stopped) and `feedbackN.md` (my answer), next to the events in SQLite. This is for debugging and for judging the factory over time.
 - **Done when:** 10 tickets have run and I know the success rate, pauses and cost per ticket.
 
 ## Phase 2: Fewer interruptions
@@ -27,6 +30,8 @@ Full research: [reports/Local Claude dark factory design.md](reports/Local%20Cla
 - The `defer` hook handles questions in the middle of a run.
 - Watchers for Jira answers, PR comments and CI, plus a follow-through skill.
 - I approve posts in the inbox, then the factory posts them with my token.
+- Intake writes a risk level (low, medium, high) into the JSON end report, and that sets the later steps. For example, the security review runs only for medium and high risk.
+- A chat way to answer: in any Claude session with a `factory` skill, I ask "what's blocked on KEY?" and answer there. The answer is saved through `factory job feedback`, the same as a dashboard click.
 - macOS notifications only for decisions and failures.
 - Guard hooks for protected paths and for edits to tests.
 - A test set of 20–50 past tickets that must pass before any skill or model change.
@@ -39,6 +44,14 @@ Full research: [reports/Local Claude dark factory design.md](reports/Local%20Cla
 - Postgres for a team server. Hosted Supabase in Sydney is one option, after a risk review.
 - A release skill with a human merge and a prod gate. Still no auto-merge.
 - **Done when:** security and compliance have agreed.
+
+## Lessons from ZazenCodes factory v2
+
+Source: [video](https://www.youtube.com/watch?v=RiaTyJ2POVo), 9 Nov 2026.
+
+- Never review with a weaker model than the builder. Haiku reviewers sent good work back for picky reasons, which can cost more.
+- Don't make an interactive Claude session the orchestrator. One Ctrl-C killed all running work, and every step started again from scratch.
+- More steps aren't always better. Keep it simple.
 
 ## Decided
 
