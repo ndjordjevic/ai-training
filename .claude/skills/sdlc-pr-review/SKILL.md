@@ -50,7 +50,7 @@ Goal: the author gets a review that is correct, short and easy to act on. Each p
 A short list of the problems, most important first: one or two lines each, with the file and line and how you proved it. Not the draft comments yet.
 
 Then ask, in the same message, how the fixes reach the author:
-- **A. Review comments:** one GitHub review with inline comments and tested suggestions the author applies (steps 5 and 6).
+- **A. Review comments:** one GitHub review with inline comments, each with the suggested code change, tested, that the author can commit with one click (steps 5 and 6).
 - **B. I fix it:** fix them in the review worktree, then one commit pushed to the author's branch, and a short PR comment that says what the commit holds (step 7).
 - **C. A PR into their branch,** so the author reviews the fixes first (step 7, on a new branch).
 
@@ -58,7 +58,7 @@ Some findings may need a choice that only the engineer or the author can make: n
 
 ## 5. A: post one review
 
-All comments in **one** review, each on its exact line, with the short summary as the body. Show the whole draft first and post only after the engineer approves it. Use the API so line ranges are exact:
+All comments in **one** review, each on its exact line, with the short summary as the body. Each comment says the problem in one or two sentences, then gives the code change (step 6). Show the whole draft first, with the code, and post only after the engineer approves it. Use the API so line ranges are exact:
 
 ```bash
 gh api repos/<repo>/pulls/<N>/reviews --input <scratch folder>/review.json
@@ -78,20 +78,24 @@ gh api repos/<repo>/pulls/<N>/reviews --input <scratch folder>/review.json
 - `"event": "COMMENT"` unless the engineer asks for `REQUEST_CHANGES` or `APPROVE`.
 - A comment can sit only on lines inside the diff. For a problem elsewhere, put it on the nearest related line and name the real file and line.
 
-## 6. A: suggestions the author can commit
+## 6. A: the suggested code change in every comment
 
-Where the fix is concrete, add a GitHub suggestion block. It replaces the lines from `start_line` to `line`:
+Every comment carries the fix as code, not only words. Write the changes before the draft, so the engineer sees and approves the code too.
 
-````markdown
-```suggestion
-<the new lines>
-```
-````
+- **On lines in the diff:** a GitHub suggestion block. It replaces the lines from `start_line` to `line`, and the author commits it with one click:
 
-- Apply it in the review worktree first, then run the repo's tests and lint on the touched code, then undo it (`git -C <folder> checkout -- <paths>`). Say in the comment that it was tested.
-- New imports or other changes go in their own suggestion, so a batch commit compiles.
+  ````markdown
+  ```suggestion
+  <the new lines>
+  ```
+  ````
+- **On lines outside the diff, or a change across several places:** a `diff` block with the file names (no commit button). Put the part that is in the diff in a suggestion block too.
+- **A missing test:** the test itself, as a suggestion next to the related tests, or a `diff` block if that file isn't in the diff.
+- **A choice for the author** (two fair ways to fix it): the code for the one you'd pick, and one line on the other.
+- **An open question** (for example, what another system really sends): the code for the likeliest answer, and what changes if the answer is the other one.
+- **Test them all together:** apply every suggestion in the review worktree at once, then run the repo's build, tests and lint, and check each new test fails without its fix. Then undo it (`git -C <folder> checkout -- <paths>`). Say in the summary that the suggestions were tested together. Something you can't test: say so in that comment.
+- New imports or other changes a suggestion needs go in their own suggestion, so a batch commit compiles.
 - Suggestions must not overlap, so the author can use "Add suggestion to batch".
-- For lines outside the diff, use a `diff` block (no commit button).
 - A posted comment's line range can't change. To widen it, post the new one first, then delete the old one (`gh api -X DELETE repos/<repo>/pulls/comments/<id>`). To change only the text, `-X PATCH` with a new `body`.
 
 ## 7. B or C: fix it yourself
