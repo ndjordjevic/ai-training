@@ -68,12 +68,15 @@ List 3 to 5 possible causes, each with a check that would prove it wrong, and ru
 
 Before you report, argue against the cause you picked: the best case that it's wrong, and the check that would show it. Run that check.
 
+**The same bug elsewhere:** look for the same fault in the code next to it (the other endpoints that read the same system, the same error path). List where it is, and say what you'd do: fix it in this PR as its own commit, or on the other open PR if the code is there (step 5). Name whose ticket the code belongs to.
+
 Then tell the engineer in plain words: what's wrong, where, why the earlier checks missed it, and the fix you propose. Wait for a yes before changing code.
 
 ## 5. Fix
 
 - **PR not merged:** fix on its branch, in its worktree (ask before creating one if there isn't one).
 - **The cause is in another open PR** (for example, a later fix on the same code): fix it on that PR's branch, with this ticket's key in the commit.
+- **Another open PR needs the same fix and shares the changed code:** merge this branch into it, so there is one version of the shared code and no conflict later. Its description then says "merge #<this PR> first".
 - **PR merged:** a new branch and worktree from the release branch it merged into (`${CLAUDE_SKILL_DIR}/../sdlc-ticket/scripts/worktree.sh <base> <branch> <folder>`), with a subtask key in the branch name if there's one (the first, if there are several). Ask for the name first. All the subtasks go on one branch and one PR, unless the engineer says otherwise.
 - To try an idea out first, ask before making an experiment branch. When it works, bring it onto the real branch and delete the experiment, locally and on the remote, with the engineer's OK.
 - Add a test that fails without the fix. Run the repo's build, tests and lint.
@@ -85,13 +88,16 @@ Deploy as the verify skill says (whose deploy it replaces, the before-saves). Th
 - Each QA case, where QA saw it (step 3's call): now the expected result.
 - The parent's earlier checks that this fix could change: still as before, or changed on purpose.
 - Before and after for each, in a short table, in the checks file.
+- **A case with no stub** (for example, invalid data or a slow answer): offer to add one, as the verify skill's "Changing test data" says. Otherwise say it was tested only in unit tests.
+- **Stubs whose result changes:** a stricter check can turn a stub that gave 200 into an error. List them for the engineer, and whose they are. Don't change QA's stubs.
+- **Each redeploy:** say first what's new in it and whose build it replaces.
+- Write a result into the PR description only after you've seen it.
 
 ## 7. PR and the reply to QA
 
 - **PR:** update the description the way the `sdlc-pr` skill says (or open a new one for a new branch). Keep it short.
-- **Reply to QA**, a draft for the engineer, as a ticket comment: one on each subtask, about that bug only. Tag QA at the top as real mentions, and cc the people the instruction file lists for ticket questions. Short: two or three sentences, then one retest line. No commits, few numbers and ticket ids. Risks for other people (for example, a coming spec change) go to them, not in this reply: a short draft comment for each, on their ticket, using the `sdlc-intake` skill's `questions-template.md`: the person it's for at the top, the people the instruction file lists for ticket questions in cc. Offer it in the end report.
-  - What was wrong and what they'll see now, in words QA knows (for example, where our service sits in the flow they call).
-  - How to retest: ask QA to make sure the branch is the one deployed in the environment first (you may deploy something else there in between), and to check the mocks. Don't write "it's deployed, run it again". If a new test id can't be reached from QA's tool, say what to use instead.
+- **Reply to QA**, a draft for the engineer, as a ticket comment: one on each subtask, about that bug only. Tag QA at the top as real mentions, and cc the people the instruction file lists for ticket questions. One or two sentences: what was wrong and what they'll see now, in words QA knows (for example, where our service sits in the flow they call). End with "Please retest." If the fix isn't in the build normally deployed there, add the branch and that it's deployed now, as a fact. No retest steps (QA knows how), no commits, few numbers and ticket ids.
+  - Risks for other people (for example, a coming spec change) go to them, not in this reply: a short draft comment for each, on their ticket, using the `sdlc-intake` skill's `questions-template.md`: the person it's for at the top, the people the instruction file lists for ticket questions in cc. Offer it in the end report.
   - Don't ask QA to put back test data they changed: they check the mocks before testing anyway. Tell the engineer instead, if it matters.
 - Show the whole draft in the end report, not in an earlier message. Post it only after the engineer approves the text. Log it in the intent.
 

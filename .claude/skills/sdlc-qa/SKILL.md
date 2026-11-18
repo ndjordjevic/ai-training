@@ -32,8 +32,7 @@ The checks file `.verify/<ticket key>-*.md` (its latest Results), the stub impor
 ```
 @<QA person> <ticket key>: ready for QA. PR: <link>
 
-Before you start, please make sure branch <PR branch> is the one deployed in <environment> (I may deploy something else there in between), and check the mocks.
-I tested it there by calling <the entry point, for example the gateway>.
+Branch <PR branch>, deployed in <environment> now. I tested it there by calling <the entry point, for example the gateway>.
 
 Cases I tested
 1. <Case in a few words>: <what I sent, in words> → <what came back>. Passed.
@@ -46,6 +45,7 @@ Mock stubs I added (<mock name>)
 Please check these again as part of the full flow, and tell me if anything differs.
 ```
 
+- **The branch:** say which branch holds the change and that it's deployed now, as a fact. Don't tell QA how to check it: they know.
 - **Cases:** one line each, in the order of the checks file. Passed, failed or not run, as the Results say.
 - **Stubs:** only the ones added for this ticket. If none were added, say which existing test data the cases used.
 - The whole text fits on one screen.
