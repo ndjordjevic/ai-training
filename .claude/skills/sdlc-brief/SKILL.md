@@ -18,7 +18,7 @@ The first word is the ticket key. Any text after it is the engineer's question, 
 
 - **Read only.** Write no files in the repo or the worknotes, post nothing, and change no ticket. Downloads go to a scratch folder outside any repo.
 - **Plain, simple English.** Short sentences. Explain each term or acronym the first time, in a few words.
-- **Never guess.** Say where each fact comes from (the description, a comment, an attachment). If the ticket doesn't say, write "not said".
+- **Never guess.** Say where each fact comes from (the description, a comment, an attachment). If the ticket doesn't say, write "not said". Mark an inference as one ("that suggests").
 - **Newest wins.** A later comment can change what the description asks. Say when it does.
 - **Short.** The whole brief fits on one screen.
 
@@ -55,9 +55,9 @@ Around it
 Size: <small / medium / large>, because <one reason>.
 ```
 
-- **Unclear or missing:** only what would change the work. Say which source you checked.
+- **Unclear or missing:** only what would change the work. Say which source you checked, and name who would know (a person on the ticket, or the team).
 - **Size:** a rough guess, marked as one.
-- End with one line on the next step: `/sdlc-intake <ticket key>` to start it, or `/sdlc-ticket <ticket key>` to run it all.
+- End with one line on the next step that fits the brief. If there's work to build: `/sdlc-intake <ticket key>` to start it, or `/sdlc-ticket <ticket key>` to run it all. If the code is already there: what to check and where (for example `/sdlc-verify`), and the ticket comment that would close it.
 
 ## Done when
 
