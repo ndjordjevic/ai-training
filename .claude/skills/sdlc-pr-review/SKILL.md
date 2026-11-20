@@ -22,6 +22,7 @@ Goal: the author gets a review that is correct, short and easy to act on. Each p
 - **Never push** unless the engineer chooses B or C (step 4).
 - **Prove every finding** (step 3). A wrong comment costs the author more than a missing one.
 - **Plain, short English**, unless the repo's own rules (AGENTS.md, CLAUDE.md, CONTRIBUTING.md) say otherwise. No AI attribution.
+- **Write about behaviour, not names.** No test names or internal helper names in a comment, unless the author needs one to find the line.
 
 `<repo>` below is `owner/name` from `gh repo view --json nameWithOwner -q .nameWithOwner`.
 
@@ -45,6 +46,7 @@ Goal: the author gets a review that is correct, short and easy to act on. Each p
 - **Test what you can:** run the tests, build a small local change in the worktree, or query the cloud and mocks (read only). If you can't test it (for example, no access), say so.
 - **Real data, not the PR's test data.** If the PR edits test data so its tests pass (for example, adds a time zone to recorded payloads), run the old test data and real samples (captured responses, the test environment's mock stubs) through the new code. If the PR changes a contract or schema, check every stub the test environment serves against it.
 - **Find the answer before you ask.** For each open question (what does the other system really send?), search the specs and their examples, captured samples on tickets, the mocks, the code and the notes first. Only what none of them settles goes to someone else.
+- **Read the author's tests before asking "was that on purpose?"** A test that pins the behaviour, or a comment in the code, says it was. Then ask why, if it still looks wrong, not whether.
 - **Drop what you can't defend.**
 
 ## 4. Show the engineer, and ask how to deliver

@@ -45,6 +45,7 @@ The engineer is the reviewer. Your job is to make the diff easy to understand, s
 2. **Ask how to walk:** the combined diff of the range in data-flow order (the default: a file changed three times is explained once, as it is now), or commit by commit. For the combined diff, use `git diff <first>^ <last>`, but leave out what merges brought in from the base.
 3. **What's now out of date:** check the PR description, the ticket and its latest comments (QA notes too), and the plan or checks files for this ticket. List each place the new commits contradict, and which commit.
 4. **Tests and test data:** say which of the ticket's earlier checks or mock stubs could give a different result now. Don't rerun them unless the engineer asks.
+5. **The engineer's own comments on these commits** (on the PR or the ticket): check each point against the code as you walk. Say when the code already answers one, or shows it is wrong, and offer the corrected text.
 
 ## 1. Order: follow the data
 
