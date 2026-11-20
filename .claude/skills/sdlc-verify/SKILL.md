@@ -51,7 +51,7 @@ Never redeploy code that is already there.
 
 0. The environment holds one branch at a time. To keep another ticket's work there, deploy a branch that contains it, usually this branch after bringing in the base. Deploying the base drops any ticket not merged into it yet. Say which tickets each choice keeps and drops.
 1. If the base moved, ask whether to bring it in first. Merge it, run the checks the merge touches, and push (this updates the PR).
-2. Tell the engineer whose deploy this replaces and what it removes (another ticket's work in the same environment), and draft a short heads-up for the team.
+2. Tell the engineer in one line whose deploy this replaces and what it removes (another ticket's work in the same environment). That's information, not a reason to stop: in a shared test environment, whoever needs it next deploys over it. Draft a heads-up for the team only if `VERIFY.md` asks for one.
 3. Lower environment: plan and apply in one run, if the pipeline can (it stops if the plan fails), unless `VERIFY.md` says otherwise. Upper environment: run a plan only first. Either way, read the plan: every add, change and destroy should be explained by this branch, or by removing the last deploy's work. List anything else apart: it may be drift in the environment (something changed outside the code). Show it, and check it again after the apply.
 4. **Before the apply,** save the answers the "unchanged" checks compare against (for example, the same call on a path this branch shouldn't change), so they compare with a real before.
 5. Apply. Then check the resources from step 2 again.

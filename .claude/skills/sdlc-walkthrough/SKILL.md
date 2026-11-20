@@ -1,8 +1,8 @@
 ---
 name: sdlc-walkthrough
-description: Walk an engineer through a diff one file at a time, in data-flow order, explaining new, modified, deleted and moved files in plain English. Use for your own review before committing, before showing a PR to a coworker, or when reviewing someone else's PR. Pass HEAD to walk only uncommitted changes.
+description: Walk an engineer through a diff one file at a time, in data-flow order, explaining new, modified, deleted and moved files in plain English. Use for your own review before committing, before showing a PR to a coworker, or when reviewing someone else's PR. Pass HEAD to walk only uncommitted changes, or a range (today, since a date, from..to, an author) to walk what others committed.
 disable-model-invocation: true
-argument-hint: "[base branch | commit | HEAD | PR number]"
+argument-hint: "[base branch | commit | HEAD | PR number] [today | since <date> | <from>..<to>] [author:<name>]"
 allowed-tools:
   - Bash(${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh *)
 ---
@@ -29,11 +29,22 @@ The engineer is the reviewer. Your job is to make the diff easy to understand, s
 1. **Find the base and the diff:**
    - A PR number: the PR's base branch, and `gh pr diff <number>`.
    - A branch name: diff from where this branch left it, `git diff -M $(git merge-base HEAD <base>)`, so new commits on the base don't show as changes. It covers uncommitted changes too. If the base has moved on, say so and suggest the engineer pulls it in first.
+   - **A range** (`today`, `since <date>`, `<from>..<to>`, `author:<name>`, alone or after a PR number or branch): the commits in it, on the PR's branch, the branch given, or the current one (`git log --since`, `--author`). Fetch first, so you see what others pushed. Then follow "A range of commits" below before the files.
    - Nothing given: the base the plan names, or the branch this one was made from (stacked branches don't start from main). Ask if unsure.
    - **Walked before?** If the branch was already walked (an open PR, or a walkthrough in the Build log), walk only what is new: `HEAD` for the uncommitted changes (`git diff HEAD`, staged and unstaged), or the commit last walked. Say which, and offer the full diff instead.
 2. **Read the context, if it exists:** the ticket's intent and plan (with its Build log), `GLOSSARY.md`, and the review findings in this session.
 3. **Fix the terms once,** at the top, in one line each (for example: "data holder" = the bank; "backend" = its core banking system). Keep them for the whole walkthrough.
 4. **Show the order** (below) as a short numbered list of files and groups, with high-risk ones marked. Let the engineer change it.
+
+## A range of commits
+
+1. **List the commits first,** one line each: short hash, author, time, and what it does in plain words. Flag:
+   - a revert, or a commit that undoes someone else's change (say whose, and what it undid);
+   - a commit that gives no reason for a change in behaviour;
+   - a merge that brings in another branch.
+2. **Ask how to walk:** the combined diff of the range in data-flow order (the default: a file changed three times is explained once, as it is now), or commit by commit. For the combined diff, use `git diff <first>^ <last>`, but leave out what merges brought in from the base.
+3. **What's now out of date:** check the PR description, the ticket and its latest comments (QA notes too), and the plan or checks files for this ticket. List each place the new commits contradict, and which commit.
+4. **Tests and test data:** say which of the ticket's earlier checks or mock stubs could give a different result now. Don't rerun them unless the engineer asks.
 
 ## 1. Order: follow the data
 

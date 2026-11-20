@@ -66,7 +66,7 @@ Find out first, so you can propose an answer to each of 1 to 3: read the ticket 
    - commit and push the ticket branch (recommend yes: verify needs the pushed branch);
    - open a draft PR (recommend yes);
    - add new stubs to the test mock, new ids only, never changing existing ones (recommend yes if the checks need data the mock doesn't have yet; name the mock, and the ticket that owns it if there is one; the engineer signs in to its web console);
-   - deploy to the lower environment (name it): recommend yes only if the last deploy there is old, or is this ticket's base; otherwise no, and say whose work it would replace.
+   - deploy to the lower environment (name it): recommend yes. A shared test environment is there to be used: whoever needs it next deploys over it. Say in one line whose build it would replace. Recommend no only if `VERIFY.md` or the instruction file says to ask first.
 4. **Credentials** (no answer to propose; the engineer does this): for the environments the flow reads or deploys to. You pick the path (a scratch file outside any repo). For lower environments the engineer pastes the export lines into the chat; write them to the file at once as the verify skill says, and never repeat them. For production, the engineer uses the `pbpaste` command from the verify skill instead. Then run `${CLAUDE_SKILL_DIR}/../sdlc-verify/scripts/creds-check.sh <path>`, and one real read the flow needs (for example, list the gateway's APIs): sign-in passes even where a network rule denies everything else. If the read is denied, check the network (switch it with `VERIFY.md`'s scripts if it has them, else ask) before asking for new credentials. Where `VERIFY.md` says otherwise, the verify skill wins. Say they may expire before verify; then you'll ask once more.
 5. **Stub tool** (only if adding stubs was allowed): check now that you can reach the mock's web console, as `.verify/VERIFY.md` says (for example, the browser tool is connected and the engineer is signed in to the mock). If not, ask the engineer to fix it now, not at verify.
 
@@ -123,7 +123,7 @@ A subagent (cheaper model) runs `sdlc-verify`, with these changes:
 - Start from the verify prep's report. Redo steps 1, 2 and 4 only for what it couldn't do, or what changed since (a deploy, new test data).
 - Deploy only if allowed at the start. Otherwise check what is deployed and run only the checks it covers.
 - The base moved since the branch left it: don't merge it in; deploy the branch as it is and say so in the end report.
-- The deploy would replace another ticket's work and the engineer didn't allow that: don't deploy; draft the heads-up for the end report.
+- The engineer didn't allow a deploy: don't deploy; run only the checks the deployed build covers, and list the rest as "not run".
 - Expired credentials: the only stop in the middle. Ask once for new ones, the same way as at the start.
 - Test data that's missing: if stubs were allowed at the start, add them (flow rules). Otherwise mark the check "waiting on: <data>, <owner>", draft the request, go on.
 - A failing check caused by this ticket's code: fix it if small, rerun the checks, commit and push if allowed, redeploy if allowed, and run every check again. A bigger one goes in the end report.
@@ -139,7 +139,7 @@ Show the engineer only this, short:
 - **Blocks the merge** (only if something does: a failing check, a big open finding): one line each, at the top.
 - **Changes:** one line per file or group of files.
 - **Questions for the team:** one draft ticket comment, using the `sdlc-intake` skill's `questions-template.md`, with the assumption each item was built on (no intro line, just the tags and the questions). If one of our own subtasks is now covered, say in the report that it can move to Done; don't ask. Post nothing; the engineer approves the text first.
-- **Notes to send** (only if needed): the heads-up if the deploy replaced someone's work, and a retest note for QA that says how QA reaches each test case from where they test (a new test id may not be reachable from their tool).
+- **Notes to send** (only if needed): a heads-up if the deploy replaced someone's work and `VERIFY.md` asks for one, and a retest note for QA that says how QA reaches each test case from where they test (a new test id may not be reachable from their tool).
 - **Verify:** one line, for example "12 of 12 checks passed in <environment>", or what failed or wasn't tested.
 - **Next:** `/sdlc-walkthrough <base>` in a new session in the worktree. The rest is in the plan's Build log.
 

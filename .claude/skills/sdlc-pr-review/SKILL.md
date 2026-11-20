@@ -11,6 +11,8 @@ Input: $ARGUMENTS
 
 The first word is the PR (a number or a link). Any text after it is the engineer's note.
 
+**A coworker's commits on your own PR:** review only their commits (the note gives the range, for example "their commits from today"). Read the earlier review comments and what was agreed on the ticket first, so you don't raise a point already settled. Steps 4 to 7 still apply.
+
 Goal: the author gets a review that is correct, short and easy to act on. Each problem sits on the right line, and most fixes can be applied with one click.
 
 ## Rules
@@ -53,6 +55,8 @@ Then ask, in the same message, how the fixes reach the author:
 - **A. Review comments:** one GitHub review with inline comments, each with the suggested code change, tested, that the author can commit with one click (steps 5 and 6).
 - **B. I fix it:** fix them in the review worktree, then one commit pushed to the author's branch, and a short PR comment that says what the commit holds (step 7).
 - **C. A PR into their branch,** so the author reviews the fixes first (step 7, on a new branch).
+
+**Fix what's yours first.** If a finding is in something the engineer owns (their own test data or mock stub, their notes), offer to fix it before drafting. The comment then says it's done ("I updated the stub"), not that it needs doing.
 
 Some findings may need a choice that only the engineer or the author can make: name them and say which way you'd go. Wait for the answer. Show the drafts only after it, short: a reader should take in each comment in a few seconds.
 
