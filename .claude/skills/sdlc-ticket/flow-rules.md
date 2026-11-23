@@ -36,5 +36,6 @@ For every step of the `sdlc-ticket` flow: the main session and every subagent. W
 
 - `${CLAUDE_SKILL_DIR}` in a step skill means that skill's folder: `<skills folder>/sdlc-<step>`.
 - **Worknotes:** push with `<skills folder>/sdlc-setup/scripts/worknotes-push.sh "<message>"`, run in the worktree. It commits only this repo's folder and pulls first; another session may have pushed.
+- **Notes and instruction files: small edits only.** Add, change or remove one item at a time, with `(seen in <ticket key>)`. Never rewrite or shorten a whole file or section: a rewrite loses the details that made it useful.
 - **Mark each step done** with one Build log line in the plan: "flow: build done", "flow: review done", "flow: verify done". The status script reads them.
 - **Plain, short English** in every file and report.

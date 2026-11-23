@@ -103,7 +103,7 @@ Deploy as the verify skill says (whose deploy it replaces, the before-saves). Th
 
 ## 8. Keep what was learned
 
-Write what the next ticket should know into the repo's notes: the call chain, how to call through the caller, how the caller reads our answers, and anything `VERIFY.md` should say about testing. Add a line to the instruction file if every session needs it. Push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
+Write what the next ticket should know into the repo's notes: the call chain, how to call through the caller, how the caller reads our answers, and anything `VERIFY.md` should say about testing. Add a line to the instruction file if every session needs it. Small edits only: one item at a time, with `(seen in <ticket key>)`, never a rewrite. For lessons about how the agent worked (not the code), run `/sdlc-learn` after the session. Push the worknotes repo (`${CLAUDE_SKILL_DIR}/../sdlc-setup/scripts/worknotes-push.sh "<message>"`).
 
 ## Done when
 
